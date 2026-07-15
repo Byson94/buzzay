@@ -3,4 +3,4 @@
 #include <wlr/backend.h>
 #include <wayland-client-core.h>
 
-void server_new_output(struct wl_listener *listener, void *data);
+void server_new_input(struct wl_listener *listener, void *data);

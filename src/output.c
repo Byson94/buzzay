@@ -44,7 +44,7 @@ static void output_destroy(struct wl_listener *listener, void *data) {
 }
 
 
-static void server_new_output(struct wl_listener *listener, void *data) {
+void server_new_output(struct wl_listener *listener, void *data) {
     // ran when a new output (i.e display) is available.
     struct buzzay_server *server = wl_container_of(listener, server, new_output);
     struct wlr_output *wlr_output = data;

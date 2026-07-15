@@ -18,6 +18,7 @@
 #include <wlr/render/allocator.h>
 
 #include "server.h"
+#include "input.h"
 #include "output.h"
 #include "xdg.h"
 

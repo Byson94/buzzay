@@ -3,17 +3,21 @@ PKG_CONFIG?=pkg-config
 
 PKGS="wlroots-0.20" wayland-server xkbcommon
 CFLAGS_PKG_CONFIG!=$(PKG_CONFIG) --cflags $(PKGS)
-CFLAGS+=$(CFLAGS_PKG_CONFIG)
+CFLAGS+=$(CFLAGS_PKG_CONFIG) -g -Werror -Iinclude -DWLR_USE_UNSTABLE
 LIBS!=$(PKG_CONFIG) --libs $(PKGS)
+
+SRCS = $(wildcard src/*.c)
+OBJS = $(patsubst src/%.c, build/%.o, $(SRCS))
 
 all: build/buzzay
 
-build/buzzay.o: src/*
-	mkdir -p build
-	$(CC) -c $< -g -Werror $(CFLAGS) -Iinclude -DWLR_USE_UNSTABLE -o $@
+build/buzzay: $(OBJS)
+	@mkdir -p build
+	$(CC) $(OBJS) $(LDFLAGS) $(LIBS) -o $@
 
-build/buzzay: build/buzzay.o
-	$(CC) $^ -g -Werror $(CFLAGS) $(LDFLAGS) $(LIBS) -o $@
+build/%.o: src/%.c
+	@mkdir -p build
+	$(CC) -c $< $(CFLAGS) -o $@
 
 clean:
 	rm -rf build
