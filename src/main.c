@@ -2,8 +2,12 @@
 #include <stdio.h>
 #include <getopt.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <limits.h>
+#include <fcntl.h>
+#include <sys/un.h>
+#include <sys/socket.h>
 #include <wayland-server-core.h>
 #include <wlr/backend.h>
 #include <wlr/util/log.h>
@@ -24,6 +28,7 @@
 #include "output.h"
 #include "cursor.h"
 #include "xdg.h"
+#include "ipc.h"
 
 const char *program_name = "buzzay";
 const char *program_ver = "0.1.0";
@@ -59,19 +64,27 @@ int main(int argc, char** argv) {
                 }
 
                 const char* plugin = argv[optind];
+                if (strlen(plugin) > 100) {
+                    printf("Plugin name must not exceed 100 characters.\n");
+                    return 1;
+                }
 
-                break;
+                char msg[100+5] = "load ";
+                strcat(msg, plugin);
+                int ret = ipc_send_msg(msg);
+
+                return ret;
             case 'm':
                 for (int i = optind; i < argc; i++) {
                     printf("%s\n", argv[i]);
                 }
-                break;
+                return 0;
             case 'h':
                 print_help();
-                break;
+                return 0;
             case 'v': 
                 printf("%s v%s\n", program_name, program_ver);
-                break;
+                return 0;
         }
     }
 
@@ -194,8 +207,8 @@ int main(int argc, char** argv) {
 	wl_signal_add(&server.seat->events.request_set_selection,
 			&server.request_set_selection);
 
-    const char *socket = wl_display_add_socket_auto(server.wl_display);
-    if (!socket) {
+    const char *wayland_socket = wl_display_add_socket_auto(server.wl_display);
+    if (!wayland_socket) {
         wlr_backend_destroy(server.backend);
         return 1;
     }
@@ -207,8 +220,26 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    // startup IPC
+    int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+    int flags = fcntl(fd, F_GETFL, 0);
+    fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+
+    struct sockaddr_un addr = { .sun_family = AF_UNIX };
+    strncpy(addr.sun_path, ipc_socket_file, sizeof(addr.sun_path) - 1);
+
+    unlink(addr.sun_path);
+    if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) != 0) {
+        wlr_log(WLR_ERROR, "Failed to bind IPC socket: is another instance running?");
+        close(fd);
+        return 1;
+    }
+    listen(fd, 5);
+
+    wl_event_loop_add_fd(server.wl_event_loop, fd, WL_EVENT_READABLE, handle_ipc_connection, (void *)&server);
+
     // setup WAYLAND_DISPLAY env var and run init script
-    setenv("WAYLAND_DISPLAY", socket, true);
+    setenv("WAYLAND_DISPLAY", wayland_socket, true);
     char init_file_str[PATH_MAX];
     char *conf_home = getenv("XDG_CONFIG_HOME");
 
@@ -231,10 +262,13 @@ int main(int argc, char** argv) {
     }
 
     // Finally, run the wayland event loop.
-    wlr_log(WLR_INFO, "Running Wayland compositor on WAYLAND_DISPLAY=%s", socket);
+    wlr_log(WLR_INFO, "Running Wayland compositor on WAYLAND_DISPLAY=%s", wayland_socket);
     wl_display_run(server.wl_display);
 
     // once the loop (wl_display_run) exists, we can gracefully exit
+    close(fd);
+    unlink("/tmp/buzzay.sock");
+
     wl_display_destroy_clients(server.wl_display);
 
     wl_list_remove(&server.new_xdg_toplevel.link);
