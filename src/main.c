@@ -149,7 +149,23 @@ int main(int argc, char** argv) {
     server.cursor = wlr_cursor_create();
     wlr_cursor_attach_output_layout(server.cursor, server.output_layout);
 
-    server.cursor_mgr = wlr_xcursor_manager_create(NULL, 24);
+    const char* xcursor_theme = getenv("XCURSOR_THEME");
+    const char* xcursor_size_str = getenv("XCURSOR_SIZE");
+    int xcursor_size = 24;
+    if (xcursor_size_str != NULL) {
+        xcursor_size = atoi(xcursor_size_str);
+    }
+
+    server.cursor_mgr = wlr_xcursor_manager_create(xcursor_theme, xcursor_size);
+    if (!wlr_xcursor_manager_load(server.cursor_mgr, 1.0f)) {
+        wlr_log(WLR_ERROR, "Failed to load XCursor theme");
+    }
+    wlr_log(WLR_INFO, "Theme: %s, Size: %d", xcursor_theme ? xcursor_theme : "default", xcursor_size);
+    if (server.cursor_mgr) {
+        bool loaded = wlr_xcursor_manager_load(server.cursor_mgr, 1.0f);
+        wlr_log(WLR_INFO, "Manager loaded: %s", loaded ? "YES" : "NO");
+    }
+    wlr_cursor_set_xcursor(server.cursor, server.cursor_mgr, "default");
 
     // track cursor movement
     server.cursor_motion.notify = server_cursor_motion;
