@@ -22,6 +22,7 @@
 #include "server.h"
 #include "input.h"
 #include "output.h"
+#include "cursor.h"
 #include "xdg.h"
 
 const char *program_name = "buzzay";
@@ -150,14 +151,32 @@ int main(int argc, char** argv) {
 
     server.cursor_mgr = wlr_xcursor_manager_create(NULL, 24);
 
-    // TODO: https://drewdevault.com/2018/07/17/Input-handling-in-wlroots.html
-    
+    // track cursor movement
+    server.cursor_motion.notify = server_cursor_motion;
+    wl_signal_add(&server.cursor->events.motion, &server.cursor_motion);
+    server.cursor_motion_absolute.notify = server_cursor_motion_absolute;
+    wl_signal_add(&server.cursor->events.motion_absolute, &server.cursor_motion_absolute);
+	server.cursor_button.notify = server_cursor_button;
+	wl_signal_add(&server.cursor->events.button, &server.cursor_button);
+	server.cursor_axis.notify = server_cursor_axis;
+	wl_signal_add(&server.cursor->events.axis, &server.cursor_axis);
+	server.cursor_frame.notify = server_cursor_frame;
+	wl_signal_add(&server.cursor->events.frame, &server.cursor_frame);
+
+    // setup seats
     wl_list_init(&server.keyboards);
     server.new_input.notify = server_new_input;
     wl_signal_add(&server.backend->events.new_input, &server.new_input);
     server.seat = wlr_seat_create(server.wl_display, "seat0");
-
-    // TODO: do smth
+	server.request_cursor.notify = seat_request_cursor;
+	wl_signal_add(&server.seat->events.request_set_cursor,
+			&server.request_cursor);
+	server.pointer_focus_change.notify = seat_pointer_focus_change;
+	wl_signal_add(&server.seat->pointer_state.events.focus_change,
+			&server.pointer_focus_change);
+	server.request_set_selection.notify = seat_request_set_selection;
+	wl_signal_add(&server.seat->events.request_set_selection,
+			&server.request_set_selection);
 
     const char *socket = wl_display_add_socket_auto(server.wl_display);
     if (!socket) {
@@ -205,8 +224,13 @@ int main(int argc, char** argv) {
     wl_list_remove(&server.new_xdg_toplevel.link);
     wl_list_remove(&server.new_xdg_popup.link);
 
-    wl_list_remove(&server.new_input.link);
+	wl_list_remove(&server.cursor_motion.link);
+	wl_list_remove(&server.cursor_motion_absolute.link);
+	wl_list_remove(&server.cursor_button.link);
+	wl_list_remove(&server.cursor_axis.link);
+	wl_list_remove(&server.cursor_frame.link);
 
+    wl_list_remove(&server.new_input.link);
     wl_list_remove(&server.new_output.link);
 
     wlr_scene_node_destroy(&server.scene->tree.node);
@@ -216,7 +240,6 @@ int main(int argc, char** argv) {
     wlr_renderer_destroy(server.renderer);
     wlr_backend_destroy(server.backend);
     wl_display_destroy(server.wl_display);
-    wl_event_loop_destroy(server.wl_event_loop);
 
     return 0;
 }

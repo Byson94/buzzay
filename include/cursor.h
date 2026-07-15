@@ -1,0 +1,13 @@
+#pragma once
+
+#include <wlr/backend.h>
+
+void server_cursor_motion(struct wl_listener *listener, void *data);
+void server_cursor_motion_absolute(struct wl_listener *listener, void *data);
+void server_cursor_button(struct wl_listener *listener, void *data);
+void server_cursor_axis(struct wl_listener *listener, void *data);
+void server_cursor_frame(struct wl_listener *listener, void *data);
+
+void seat_request_cursor(struct wl_listener *listener, void *data);
+void seat_pointer_focus_change(struct wl_listener *listener, void *data);
+void seat_request_set_selection(struct wl_listener *listener, void *data);
