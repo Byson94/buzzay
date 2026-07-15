@@ -3,9 +3,11 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <limits.h>
 #include <wayland-server-core.h>
 #include <wlr/backend.h>
 #include <wlr/util/log.h>
+#include <wlr/backend/session.h>
 #include <wlr/types/wlr_cursor.h>
 #include <wlr/types/wlr_compositor.h>
 #include <wlr/types/wlr_subcompositor.h>
@@ -87,10 +89,10 @@ int main(int argc, char** argv) {
     // - managed by libwayland. 
     // - manages many stuff.
     server.wl_display = wl_display_create();
+    server.wl_event_loop = wl_display_get_event_loop(server.wl_display);
 
     // abstraction of i/o
-    server.backend = wlr_backend_autocreate(wl_display_get_event_loop(server.wl_display), NULL);
-
+    server.backend = wlr_backend_autocreate(server.wl_event_loop, &server.session);
     if (server.backend == NULL) {
         wlr_log(WLR_ERROR, "failed to create wlr_backend");
         return 1;
@@ -172,23 +174,25 @@ int main(int argc, char** argv) {
 
     // setup WAYLAND_DISPLAY env var and run init script
     setenv("WAYLAND_DISPLAY", socket, true);
-    char* conf_home = getenv("XDG_DATA_HOME");
+    char init_file_str[PATH_MAX];
+    char *conf_home = getenv("XDG_CONFIG_HOME");
 
-    if (conf_home == NULL) {
+    if (conf_home != NULL) {
+        snprintf(init_file_str, sizeof(init_file_str), "%s/buzzay/init", conf_home);
+    } else {
         char *homedir = getpwuid(getuid())->pw_dir;
-        conf_home = strcat(homedir, "/.config");
+        snprintf(init_file_str, sizeof(init_file_str), "%s/.config/buzzay/init", homedir);
     }
-    
-    const char* init_file_str = strcat(conf_home, "/buzzay/init");
 
     FILE *init_file = fopen(init_file_str, "r");
     if (init_file) {
         fclose(init_file);
         if (fork() == 0) {
             execl("/bin/sh", "/bin/sh", "-c", init_file_str, (void *)NULL);
+            _exit(127);
         }
     } else {
-        wlr_log(WLR_ERROR, "Init file does not exist.");
+        wlr_log(WLR_ERROR, "Init file '%s' does not exist.", init_file_str);
     }
 
     // Finally, run the wayland event loop.
@@ -212,6 +216,7 @@ int main(int argc, char** argv) {
     wlr_renderer_destroy(server.renderer);
     wlr_backend_destroy(server.backend);
     wl_display_destroy(server.wl_display);
+    wl_event_loop_destroy(server.wl_event_loop);
 
     return 0;
 }

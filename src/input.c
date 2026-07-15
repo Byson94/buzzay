@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <wayland-server-core.h>
+#include <wayland-server-protocol.h>
 #include <wlr/backend.h>
+#include <wlr/backend/session.h>
 #include <wlr/types/wlr_cursor.h>
 #include <wlr/types/wlr_scene.h>
 #include <wlr/types/wlr_xdg_shell.h>
@@ -36,26 +38,25 @@ static bool handle_keybinding(struct buzzay_server *server, xkb_keysym_t sym) {
 	 * This function assumes Alt is held down.
 	 */
 	switch (sym) {
-	case XKB_KEY_Escape:
-		wl_display_terminate(server->wl_display);
-		break;
-	case XKB_KEY_F1:
-		/* Cycle to the next toplevel */
-		if (wl_list_length(&server->toplevels) < 2) {
-			break;
-		}
-		struct buzzay_toplevel *next_toplevel =
-			wl_container_of(server->toplevels.prev, next_toplevel, link);
-		focus_toplevel(next_toplevel);
-		break;
-	default:
-		return false;
+        case XKB_KEY_Escape:
+            wl_display_terminate(server->wl_display);
+            break;
+        case XKB_KEY_F1:
+            /* Cycle to the next toplevel */
+            if (wl_list_length(&server->toplevels) < 2) {
+                break;
+            }
+            struct buzzay_toplevel *next_toplevel =
+                wl_container_of(server->toplevels.prev, next_toplevel, link);
+            focus_toplevel(next_toplevel);
+            break;
+        default:
+            return false;
 	}
 	return true;
 }
 
-static void keyboard_handle_key(
-		struct wl_listener *listener, void *data) {
+static void keyboard_handle_key(struct wl_listener *listener, void *data) {
 	/* This event is raised when a key is pressed or released. */
 	struct buzzay_keyboard *keyboard =
 		wl_container_of(listener, keyboard, key);
@@ -70,8 +71,23 @@ static void keyboard_handle_key(
 	int nsyms = xkb_state_key_get_syms(
 			keyboard->wlr_keyboard->xkb_state, keycode, &syms);
 
-	bool handled = false;
+    // get kb modifiers
 	uint32_t modifiers = wlr_keyboard_get_modifiers(keyboard->wlr_keyboard);
+
+    // quickly handle tty switching
+    if ((modifiers & WLR_MODIFIER_ALT) && 
+            (modifiers & WLR_MODIFIER_CTRL) &&
+            event-> state == WL_KEYBOARD_KEY_STATE_PRESSED) {
+        xkb_keysym_t sym = syms[0];
+
+        if (sym >= XKB_KEY_XF86Switch_VT_1 && sym <= XKB_KEY_XF86Switch_VT_12) {
+            unsigned int vt = sym - XKB_KEY_XF86Switch_VT_1 + 1;
+            wlr_session_change_vt(server->session, vt);
+        }
+    }
+
+    // else handling compositor key binding
+	bool handled = false;
 	if ((modifiers & WLR_MODIFIER_ALT) &&
 			event->state == WL_KEYBOARD_KEY_STATE_PRESSED) {
 		/* If alt is held down and this button was _pressed_, we attempt to

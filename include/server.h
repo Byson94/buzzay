@@ -5,9 +5,11 @@
 
 struct buzzay_server {
     struct wl_display *wl_display;
+    struct wl_event_loop *wl_event_loop;
     struct wlr_backend *backend;
     struct wlr_renderer *renderer;
     struct wlr_allocator *allocator;
+    struct wlr_session *session;
     struct wlr_scene *scene;
 	struct wlr_scene_output_layout *scene_layout;
 
