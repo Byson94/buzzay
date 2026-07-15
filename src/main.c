@@ -1,6 +1,8 @@
+#include <pwd.h>
 #include <stdio.h>
 #include <getopt.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <wayland-server-core.h>
 #include <wlr/backend.h>
 #include <wlr/util/log.h>
@@ -167,8 +169,26 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    // setup WAYLAND_DISPLAY env var
+    // setup WAYLAND_DISPLAY env var and run init script
     setenv("WAYLAND_DISPLAY", socket, true);
+    char* conf_home = getenv("XDG_DATA_HOME");
+
+    if (conf_home == NULL) {
+        char *homedir = getpwuid(getuid())->pw_dir;
+        conf_home = strcat(homedir, "/.config");
+    }
+    
+    const char* init_file_str = strcat(conf_home, "/buzzay/init");
+
+    FILE *init_file = fopen(init_file_str, "r");
+    if (init_file) {
+        fclose(init_file);
+        if (fork() == 0) {
+            execl("/bin/sh", "/bin/sh", "-c", init_file_str, (void *)NULL);
+        }
+    } else {
+        wlr_log(WLR_ERROR, "Init file does not exist.");
+    }
 
     // Finally, run the wayland event loop.
     wlr_log(WLR_INFO, "Running Wayland compositor on WAYLAND_DISPLAY=%s", socket);
