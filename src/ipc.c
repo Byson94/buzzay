@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 #include "ipc.h"
+#include "plugin.h"
 
 const char *ipc_socket_file = "/tmp/buzzay.sock";
 
@@ -46,6 +47,15 @@ int handle_ipc_connection(int fd, uint32_t mask, void *data) {
             const char *plugin = token;
 
             printf("Loading plugin: %s\n", plugin);
+            char *path = resolve_plugin_path(plugin);
+            if (path == NULL) {
+                printf("Path of plugin could not be resolved.\n");
+                close(client_fd);
+                return 1;
+            }
+
+            printf("Resolved plugin path: %s\n", path);
+            handle_plugin(path, server);
         }
     }
 
