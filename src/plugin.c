@@ -13,37 +13,34 @@ int plugin_count = 0;
 int plugin_capacity = 0;
 
 char *resolve_plugin_path(const char* plugin) {
-    // plugin is in the following format:
-    // - plugin_name
     char plugin_base[105];
-    strncpy(plugin_base, plugin, sizeof(plugin_base) - 1);
-    plugin_base[sizeof(plugin_base) - 1] = '\0';
-    strcat(plugin_base, ".so");
+    snprintf(plugin_base, sizeof(plugin_base), "%s.so", plugin);
 
-    // list files
-    char path[PATH_MAX] = "/usr/lib/buzzay-plugins/";
-    struct dirent *entry;
-    DIR *dir = opendir(path);
+    const char *dir_path = "/usr/lib/buzzay-plugins/";
+    DIR *dir = opendir(dir_path);
 
     if (dir == NULL) {
         perror("Unable to open directory");
         return NULL;
     }
 
+    struct dirent *entry;
+    char *result = NULL;
+
     while ((entry = readdir(dir)) != NULL) {
-        if (entry->d_type == DT_REG) {
-            printf("File: %s\n", entry->d_name);
-            if (strcmp(entry->d_name, plugin_base) == 0) {
-                strcat(path, plugin_base);
+        if (entry->d_type == DT_REG && strcmp(entry->d_name, plugin_base) == 0) {
+            size_t full_path_len = strlen(dir_path) + strlen(plugin_base) + 1;
+            result = malloc(full_path_len);
+            
+            if (result) {
+                snprintf(result, full_path_len, "%s%s", dir_path, plugin_base);
             }
+            break;
         }
     }
 
-
-    char *final_path = path;
     closedir(dir);
-
-    return final_path;
+    return result;
 }
 
 void handle_plugin(char *path, const char *plugin_name, struct buzzay_server *server) {
@@ -108,7 +105,7 @@ void handle_plugin(char *path, const char *plugin_name, struct buzzay_server *se
 
 void msg_plugin(const char *plugin_name, int argc, char **argv) {
     void *handle = NULL;
-    for (int i = 0; i <= plugin_count; i++) {
+    for (int i = 0; i < plugin_count; i++) {
         if (strcmp(plugin_array[i].name, plugin_name) == 0) {
             handle = plugin_array[i].handle;
         }
