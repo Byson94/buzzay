@@ -27,6 +27,7 @@
 #include "input.h"
 #include "output.h"
 #include "cursor.h"
+#include "plugin.h"
 #include "xdg.h"
 #include "ipc.h"
 
@@ -74,11 +75,27 @@ int main(int argc, char** argv) {
                 int ret = ipc_send_msg(msg);
 
                 return ret;
-            case 'm':
-                for (int i = optind; i < argc; i++) {
-                    printf("%s\n", argv[i]);
+            case 'm': {
+                int mcount = 0;
+                char *margs[100];
+                
+                // get plugin name
+                const char *plugin_name = argv[optind];
+                optind++;
+
+                if ((argc - optind) >= 100) {
+                    printf("Only a maximum of 100 arguments can be passed.\n");
+                    return 1;
                 }
+
+                for (int i = optind; i < argc; i++) {
+                    margs[mcount] = argv[i];
+                    mcount++;
+                }
+
+                msg_plugin(plugin_name, argc, argv);
                 return 0;
+            }
             case 'h':
                 print_help();
                 return 0;
@@ -290,6 +307,8 @@ int main(int argc, char** argv) {
     wlr_renderer_destroy(server.renderer);
     wlr_backend_destroy(server.backend);
     wl_display_destroy(server.wl_display);
+
+    free(plugin_array);
 
     return 0;
 }

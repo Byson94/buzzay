@@ -55,7 +55,7 @@ int handle_ipc_connection(int fd, uint32_t mask, void *data) {
             }
 
             printf("Resolved plugin path: %s\n", path);
-            handle_plugin(path, server);
+            handle_plugin(path, plugin, server);
         }
     }
 

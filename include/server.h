@@ -3,6 +3,8 @@
 #include <wayland-client-core.h>
 #include <wlr/types/wlr_input_device.h>
 
+#define BUZZAY_API_VERSION 1
+
 struct buzzay_server {
     struct wl_display *wl_display;
     struct wl_event_loop *wl_event_loop;
