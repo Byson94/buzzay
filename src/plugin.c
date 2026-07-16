@@ -97,7 +97,12 @@ void handle_plugin(char *path, const char *plugin_name, struct buzzay_server *se
         plugin_capacity = new_capacity;
     }
 
-    plugin_array[plugin_count].name = plugin_name;
+    plugin_array[plugin_count].name = strdup(plugin_name); 
+
+    if (plugin_array[plugin_count].name == NULL) {
+        fprintf(stderr, "Failed to allocate memory for plugin name\n");
+        return;
+    }
     plugin_array[plugin_count].handle = handle;
 
     plugin_count++;

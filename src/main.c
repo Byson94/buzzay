@@ -76,25 +76,19 @@ int main(int argc, char** argv) {
 
                 return ret;
             case 'm': {
-                int mcount = 0;
-                char *margs[100];
-                
-                // get plugin name
-                const char *plugin_name = argv[optind];
-                optind++;
-
                 if ((argc - optind) >= 100) {
                     printf("Only a maximum of 100 arguments can be passed.\n");
                     return 1;
                 }
 
+                char msg[100+5] = "msg ";
                 for (int i = optind; i < argc; i++) {
-                    margs[mcount] = argv[i];
-                    mcount++;
+                    strcat(msg, argv[i]);
+                    strcat(msg, " ");
                 }
 
-                msg_plugin(plugin_name, argc, argv);
-                return 0;
+                int ret = ipc_send_msg(msg);
+                return ret;
             }
             case 'h':
                 print_help();

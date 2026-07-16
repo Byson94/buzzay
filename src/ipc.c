@@ -56,6 +56,23 @@ int handle_ipc_connection(int fd, uint32_t mask, void *data) {
 
             printf("Resolved plugin path: %s\n", path);
             handle_plugin(path, plugin, server);
+        } else if (strcmp(token, "msg") == 0) {
+            token = strtok(NULL, " ");
+            const char *plugin_name = token;
+
+            char *margv[100];
+            int i = 0;
+
+            token = strtok(NULL, " ");
+            while (token != NULL && i < 99) {
+                margv[i] = token;
+                i++;
+                token = strtok(NULL, " ");
+            }
+
+            // null terminating
+            margv[i] = NULL;
+            msg_plugin(plugin_name, i, margv);
         }
     }
 
