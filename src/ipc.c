@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 #include "ipc.h"
-#include "plugin.h"
+#include "handle-plugin.h"
 
 const char *ipc_socket_file = "/tmp/buzzay.sock";
 

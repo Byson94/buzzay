@@ -5,6 +5,7 @@
 
 #include <wayland-client-core.h>
 #include <wlr/types/wlr_input_device.h>
+#include <wlr/types/wlr_xdg_shell.h>
 
 // MUST increment once every release
 // IF a change is made to the file
@@ -54,23 +55,18 @@ struct bz_plugin {
     struct buzzay_server *server;
 };
 
-// Protocol API's
-BZ_API struct wl_global *bz_register_plugin_protocol(
-    struct bz_plugin *plugin,
-    const struct wl_interface *interface,
-    void *data,
-    wl_global_bind_func_t bind);
-
 // Keybinding API's
+#define BZ_ALLOWED_MODS (BZ_MOD_SHIFT | BZ_MOD_ALT | BZ_MOD_CTRL | BZ_MOD_SUPER)
+
 typedef enum {
-    BZ_MOD_SHIFT = (1 << 0),
-    BZ_MOD_ALT = (1 << 1),
-    BZ_MOD_CTRL = (1 << 2),
-    BZ_MOD_SUPER = (1 << 3),
+    BZ_MOD_SHIFT = WLR_MODIFIER_SHIFT,
+    BZ_MOD_ALT   = WLR_MODIFIER_ALT,
+    BZ_MOD_CTRL  = WLR_MODIFIER_CTRL,
+    BZ_MOD_SUPER = WLR_MODIFIER_LOGO,
 } bz_modifier_t;
 
 struct bz_keybinding {
-    uint32_t keysym;
+    xkb_keysym_t sym;
     bz_modifier_t modifiers;
     void (*handler)(struct bz_plugin *plugin, void *data);
     void *data;
@@ -83,6 +79,6 @@ BZ_API bz_binding_handle_t bz_register_keybinding(
     struct bz_keybinding binding
 );
 
-BZ_API void bz_unregister_keybinding(bz_binding_handle_t *handle);
+BZ_API void bz_unregister_keybinding(bz_binding_handle_t handle);
 
 #endif

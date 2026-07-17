@@ -4,9 +4,10 @@
 #include <dirent.h>
 #include <limits.h>
 #include <dlfcn.h>
+#include <wayland-server-core.h>
 
-#include "plugin.h"
-#include "server.h"
+#include "buzzay-plugin.h"
+#include "handle-plugin.h"
 
 struct plugin_data *plugin_array = NULL;
 int plugin_count = 0;
@@ -79,9 +80,16 @@ void handle_plugin(char *path, const char *plugin_name, struct buzzay_server *se
         return;
     }
 
-    typedef void (*init_plugin)(struct buzzay_server *server);
+    typedef void (*init_plugin)(struct bz_plugin *plugin);
     init_plugin init_func = init_sym;
-    init_func(server);
+
+    struct bz_plugin plugin = {
+        .plugin_name = plugin_name,
+        .plugin_path = path,
+        .server = server,
+    };
+
+    init_func(&plugin);
 
     // save the plugin
     if (plugin_count >= plugin_capacity) {
@@ -131,4 +139,48 @@ void msg_plugin(const char *plugin_name, int argc, char **argv) {
     typedef void (*msg_request)(int argc, char **argv);
     msg_request msg_func = msg_sym;
     msg_func(argc, argv);
+}
+
+// == Implement Helpers ==
+
+struct keybinding_data *keybinding_arr = NULL;
+int keybinding_count = 0;
+int keybinding_capacity = 0;
+static int kb_next_id = 0;
+
+BZ_API bz_binding_handle_t bz_register_keybinding(
+    struct bz_plugin *plugin,
+    struct bz_keybinding binding
+) {
+    // save the keybinding
+    if (keybinding_count >= keybinding_capacity) {
+        int new_capacity = (keybinding_capacity == 0) ? 1 : keybinding_capacity * 2;
+        struct keybinding_data *temp = realloc(keybinding_arr, new_capacity * sizeof(struct keybinding_data));
+        
+        if (temp == NULL) {
+            fprintf(stderr, "Failed to grow array\n");
+            return -1; 
+        }
+        
+        keybinding_arr = temp;
+        keybinding_capacity = new_capacity;
+    }
+
+    int id = kb_next_id++;
+    keybinding_arr[keybinding_count].id = id;
+    keybinding_arr[keybinding_count].binding = binding;
+    keybinding_arr[keybinding_count].owner = plugin;
+    keybinding_count++;
+
+    return id;
+}
+
+BZ_API void bz_unregister_keybinding(bz_binding_handle_t handle) {
+    for (int i = 0; i < keybinding_count; i++) {
+        if (keybinding_arr[i].id == handle) {
+            keybinding_arr[i] = keybinding_arr[keybinding_count - 1];
+            keybinding_count--;
+            return;
+        }
+    }
 }

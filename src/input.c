@@ -7,6 +7,8 @@
 #include <wlr/types/wlr_scene.h>
 #include <wlr/types/wlr_xdg_shell.h>
 
+#include "buzzay-plugin.h"
+#include "handle-plugin.h"
 #include "server.h"
 #include "input.h"
 #include "xdg.h"
@@ -29,31 +31,19 @@ static void keyboard_handle_modifiers(
 		&keyboard->wlr_keyboard->modifiers);
 }
 
-static bool handle_keybinding(struct buzzay_server *server, xkb_keysym_t sym) {
-	/*
-	 * Here we handle compositor keybindings. This is when the compositor is
-	 * processing keys, rather than passing them on to the client for its own
-	 * processing.
-	 *
-	 * This function assumes Alt is held down.
-	 */
-	switch (sym) {
-        case XKB_KEY_Escape:
-            wl_display_terminate(server->wl_display);
-            break;
-        case XKB_KEY_F1:
-            /* Cycle to the next toplevel */
-            if (wl_list_length(&server->toplevels) < 2) {
-                break;
+bool handle_keybinding(struct buzzay_server *server, xkb_keysym_t sym, uint32_t modifiers) {
+    for (int i = 0; i < keybinding_count; i++) {
+        struct keybinding_data *kb_dat = &keybinding_arr[i];
+        struct bz_keybinding *kb = &kb_dat->binding;
+
+        if (kb->sym == sym && (modifiers & BZ_ALLOWED_MODS) == kb->modifiers) {
+            if (kb->handler) {
+                kb->handler(kb_dat->owner, kb->data);
+                return true;
             }
-            struct buzzay_toplevel *next_toplevel =
-                wl_container_of(server->toplevels.prev, next_toplevel, link);
-            focus_toplevel(next_toplevel);
-            break;
-        default:
-            return false;
-	}
-	return true;
+        }
+    }
+    return false;
 }
 
 static void keyboard_handle_key(struct wl_listener *listener, void *data) {
@@ -77,7 +67,7 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
     // quickly handle tty switching
     if ((modifiers & WLR_MODIFIER_ALT) && 
             (modifiers & WLR_MODIFIER_CTRL) &&
-            event-> state == WL_KEYBOARD_KEY_STATE_PRESSED) {
+            event->state == WL_KEYBOARD_KEY_STATE_PRESSED) {
         xkb_keysym_t sym = syms[0];
 
         if (sym >= XKB_KEY_XF86Switch_VT_1 && sym <= XKB_KEY_XF86Switch_VT_12) {
@@ -87,15 +77,15 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
     }
 
     // else handling compositor key binding
-	bool handled = false;
-	if ((modifiers & WLR_MODIFIER_ALT) &&
-			event->state == WL_KEYBOARD_KEY_STATE_PRESSED) {
-		/* If alt is held down and this button was _pressed_, we attempt to
-		 * process it as a compositor keybinding. */
-		for (int i = 0; i < nsyms; i++) {
-			handled = handle_keybinding(server, syms[i]);
-		}
-	}
+    bool handled = false;
+    if (event->state == WL_KEYBOARD_KEY_STATE_PRESSED) {
+        for (int i = 0; i < nsyms; i++) {
+            if (handle_keybinding(server, syms[i], modifiers)) {
+                handled = true;
+                break;
+            }
+        }
+    }
 
 	if (!handled) {
 		/* Otherwise, we pass it along to the client. */

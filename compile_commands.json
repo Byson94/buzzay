@@ -1,0 +1,135 @@
+[
+  {
+    "file": "src/cursor.c",
+    "arguments": [
+      "/usr/sbin/gcc",
+      "-c",
+      "src/cursor.c",
+      "-I/usr/include/wlroots-0.20",
+      "-I/usr/include/pixman-1",
+      "-I/usr/include/libdrm",
+      "-g",
+      "-Werror",
+      "-Iinclude",
+      "-DWLR_USE_UNSTABLE",
+      "-o",
+      "build/cursor.o"
+    ],
+    "directory": "/home/byson94/Documents/Programming/buzzay",
+    "output": "build/cursor.o"
+  },
+  {
+    "file": "src/input.c",
+    "arguments": [
+      "/usr/sbin/gcc",
+      "-c",
+      "src/input.c",
+      "-I/usr/include/wlroots-0.20",
+      "-I/usr/include/pixman-1",
+      "-I/usr/include/libdrm",
+      "-g",
+      "-Werror",
+      "-Iinclude",
+      "-DWLR_USE_UNSTABLE",
+      "-o",
+      "build/input.o"
+    ],
+    "directory": "/home/byson94/Documents/Programming/buzzay",
+    "output": "build/input.o"
+  },
+  {
+    "file": "src/ipc.c",
+    "arguments": [
+      "/usr/sbin/gcc",
+      "-c",
+      "src/ipc.c",
+      "-I/usr/include/wlroots-0.20",
+      "-I/usr/include/pixman-1",
+      "-I/usr/include/libdrm",
+      "-g",
+      "-Werror",
+      "-Iinclude",
+      "-DWLR_USE_UNSTABLE",
+      "-o",
+      "build/ipc.o"
+    ],
+    "directory": "/home/byson94/Documents/Programming/buzzay",
+    "output": "build/ipc.o"
+  },
+  {
+    "file": "src/main.c",
+    "arguments": [
+      "/usr/sbin/gcc",
+      "-c",
+      "src/main.c",
+      "-I/usr/include/wlroots-0.20",
+      "-I/usr/include/pixman-1",
+      "-I/usr/include/libdrm",
+      "-g",
+      "-Werror",
+      "-Iinclude",
+      "-DWLR_USE_UNSTABLE",
+      "-o",
+      "build/main.o"
+    ],
+    "directory": "/home/byson94/Documents/Programming/buzzay",
+    "output": "build/main.o"
+  },
+  {
+    "file": "src/output.c",
+    "arguments": [
+      "/usr/sbin/gcc",
+      "-c",
+      "src/output.c",
+      "-I/usr/include/wlroots-0.20",
+      "-I/usr/include/pixman-1",
+      "-I/usr/include/libdrm",
+      "-g",
+      "-Werror",
+      "-Iinclude",
+      "-DWLR_USE_UNSTABLE",
+      "-o",
+      "build/output.o"
+    ],
+    "directory": "/home/byson94/Documents/Programming/buzzay",
+    "output": "build/output.o"
+  },
+  {
+    "file": "src/plugin.c",
+    "arguments": [
+      "/usr/sbin/gcc",
+      "-c",
+      "src/plugin.c",
+      "-I/usr/include/wlroots-0.20",
+      "-I/usr/include/pixman-1",
+      "-I/usr/include/libdrm",
+      "-g",
+      "-Werror",
+      "-Iinclude",
+      "-DWLR_USE_UNSTABLE",
+      "-o",
+      "build/plugin.o"
+    ],
+    "directory": "/home/byson94/Documents/Programming/buzzay",
+    "output": "build/plugin.o"
+  },
+  {
+    "file": "src/xdg.c",
+    "arguments": [
+      "/usr/sbin/gcc",
+      "-c",
+      "src/xdg.c",
+      "-I/usr/include/wlroots-0.20",
+      "-I/usr/include/pixman-1",
+      "-I/usr/include/libdrm",
+      "-g",
+      "-Werror",
+      "-Iinclude",
+      "-DWLR_USE_UNSTABLE",
+      "-o",
+      "build/xdg.o"
+    ],
+    "directory": "/home/byson94/Documents/Programming/buzzay",
+    "output": "build/xdg.o"
+  }
+]

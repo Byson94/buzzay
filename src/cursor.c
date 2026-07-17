@@ -5,7 +5,7 @@
 #include <wlr/types/wlr_scene.h>
 #include <wlr/types/wlr_data_device.h>
 
-#include "server.h"
+#include "buzzay-plugin.h"
 #include "cursor.h"
 #include "xdg.h"
 

@@ -6,6 +6,7 @@
 #include <wlr/types/wlr_scene.h>
 #include <wlr/types/wlr_xdg_shell.h>
 
+#include "buzzay-plugin.h"
 #include "server.h"
 #include "xdg.h"
 
