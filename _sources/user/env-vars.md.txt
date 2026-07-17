@@ -1,4 +1,4 @@
-# Environment Variables
+# Env Variables
 
 List of all the environment variables buzzay is aware of by default.
 
