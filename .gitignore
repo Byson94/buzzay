@@ -1,1 +1,8 @@
 build/
+
+# Sphnix stuff
+venv/
+.venv/
+__pycache__/
+*.pyc
+docs/build/
