@@ -13,13 +13,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup python venv
-        run: python3 -m venv venv
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: |
-          source venv/bin/activate
-          pip install -r docs/requirements.txt
+        run: pip install -r docs/requirements.txt
 
       - name: Build docs
         run: make -C docs html
