@@ -6,3 +6,6 @@ venv/
 __pycache__/
 *.pyc
 docs/build/
+
+# LSP
+./compile_commands.json

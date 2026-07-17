@@ -23,7 +23,6 @@
 #include <wlr/types/wlr_scene.h>
 #include <wlr/render/allocator.h>
 
-#include "server.h"
 #include "input.h"
 #include "output.h"
 #include "cursor.h"
@@ -252,9 +251,12 @@ int main(int argc, char** argv) {
     // setup WAYLAND_DISPLAY env var and run init script
     setenv("WAYLAND_DISPLAY", wayland_socket, true);
     char init_file_str[PATH_MAX];
-    char *conf_home = getenv("XDG_CONFIG_HOME");
+    const char *conf_home = getenv("XDG_CONFIG_HOME");
+    const char *conf_file = getenv("BUZZAY_CONF");
 
-    if (conf_home != NULL) {
+    if (conf_file != NULL) {
+        strcpy(init_file_str, conf_file);
+    } else if (conf_home != NULL) {
         snprintf(init_file_str, sizeof(init_file_str), "%s/buzzay/init", conf_home);
     } else {
         char *homedir = getpwuid(getuid())->pw_dir;
