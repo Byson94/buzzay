@@ -3,5 +3,5 @@
 
 user/getting-started
 user/configuration
-api/server
+user/env-vars
 ```
