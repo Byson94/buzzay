@@ -7,7 +7,7 @@ this will be the `~/.config/buzzay/init` file.
 
 Inside the the init file, you can call back to Buzzay IPC using the `buzzay` command.
 
-```bash
+```{code-block} bash
 :caption: ~/.config/buzzay/init
 #!/bin/bash
 

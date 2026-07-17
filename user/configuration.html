@@ -243,8 +243,9 @@ this will be the <code class="docutils literal notranslate"><span class="pre">~/
 <section id="basics">
 <h2>Basics<a class="headerlink" href="#basics" title="Link to this heading">¶</a></h2>
 <p>Inside the the init file, you can call back to Buzzay IPC using the <code class="docutils literal notranslate"><span class="pre">buzzay</span></code> command.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>:caption:<span class="w"> </span>~/.config/buzzay/init
-<span class="c1">#!/bin/bash</span>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">~/.config/buzzay/init</span><a class="headerlink" href="#id1" title="Link to this code">¶</a></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 
 <span class="c1"># Load initial plugins</span>
 buzzay<span class="w"> </span>--load<span class="w"> </span>core_protocols
@@ -254,6 +255,7 @@ buzzay<span class="w"> </span>--load<span class="w"> </span>wmpire
 <span class="c1"># Setup keybindings</span>
 buzzay<span class="w"> </span>--msg<span class="w"> </span>keybinder<span class="w"> </span><span class="s2">&quot;Super+Enter&quot;</span><span class="w"> </span><span class="s2">&quot;kitty&quot;</span>
 </pre></div>
+</div>
 </div>
 <p>And that’s pretty much it! You will mostly be loading plugins and sending messages to them.</p>
 <div class="admonition tip">
