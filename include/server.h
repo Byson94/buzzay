@@ -2,7 +2,6 @@
 
 #include <wayland-client-core.h>
 #include <wlr/types/wlr_input_device.h>
-#include "../buzzay-plugin.h"
 
 struct buzzay_output {
     struct wl_list link;
