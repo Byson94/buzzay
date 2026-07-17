@@ -39,6 +39,6 @@ html_theme_options = {
     ],
     "source_repository": "https://github.com/byson94/buzzay/",
     "source_branch": "main",
-    "source_directory": "docs/",
+    "source_directory": "docs/source/",
 }
 
