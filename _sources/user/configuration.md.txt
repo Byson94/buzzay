@@ -9,6 +9,7 @@ Inside the the init file, you can call back to Buzzay IPC using the `buzzay` com
 
 ```{code-block} bash
 :caption: ~/.config/buzzay/init
+
 #!/bin/bash
 
 # Load initial plugins
