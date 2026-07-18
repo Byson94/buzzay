@@ -4,6 +4,8 @@
 #include <dirent.h>
 #include <limits.h>
 #include <dlfcn.h>
+#include <pwd.h>
+#include <unistd.h>
 #include <wayland-server-core.h>
 
 #include "buzzay-plugin.h"
@@ -14,11 +16,8 @@ struct plugin_data *plugin_array = NULL;
 int plugin_count = 0;
 int plugin_capacity = 0;
 
-char *resolve_plugin_path(const char* plugin) {
-    char plugin_base[105];
-    snprintf(plugin_base, sizeof(plugin_base), "%s.so", plugin);
-
-    const char *dir_path = "/usr/lib/buzzay-plugins/";
+static char *search_in_path(const char *dir_path, const char *plugin_base) {
+    printf("Searching for plugin in '%s'\n", dir_path);
     DIR *dir = opendir(dir_path);
 
     if (dir == NULL) {
@@ -26,8 +25,8 @@ char *resolve_plugin_path(const char* plugin) {
         return NULL;
     }
 
-    struct dirent *entry;
     char *result = NULL;
+    struct dirent *entry;
 
     while ((entry = readdir(dir)) != NULL) {
         if (entry->d_type == DT_REG && strcmp(entry->d_name, plugin_base) == 0) {
@@ -42,6 +41,24 @@ char *resolve_plugin_path(const char* plugin) {
     }
 
     closedir(dir);
+    return result;
+}
+
+char *resolve_plugin_path(const char* plugin) {
+    char plugin_base[105];
+    snprintf(plugin_base, sizeof(plugin_base), "%s.so", plugin);
+
+    const char *global_dir_path = "/usr/lib/buzzay-plugins/";
+    char local_dir_path[PATH_MAX];
+
+    char *homedir = getpwuid(getuid())->pw_dir;
+    snprintf(local_dir_path, sizeof(local_dir_path), "%s/.local/share/buzzay-plugins/", homedir);
+
+    char *result = search_in_path(global_dir_path, plugin_base);
+    if (result == NULL) {
+        result = search_in_path(local_dir_path, plugin_base);
+    }
+
     return result;
 }
 
