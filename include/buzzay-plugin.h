@@ -69,6 +69,13 @@ struct bz_plugin {
     struct buzzay_server *server;
 };
 
+// General
+
+/**
+ * Quit buzzay.
+ */
+BZ_API void bz_quit(struct bz_plugin *plugin);
+
 // Keybinding API's
 #define BZ_ALLOWED_MODS (BZ_MOD_SHIFT | BZ_MOD_ALT | BZ_MOD_CTRL | BZ_MOD_SUPER)
 

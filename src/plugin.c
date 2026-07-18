@@ -163,6 +163,10 @@ void msg_plugin(const char *plugin_name, int argc, char **argv, int client_fd) {
 
 // == Implement Helpers ==
 
+BZ_API void bz_quit(struct bz_plugin *plugin) {
+    wl_display_terminate(plugin->server->wl_display);
+}
+
 struct keybinding_data *keybinding_arr = NULL;
 int keybinding_count = 0;
 int keybinding_capacity = 0;
