@@ -7,7 +7,7 @@
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>Plugin API - Buzzay Docs</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=acfd86a5" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
@@ -320,50 +320,44 @@
 </section>
 <section id="api-functions">
 <h2>API Functions<a class="headerlink" href="#api-functions" title="Link to this heading">¶</a></h2>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>doxygenfunction: Unable to resolve function “bz_register_keybinding” with arguments “None”.
-Candidate function could not be parsed. Parsing error is
-Error when parsing function declaration.
-If the function has no return type:
-  Error in declarator or parameters-and-qualifiers
-  Invalid C++ declaration: Expecting “(” in parameters-and-qualifiers. [error at 7]
-    BZ_API bz_binding_handle_t bz_register_keybinding (struct bz_plugin *plugin, struct bz_keybinding binding)
-    ——-^
-If the function has a return type:
-  Error in declarator or parameters-and-qualifiers
-  If pointer to member declarator:
-    Invalid C++ declaration: Expected ‘::’ in pointer to member (function). [error at 27]
-      BZ_API bz_binding_handle_t bz_register_keybinding (struct bz_plugin *plugin, struct bz_keybinding binding)
-      —————————^
-  If declarator-id:
-    Invalid C++ declaration: Expecting “(” in parameters-and-qualifiers. [error at 27]
-      BZ_API bz_binding_handle_t bz_register_keybinding (struct bz_plugin *plugin, struct bz_keybinding binding)
-      —————————^
-</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv422bz_register_keybindingP9bz_plugin13bz_keybinding">
+<span id="_CPPv322bz_register_keybindingP9bz_plugin13bz_keybinding"></span><span id="_CPPv222bz_register_keybindingP9bz_plugin13bz_keybinding"></span><span id="bz_register_keybinding__bz_pluginP.bz_keybinding"></span><span class="target" id="buzzay-plugin_8h_1aa1e31b162ceda8574ac594571b9f4a55"></span><span class="n"><span class="pre">bz_binding_handle_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bz_register_keybinding</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49bz_plugin" title="bz_plugin"><span class="n"><span class="pre">bz_plugin</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">plugin</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv413bz_keybinding" title="bz_keybinding"><span class="n"><span class="pre">bz_keybinding</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">binding</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422bz_register_keybindingP9bz_plugin13bz_keybinding" title="Link to this definition">¶</a><br /></dt>
+<dd><p>Register a keybinding into buzzay.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">my_handle</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">bz_plugin</span><span class="w"> </span><span class="o">*</span><span class="n">plugin</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Do something...</span>
+<span class="p">}</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">init_plugin</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">bz_plugin</span><span class="w"> </span><span class="o">*</span><span class="n">plugin</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">struct</span><span class="w"> </span><span class="nc">bz_keybinding</span><span class="w"> </span><span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="p">.</span><span class="n">sym</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">XKB_KEY_Q</span>
+<span class="w">       </span><span class="p">.</span><span class="n">modifiers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BZ_MOD_SHIFT</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">BZ_MOD_SUPER</span><span class="p">,</span>
+<span class="w">       </span><span class="p">.</span><span class="n">handler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">my_handle</span><span class="p">,</span>
+<span class="w">       </span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span>
+<span class="w">   </span><span class="p">};</span>
+<span class="w">   </span><span class="n">bz_register_keybinding</span><span class="p">(</span><span class="n">plugin</span><span class="p">,</span><span class="w"> </span><span class="n">binding</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>doxygenfunction: Unable to resolve function “bz_unregister_keybinding” with arguments “None”.
-Candidate function could not be parsed. Parsing error is
-Error when parsing function declaration.
-If the function has no return type:
-  Error in declarator or parameters-and-qualifiers
-  Invalid C++ declaration: Expecting “(” in parameters-and-qualifiers. [error at 7]
-    BZ_API void bz_unregister_keybinding (bz_binding_handle_t handle)
-    ——-^
-If the function has a return type:
-  Error in declarator or parameters-and-qualifiers
-  If pointer to member declarator:
-    Invalid C++ declaration: Expected identifier in nested name, got keyword: void [error at 11]
-      BZ_API void bz_unregister_keybinding (bz_binding_handle_t handle)
-      ———–^
-  If declarator-id:
-    Invalid C++ declaration: Expected identifier in nested name, got keyword: void [error at 11]
-      BZ_API void bz_unregister_keybinding (bz_binding_handle_t handle)
-      ———–^
-</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv424bz_unregister_keybinding19bz_binding_handle_t">
+<span id="_CPPv324bz_unregister_keybinding19bz_binding_handle_t"></span><span id="_CPPv224bz_unregister_keybinding19bz_binding_handle_t"></span><span id="bz_unregister_keybinding__bz_binding_handle_t"></span><span class="target" id="buzzay-plugin_8h_1a4b488408e5ddf81c04caa8c2ab839df6"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bz_unregister_keybinding</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">bz_binding_handle_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424bz_unregister_keybinding19bz_binding_handle_t" title="Link to this definition">¶</a><br /></dt>
+<dd><p>Unregister a binding you registered into buzzay.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">init_plugin</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">bz_plugin</span><span class="w"> </span><span class="o">*</span><span class="n">plugin</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="c1">// ...</span>
+<span class="w">   </span><span class="n">bz_binding_handle_t</span><span class="w"> </span><span class="n">handle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bz_register_keybinding</span><span class="p">(</span><span class="n">plugin</span><span class="p">,</span><span class="w"> </span><span class="n">binding</span><span class="p">);</span>
+
+<span class="w">   </span><span class="c1">// Unregister with the handle</span>
+<span class="w">   </span><span class="n">bz_unregister_keybinding</span><span class="p">(</span><span class="n">handle</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
 </div>
+</dd></dl>
+
 </section>
 </section>
 
@@ -443,7 +437,11 @@ If the function has a return type:
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#api-functions">API Functions</a></li>
+<li><a class="reference internal" href="#api-functions">API Functions</a><ul>
+<li><a class="reference internal" href="#_CPPv422bz_register_keybindingP9bz_plugin13bz_keybinding"><code class="docutils literal notranslate"><span class="pre">bz_register_keybinding()</span></code></a></li>
+<li><a class="reference internal" href="#_CPPv424bz_unregister_keybinding19bz_binding_handle_t"><code class="docutils literal notranslate"><span class="pre">bz_unregister_keybinding()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
