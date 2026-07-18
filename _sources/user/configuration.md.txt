@@ -13,7 +13,7 @@ Inside the the init file, you can call back to Buzzay IPC using the `buzzay` com
 #!/bin/bash
 
 # Load initial plugins
-buzzay --load core_protocols
+buzzay --load coreconf
 buzzay --load kbinder
 buzzay --load wmpire
 

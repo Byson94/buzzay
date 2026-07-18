@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Env Variables" href="env-vars.html"><link rel="prev" title="Getting Started" href="getting-started.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="prev" title="Extra Information" href="extra-info.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Configuration - Buzzay Docs</title>
+        <title>Advanced Plugins - Buzzay Docs</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -172,7 +172,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -190,10 +190,10 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Configuration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="env-vars.html">Env Variables</a></li>
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../user/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/env-vars.html">Env Variables</a></li>
 </ul>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../plugins/index.html">Included Plugins</a><input aria-label="Toggle navigation of Included Plugins" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -202,12 +202,12 @@
 </li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developer</span></p>
-<ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">Plugin Docs</a><input aria-label="Toggle navigation of Plugin Docs" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../api/getting-started.html">Getting Started</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/plugin-api.html">Plugin API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/extra-info.html">Extra Information</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/advanced.html">Advanced Plugins</a></li>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Plugin Docs</a><input aria-label="Toggle navigation of Plugin Docs" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugin-api.html">Plugin API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extra-info.html">Extra Information</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Advanced Plugins</a></li>
 </ul>
 </li>
 </ul>
@@ -230,12 +230,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/byson94/buzzay/blob/main/docs/source/user/configuration.md?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/byson94/buzzay/blob/main/docs/source/api/advanced.md?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/byson94/buzzay/edit/main/docs/source/user/configuration.md" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/byson94/buzzay/edit/main/docs/source/api/advanced.md" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -247,39 +247,27 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="configuration">
-<h1>Configuration<a class="headerlink" href="#configuration" title="Link to this heading">¶</a></h1>
-<p>Buzzay is configured through the IPC in a bash file located at <code class="docutils literal notranslate"><span class="pre">$XDG_CONFIG_HOME/buzzay/init</span></code>. On most systems,
-this will be the <code class="docutils literal notranslate"><span class="pre">~/.config/buzzay/init</span></code> file.</p>
-<section id="basics">
-<h2>Basics<a class="headerlink" href="#basics" title="Link to this heading">¶</a></h2>
-<p>Inside the the init file, you can call back to Buzzay IPC using the <code class="docutils literal notranslate"><span class="pre">buzzay</span></code> command.</p>
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">~/.config/buzzay/init</span><a class="headerlink" href="#id1" title="Link to this code">¶</a></div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+          <section id="advanced-plugins">
+<h1>Advanced Plugins<a class="headerlink" href="#advanced-plugins" title="Link to this heading">¶</a></h1>
+<p>Some plugins may find that the core abstraction is too limiting. Those plugins can drop down to the core compositor
+server and work with it directly.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;buzzay-plugin.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;buzzay-server.h&gt;</span>
 
-<span class="c1"># Load initial plugins</span>
-buzzay<span class="w"> </span>--load<span class="w"> </span>coreconf
-buzzay<span class="w"> </span>--load<span class="w"> </span>kbinder
-buzzay<span class="w"> </span>--load<span class="w"> </span>wmpire
+<span class="c1">// ...</span>
 
-<span class="c1"># Setup keybindings</span>
-buzzay<span class="w"> </span>--msg<span class="w"> </span>kbinder<span class="w"> </span><span class="s2">&quot;Super+Enter&quot;</span><span class="w"> </span><span class="s2">&quot;kitty&quot;</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">init_plugin</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">bz_plugin</span><span class="w"> </span><span class="o">*</span><span class="n">plugin</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">buzzay_server</span><span class="w"> </span><span class="o">*</span><span class="n">server</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bz_server_extract</span><span class="p">(</span><span class="n">plugin</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// Do something with server...</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-</div>
-<p>And that’s pretty much it! You will mostly be loading plugins and sending messages to them.</p>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>You will mostly have to do a lot of <code class="docutils literal notranslate"><span class="pre">buzzay</span> <span class="pre">--msg</span></code> calls in your configuration. So it is recommended to
-create a alias to that command. Try something like <code class="docutils literal notranslate"><span class="pre">bzmsg</span></code>!</p>
-</div>
-</section>
+<p>This safely extracts the compositor server on which you can perform actions on.</p>
 </section>
 
         </article>
@@ -287,23 +275,15 @@ create a alias to that command. Try something like <code class="docutils literal
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="env-vars.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">Env Variables</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="getting-started.html">
+          
+          <a class="prev-page" href="extra-info.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Getting Started</div>
+                <div class="title">Extra Information</div>
                 
               </div>
             </a>
@@ -328,27 +308,8 @@ create a alias to that command. Try something like <code class="docutils literal
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">Configuration</a><ul>
-<li><a class="reference internal" href="#basics">Basics</a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>
