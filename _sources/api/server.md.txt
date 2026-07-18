@@ -1,3 +1,0 @@
-# Server API
-
-Cool server!

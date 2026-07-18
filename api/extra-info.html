@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Configuration" href="configuration.html"><link rel="prev" title="Buzzay" href="../index.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="prev" title="Plugin API" href="plugin-api.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Getting Started - Buzzay Docs</title>
+        <title>Extra Information - Buzzay Docs</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=acfd86a5" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -190,17 +190,17 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <ul class="current">
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="env-vars.html">Env Variables</a></li>
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../user/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/env-vars.html">Env Variables</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developer</span></p>
-<ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">Plugin Docs</a><input aria-label="Toggle navigation of Plugin Docs" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../api/getting-started.html">Getting Started</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/plugin-api.html">Plugin API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/extra-info.html">Extra Information</a></li>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Plugin Docs</a><input aria-label="Toggle navigation of Plugin Docs" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugin-api.html">Plugin API</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Extra Information</a></li>
 </ul>
 </li>
 </ul>
@@ -223,12 +223,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/byson94/buzzay/blob/main/docs/source/user/getting-started.md?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/byson94/buzzay/blob/main/docs/source/api/extra-info.md?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/byson94/buzzay/edit/main/docs/source/user/getting-started.md" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/byson94/buzzay/edit/main/docs/source/api/extra-info.md" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -245,24 +245,26 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="getting-started">
-<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h1>
-<section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
-<p>Blah blah…blah blah… todo!</p>
+          <section id="extra-information">
+<h1>Extra Information<a class="headerlink" href="#extra-information" title="Link to this heading">¶</a></h1>
+<p>Extra information about plugins are handled.</p>
+<section id="plugin-resolval">
+<h2>Plugin Resolval<a class="headerlink" href="#plugin-resolval" title="Link to this heading">¶</a></h2>
+<p>For a plugin to be resolved, they must be in the <code class="docutils literal notranslate"><span class="pre">/usr/lib/buzzay-plugins/</span></code> directory root.
+The name of the plugin is learnt directly from the filename instead of any metadata provided
+inside the plugin.</p>
 </section>
-<section id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">buzzay</span></code> binary is used for both launching an instance and interacting with the currently running instance.</p>
-<p>Runing buzzay without any arguments is how you launch it:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>buzzay
-</pre></div>
-</div>
-<p>The <code class="docutils literal notranslate"><span class="pre">--load</span></code> and <code class="docutils literal notranslate"><span class="pre">--msg</span></code> options can be used to launch a plugin and send message to a plugin, respectively.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ buzzay --load my_plugin
-$ buzzay --msg my_plugin &quot;arg1&quot; &quot;arg2&quot; &quot;arg3&quot; # and so on...
-</pre></div>
-</div>
+<section id="plugin-compilation">
+<h2>Plugin Compilation<a class="headerlink" href="#plugin-compilation" title="Link to this heading">¶</a></h2>
+<p>It is the duty of the plugin author to ensure that the plugin is compatible with buzzay.
+So the plugins must link to the same wlroots version that buzzay is linked to. Moreover,
+they should ensure that the plugin is also compiled against the latest version of <code class="docutils literal notranslate"><span class="pre">buzzay-plugin.h</span></code>.</p>
+</section>
+<section id="breaking-changes">
+<h2>Breaking Changes<a class="headerlink" href="#breaking-changes" title="Link to this heading">¶</a></h2>
+<p>I plan on avoiding breaking changes as much as possible. Especially in the plugin api library (<code class="docutils literal notranslate"><span class="pre">buzzay-plugin.h</span></code>).
+Using the API abstractions provided in the library is much safer than directly working with <code class="docutils literal notranslate"><span class="pre">buzzay_server</span></code> as
+it has the lowest changes of encountering changes.</p>
 </section>
 </section>
 
@@ -271,23 +273,15 @@ $ buzzay --msg my_plugin &quot;arg1&quot; &quot;arg2&quot; &quot;arg3&quot; # an
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="configuration.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">Configuration</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="../index.html">
+          
+          <a class="prev-page" href="plugin-api.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Home</div>
+                <div class="title">Plugin API</div>
                 
               </div>
             </a>
@@ -324,9 +318,10 @@ $ buzzay --msg my_plugin &quot;arg1&quot; &quot;arg2&quot; &quot;arg3&quot; # an
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Getting Started</a><ul>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#">Extra Information</a><ul>
+<li><a class="reference internal" href="#plugin-resolval">Plugin Resolval</a></li>
+<li><a class="reference internal" href="#plugin-compilation">Plugin Compilation</a></li>
+<li><a class="reference internal" href="#breaking-changes">Breaking Changes</a></li>
 </ul>
 </li>
 </ul>

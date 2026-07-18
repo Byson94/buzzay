@@ -15,6 +15,7 @@ user/env-vars
 ```
 
 ```{toctree}
+:caption: Developer
 :hidden:
 
 api/index

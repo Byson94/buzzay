@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Server API" href="server.html"><link rel="prev" title="Env Variables" href="../user/env-vars.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Getting Started" href="getting-started.html"><link rel="prev" title="Env Variables" href="../user/env-vars.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Developer Documentation - Buzzay Docs</title>
+        <title>Plugin Docs - Buzzay Docs</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=acfd86a5" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -195,9 +195,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../user/configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user/env-vars.html">Env Variables</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Developer</span></p>
 <ul class="current">
-<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Developer Documentation</a><input aria-label="Toggle navigation of Developer Documentation" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="server.html">Server API</a></li>
+<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Plugin Docs</a><input aria-label="Toggle navigation of Plugin Docs" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugin-api.html">Plugin API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extra-info.html">Extra Information</a></li>
 </ul>
 </li>
 </ul>
@@ -242,11 +245,39 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="developer-documentation">
-<h1>Developer Documentation<a class="headerlink" href="#developer-documentation" title="Link to this heading">¶</a></h1>
+          <section id="plugin-docs">
+<h1>Plugin Docs<a class="headerlink" href="#plugin-docs" title="Link to this heading">¶</a></h1>
+<p>Documentation on how to write plugins for buzzay.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="server.html">Server API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plugin-api.html">Plugin API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="plugin-api.html#structures">Structures</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plugin-api.html#_CPPv413buzzay_server"><code class="docutils literal notranslate"><span class="pre">buzzay_server</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugin-api.html#_CPPv49bz_plugin"><code class="docutils literal notranslate"><span class="pre">bz_plugin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="plugin-api.html#_CPPv4N9bz_plugin11plugin_nameE"><code class="docutils literal notranslate"><span class="pre">plugin_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="plugin-api.html#_CPPv4N9bz_plugin11plugin_pathE"><code class="docutils literal notranslate"><span class="pre">plugin_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="plugin-api.html#_CPPv4N9bz_plugin6serverE"><code class="docutils literal notranslate"><span class="pre">server</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="plugin-api.html#_CPPv413bz_keybinding"><code class="docutils literal notranslate"><span class="pre">bz_keybinding</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="plugin-api.html#_CPPv4N13bz_keybinding3symE"><code class="docutils literal notranslate"><span class="pre">sym</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="plugin-api.html#_CPPv4N13bz_keybinding9modifiersE"><code class="docutils literal notranslate"><span class="pre">modifiers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="plugin-api.html#_CPPv4N13bz_keybinding7handlerE"><code class="docutils literal notranslate"><span class="pre">handler</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="plugin-api.html#_CPPv4N13bz_keybinding4dataE"><code class="docutils literal notranslate"><span class="pre">data</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plugin-api.html#api-functions">API Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="extra-info.html">Extra Information</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="extra-info.html#plugin-resolval">Plugin Resolval</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extra-info.html#plugin-compilation">Plugin Compilation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extra-info.html#breaking-changes">Breaking Changes</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>
@@ -256,12 +287,12 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="server.html">
+          <a class="next-page" href="getting-started.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Server API</div>
+                <div class="title">Getting Started</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -307,5 +338,6 @@
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/force-reload.js?v=e8d00f38"></script>
     </body>
 </html>
