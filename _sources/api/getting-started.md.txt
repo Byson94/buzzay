@@ -14,7 +14,9 @@ int buzzay_api_version() {
     return BUZZAY_API_VERSION;
 }
 
-void msg_request(int argc, char **argv) {}
+char *msg_request(int argc, char **argv) {
+    return "OK!\n"
+}
 
 void init_plugin(struct bz_plugin *plugin) {
     printf("Plugin initialized!\n");
