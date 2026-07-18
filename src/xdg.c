@@ -91,28 +91,24 @@ static void xdg_toplevel_destroy(struct wl_listener *listener, void *data) {
 	wl_list_remove(&toplevel->unmap.link);
 	wl_list_remove(&toplevel->commit.link);
 	wl_list_remove(&toplevel->destroy.link);
-	wl_list_remove(&toplevel->request_move.link);
-	wl_list_remove(&toplevel->request_resize.link);
+	// wl_list_remove(&toplevel->request_move.link);
+	// wl_list_remove(&toplevel->request_resize.link);
 	wl_list_remove(&toplevel->request_maximize.link);
 	wl_list_remove(&toplevel->request_fullscreen.link);
+
+    if (toplevel->scene_tree) {
+        wlr_scene_node_destroy(&toplevel->scene_tree->node);
+    }
 
 	free(toplevel);
 }
 
-static void xdg_toplevel_request_maximize(
-		struct wl_listener *listener, void *data) {
-	/* This event is raised when a client would like to maximize itself,
-	 * typically because the user clicked on the maximize button on client-side
-	 * decorations. buzzay doesn't support maximization, but to conform to
-	 * xdg-shell protocol we still must send a configure.
-	 * wlr_xdg_surface_schedule_configure() is used to send an empty reply.
-	 * However, if the request was sent before an initial commit, we don't do
-	 * anything and let the client finish the initial surface setup. */
+static void xdg_toplevel_request_maximize(struct wl_listener *listener, void *data) {
 	struct buzzay_toplevel *toplevel =
 		wl_container_of(listener, toplevel, request_maximize);
-	if (toplevel->xdg_toplevel->base->initialized) {
-		wlr_xdg_surface_schedule_configure(toplevel->xdg_toplevel->base);
-	}
+
+    wlr_xdg_surface_schedule_configure(toplevel->xdg_toplevel->base);
+    wlr_xdg_toplevel_set_maximized(toplevel->xdg_toplevel, true);
 }
 
 static void xdg_toplevel_request_fullscreen(
@@ -120,9 +116,9 @@ static void xdg_toplevel_request_fullscreen(
 	/* Just as with request_maximize, we must send a configure here. */
 	struct buzzay_toplevel *toplevel =
 		wl_container_of(listener, toplevel, request_fullscreen);
-	if (toplevel->xdg_toplevel->base->initialized) {
-		wlr_xdg_surface_schedule_configure(toplevel->xdg_toplevel->base);
-	}
+
+    wlr_xdg_surface_schedule_configure(toplevel->xdg_toplevel->base);
+    wlr_xdg_toplevel_set_maximized(toplevel->xdg_toplevel, true);
 }
 
 static void xdg_popup_commit(struct wl_listener *listener, void *data) {

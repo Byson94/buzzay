@@ -172,7 +172,7 @@ int main(int argc, char** argv) {
 
     // Setup the xdg-decorations for decoration support
     server.xdg_decoration = wlr_xdg_decoration_manager_v1_create(server.wl_display);
-    server.decoration_mode = WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE;
+    server.decoration_mode = WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_CLIENT_SIDE;
     server.new_toplevel_decoration.notify = server_new_toplevel_decoration;
     wl_signal_add(&server.xdg_decoration->events.new_toplevel_decoration, &server.new_toplevel_decoration);
 
