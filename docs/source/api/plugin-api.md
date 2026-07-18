@@ -4,10 +4,6 @@ The API documentation of `buzzay-plugin.h`.
 
 ## Structures
 
-```{doxygenstruct} buzzay_server
-:project: buzzay
-```
-
 ```{doxygenstruct} bz_plugin
 :project: buzzay
 :members:

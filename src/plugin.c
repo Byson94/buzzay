@@ -121,6 +121,7 @@ void handle_plugin(char *path, const char *plugin_name, struct buzzay_server *se
         .plugin_name = plugin_name,
         .plugin_path = path,
         ._internal_server = server,
+        ._internal_server_size = sizeof(struct buzzay_server),
     };
 
     init_func(&plugin);

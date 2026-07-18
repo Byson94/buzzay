@@ -24,6 +24,11 @@ void server_new_layer_surface(struct wl_listener *listener, void *data) {
     struct buzzay_server *server = wl_container_of(listener, server, new_layer_surface);
     struct wlr_layer_surface_v1 *surface = data;
 
+	if (!surface->output) {
+		wlr_layer_surface_v1_destroy(surface);
+		return;
+	}
+
     struct buzzay_layer_surface *layer_surface = calloc(1, sizeof(*layer_surface));
     layer_surface->server = server;
 

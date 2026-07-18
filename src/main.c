@@ -179,7 +179,7 @@ int main(int argc, char** argv) {
     wl_signal_add(&server.xdg_decoration->events.new_toplevel_decoration, &server.new_toplevel_decoration);
 
     // Setup layer shell
-    server.layer_shell = wlr_layer_shell_v1_create(server.wl_display, 4);
+    server.layer_shell = wlr_layer_shell_v1_create(server.wl_display, 5);
     server.new_layer_surface.notify = server_new_layer_surface;
     wl_signal_add(&server.layer_shell->events.new_surface, &server.new_layer_surface);
 

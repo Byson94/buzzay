@@ -24,9 +24,16 @@ struct bz_plugin {
     void *data;
 
     /**
+     * @internal
      * Internal compositor server.
      */
     void *_internal_server;
+
+    /**
+     * @internal
+     * Internal compositor server size.
+     */
+    size_t _internal_server_size;
 };
 
 // General
