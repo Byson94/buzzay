@@ -11,7 +11,7 @@ grab the `buzzay-plugin.h` file from the **include/** directory in the source co
 #include <buzzay-plugin.h>
 
 int buzzay_api_version() {
-    return BUZZAY_API_VERSION
+    return BUZZAY_API_VERSION;
 }
 
 void msg_request(int argc, char **argv) {}

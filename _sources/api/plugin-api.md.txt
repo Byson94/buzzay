@@ -20,6 +20,10 @@ The API documentation of `buzzay-plugin.h`.
 
 ## API Functions
 
+```{doxygenfunction} bz_quit 
+:project: buzzay
+```
+
 ```{doxygenfunction} bz_register_keybinding
 :project: buzzay
 ```
