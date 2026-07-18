@@ -23,8 +23,23 @@ int ipc_send_msg(char *msg) {
     // Send the command string
     write(fd, msg, strlen(msg));
 
-    printf("OK!\n");
-    
+    char buffer[1024];
+    ssize_t n = read(fd, buffer, sizeof(buffer) - 1);
+    if (n > 0) {
+        buffer[n] = '\0';
+        char *token;
+
+        token = strtok(buffer, " ");
+        if (token != NULL && strcmp(token, "response") == 0) {
+            token = strtok(NULL, " ");
+            while (token != NULL) {
+                printf("%s ", token);
+                token = strtok(NULL, " ");
+            }
+            printf("\n");
+        }
+    }
+
     close(fd);
     return 0;
 }
@@ -56,6 +71,9 @@ int handle_ipc_connection(int fd, uint32_t mask, void *data) {
 
             printf("Resolved plugin path: %s\n", path);
             handle_plugin(path, plugin, server);
+
+            const char *msg = "response OK!";
+            write(client_fd, msg, strlen(msg));
         } else if (strcmp(token, "msg") == 0) {
             token = strtok(NULL, " ");
             const char *plugin_name = token;

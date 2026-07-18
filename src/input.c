@@ -9,9 +9,8 @@
 
 #include "buzzay-plugin.h"
 #include "handle-plugin.h"
-#include "server.h"
+#include "compositor.h"
 #include "input.h"
-#include "xdg.h"
 
 static void keyboard_handle_modifiers(
 		struct wl_listener *listener, void *data) {

@@ -3,7 +3,7 @@
 #include <wlr/backend.h>
 #include <wayland-client-core.h>
 
-#include "server.h"
+#include "compositor.h"
 
 void focus_toplevel(struct buzzay_toplevel *toplevel);
 void server_new_xdg_toplevel(struct wl_listener *listener, void *data);
