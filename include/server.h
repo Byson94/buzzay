@@ -46,12 +46,3 @@ struct buzzay_server {
     struct wl_listener new_layer_surface;
 };
 
-#define bz_server_extract(plugin) ({ \
-    size_t expected_size = sizeof(struct buzzay_server); \
-    if (expected_size != (plugin)->_inner_server_size) { \
-        fprintf(stderr, "Plugin '%s' binary mismatch! (Header: %zu, Server: %zu). Aborting.\n", \
-                (plugin)->plugin_name, expected_size, (plugin)->_inner_server_size); \
-        return; \
-    } \
-    (struct buzzay_server *)((plugin)->_inner_server); \
-})

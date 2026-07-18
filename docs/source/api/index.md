@@ -6,5 +6,4 @@ Documentation on how to write plugins for buzzay.
 getting-started
 plugin-api
 extra-info
-advanced
 ```
