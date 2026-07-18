@@ -242,3 +242,19 @@ BZ_API void bz_unregister_keybinding(bz_binding_handle_t handle) {
         }
     }
 }
+
+// Window API"S
+
+// struct window_hook_data *window_hook_array = NULL;
+// int window_hook_count = 0;
+// int window_hook_capacity = 0;
+//
+// BZ_API void bz_window_hook(
+//         struct bz_plugin *plugin, 
+//         enum bz_window_hook hook,
+//         void (*callback)(struct bz_plugin *plugin)) {
+//
+// }
+//
+// BZ_API void bz_window_active_on(struct bz_plugin *plugin, enum bz_window_event mode) {}
+//

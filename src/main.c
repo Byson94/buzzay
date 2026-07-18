@@ -21,11 +21,13 @@
 #include <wlr/types/wlr_output_layout.h>
 #include <wlr/types/wlr_xcursor_manager.h>
 #include <wlr/types/wlr_xdg_decoration_v1.h>
+#include <wlr/types/wlr_layer_shell_v1.h>
 #include <wlr/types/wlr_scene.h>
 #include <wlr/render/allocator.h>
 
 #include "buzzay-plugin.h"
 #include "handle-plugin.h"
+#include "layershell.h"
 #include "input.h"
 #include "output.h"
 #include "cursor.h"
@@ -175,6 +177,11 @@ int main(int argc, char** argv) {
     server.decoration_mode = WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_CLIENT_SIDE;
     server.new_toplevel_decoration.notify = server_new_toplevel_decoration;
     wl_signal_add(&server.xdg_decoration->events.new_toplevel_decoration, &server.new_toplevel_decoration);
+
+    // Setup layer shell
+    server.layer_shell = wlr_layer_shell_v1_create(server.wl_display, 4);
+    server.new_layer_surface.notify = server_new_layer_surface;
+    wl_signal_add(&server.layer_shell->events.new_surface, &server.new_layer_surface);
 
     // create a cursor (the image)
     server.cursor = wlr_cursor_create();

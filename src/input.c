@@ -9,7 +9,6 @@
 
 #include "buzzay-plugin.h"
 #include "handle-plugin.h"
-#include "compositor.h"
 #include "input.h"
 
 static void keyboard_handle_modifiers(
@@ -46,7 +45,7 @@ bool handle_keybinding(struct buzzay_server *server, xkb_keysym_t sym, uint32_t 
 
         if (kb->sym == sym && (modifiers & BZ_ALLOWED_MODS) == kb->modifiers) {
             if (kb->handler) {
-                kb->handler(kb_dat->owner, kb->data);
+                kb->handler(kb_dat->owner);
 
                 if (binding_wants_passthrough) {
                     is_passthrough = true;

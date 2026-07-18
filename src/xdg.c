@@ -8,7 +8,6 @@
 #include <wlr/types/wlr_xdg_decoration_v1.h>
 
 #include "buzzay-plugin.h"
-#include "compositor.h"
 #include "xdg.h"
 
 void focus_toplevel(struct buzzay_toplevel *toplevel) {

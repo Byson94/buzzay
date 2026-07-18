@@ -7,6 +7,7 @@
 #include <wlr/types/wlr_input_device.h>
 #include <wlr/types/wlr_xdg_shell.h>
 #include <wlr/types/wlr_xdg_decoration_v1.h>
+#include <wlr/types/wlr_layer_shell_v1.h>
 
 // MUST increment once every release
 // IF a change is made to the file
@@ -59,6 +60,9 @@ struct buzzay_server {
     struct wlr_output_layout *output_layout;
     struct wl_list outputs;
     struct wl_listener new_output;
+
+    struct wlr_layer_shell_v1 *layer_shell;
+    struct wl_listener new_layer_surface;
 };
 
 /**
@@ -75,6 +79,11 @@ struct bz_plugin {
      * API's to do what you want.
      */
     struct buzzay_server *server;
+
+    /**
+     * Any data that you can insert into the plugin.
+     */
+    void *data;
 };
 
 // General
@@ -128,8 +137,7 @@ struct bz_keybinding {
      */
     bz_modifier_t modifiers;
     bz_binding_flags_t flags;
-    void (*handler)(struct bz_plugin *plugin, void *data); /**< Function to execute when keybinding is used. */
-    void *data; /**< Data to pass into the handler. */
+    void (*handler)(struct bz_plugin *plugin); /**< Function to execute when keybinding is used. */
 };
 
 /** The binding handle that can be used to unregister a binding. **/
@@ -178,5 +186,28 @@ BZ_API bz_binding_handle_t bz_register_keybinding(
  * ```
  */
 BZ_API void bz_unregister_keybinding(bz_binding_handle_t handle);
+
+// Window Manager API'S
+
+enum bz_window_hook {
+    BZ_WINDOW_RESIZE,
+    BZ_WINDOW_MOVE,
+    BZ_WINDOW_MAXIMIZE,
+    BZ_WINDOW_FULLSCREEN,
+};
+
+BZ_API void bz_window_hook(
+        struct bz_plugin *plugin, 
+        enum bz_window_hook hook,
+        void (*callback)(struct bz_plugin *plugin));
+
+BZ_API void bz_get_active_window(struct bz_plugin *plugin);
+
+enum bz_window_event {
+    BZ_WINDOW_HOVER,
+    BZ_WINDOW_CLICK
+};
+
+BZ_API void bz_window_active_on(struct bz_plugin *plugin, enum bz_window_event mode);
 
 #endif
