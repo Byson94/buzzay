@@ -22,7 +22,6 @@ The API documentation of `buzzay-plugin.h`.
 
 ```{doxygenenum} bz_decoration_mode
 :project: buzzay
-:members:
 ```
 
 ## API Functions

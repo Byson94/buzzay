@@ -14,11 +14,11 @@ Inside the the init file, you can call back to Buzzay IPC using the `buzzay` com
 
 # Load initial plugins
 buzzay --load core_protocols
-buzzay --load keybinder
+buzzay --load kbinder
 buzzay --load wmpire
 
 # Setup keybindings
-buzzay --msg keybinder "Super+Enter" "kitty"
+buzzay --msg kbinder "Super+Enter" "kitty"
 ```
 
 And that's pretty much it! You will mostly be loading plugins and sending messages to them.
