@@ -78,6 +78,7 @@ static void xdg_toplevel_commit(struct wl_listener *listener, void *data) {
 		 * configures the xdg_toplevel with 0,0 size to let the client pick the
 		 * dimensions itself. */
 		wlr_xdg_toplevel_set_size(toplevel->xdg_toplevel, 0, 0);
+        wlr_xdg_surface_schedule_configure(toplevel->xdg_toplevel->base);
 	}
 }
 

@@ -30,18 +30,37 @@ static void keyboard_handle_modifiers(
 		&keyboard->wlr_keyboard->modifiers);
 }
 
-bool handle_keybinding(struct buzzay_server *server, xkb_keysym_t sym, uint32_t modifiers) {
+bool handle_keybinding(struct buzzay_server *server, xkb_keysym_t sym, uint32_t modifiers, bool is_release) {
+    bool is_passthrough = false;
+
     for (int i = 0; i < keybinding_count; i++) {
         struct keybinding_data *kb_dat = &keybinding_arr[i];
         struct bz_keybinding *kb = &kb_dat->binding;
 
+        bool binding_wants_release = (kb->flags & BZ_BINDING_ONRELEASE) != 0;
+        bool binding_wants_passthrough = (kb->flags & BZ_BINDING_PASSTHROUGH) != 0;
+
+        if (binding_wants_release != is_release) {
+            continue;
+        }
+
         if (kb->sym == sym && (modifiers & BZ_ALLOWED_MODS) == kb->modifiers) {
             if (kb->handler) {
                 kb->handler(kb_dat->owner, kb->data);
-                return true;
+
+                if (binding_wants_passthrough) {
+                    is_passthrough = true;
+                } else {
+                    return true;
+                }
             }
         }
     }
+    
+    if (is_passthrough) {
+        return true;
+    }
+
     return false;
 }
 
@@ -77,12 +96,18 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
 
     // else handling compositor key binding
     bool handled = false;
+    bool is_release = false;
+
     if (event->state == WL_KEYBOARD_KEY_STATE_PRESSED) {
-        for (int i = 0; i < nsyms; i++) {
-            if (handle_keybinding(server, syms[i], modifiers)) {
-                handled = true;
-                break;
-            }
+        is_release = false;
+    } else {
+        is_release = true;
+    }
+
+    for (int i = 0; i < nsyms; i++) {
+        if (handle_keybinding(server, syms[i], modifiers, is_release)) {
+            handled = true;
+            break;
         }
     }
 

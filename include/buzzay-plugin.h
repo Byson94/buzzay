@@ -86,6 +86,12 @@ typedef enum {
     BZ_MOD_SUPER = WLR_MODIFIER_LOGO,
 } bz_modifier_t;
 
+typedef enum {
+    BZ_BINDING_NONE = 0, /**< No flags. */
+    BZ_BINDING_ONRELEASE = 1 << 0, /**< Trigger on release. */
+    BZ_BINDING_PASSTHROUGH = 1 << 1, /**< Let the event pass to other keybindings. */
+} bz_binding_flags_t;
+
 /**
  * Buzzay keybinding information.
  */
@@ -100,6 +106,7 @@ struct bz_keybinding {
      * You can listen to multiple modifier keys by using `|`. For example, `BZ_MOD_SHIFT | BZ_MOD_CTRL`.
      */
     bz_modifier_t modifiers;
+    bz_binding_flags_t flags;
     void (*handler)(struct bz_plugin *plugin, void *data); /**< Function to execute when keybinding is used. */
     void *data; /**< Data to pass into the handler. */
 };
@@ -119,8 +126,9 @@ typedef int bz_binding_handle_t;
  *
  * void init_plugin(struct bz_plugin *plugin) {
  *    struct bz_keybinding binding = {
- *        .sym = XKB_KEY_Q
+ *        .sym = XKB_KEY_Q,
  *        .modifiers = BZ_MOD_SHIFT | BZ_MOD_SUPER,
+ *        .flags = BZ_BINDING_NONE,
  *        .handler = my_handle,
  *        .data = NULL
  *    };
