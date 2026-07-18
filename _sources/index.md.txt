@@ -1,7 +1,21 @@
+---
+hide-toc: true
+---
+
+# Buzzay
+
+A plugin-first wayland compositor.
+
 ```{toctree}
-:maxdepth: 2
+:hidden:
 
 user/getting-started
 user/configuration
 user/env-vars
+```
+
+```{toctree}
+:hidden:
+
+api/index
 ```
