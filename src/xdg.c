@@ -5,6 +5,7 @@
 #include <wlr/types/wlr_cursor.h>
 #include <wlr/types/wlr_scene.h>
 #include <wlr/types/wlr_xdg_shell.h>
+#include <wlr/types/wlr_xdg_decoration_v1.h>
 
 #include "buzzay-plugin.h"
 #include "compositor.h"
@@ -204,4 +205,30 @@ void server_new_xdg_popup(struct wl_listener *listener, void *data) {
 	wl_signal_add(&xdg_popup->events.destroy, &popup->destroy);
 }
 
+static void handle_map_decoration(struct wl_listener *listener, void *data) {
+    struct buzzay_decoration *ctx = wl_container_of(listener, ctx, map);
+    wlr_xdg_toplevel_decoration_v1_set_mode(ctx->decoration, ctx->server->decoration_mode);
+}
 
+static void handle_decoration_cleanup(struct wl_listener *listener, void *data) {
+    struct buzzay_decoration *ctx = wl_container_of(listener, ctx, destroy);
+    
+    wl_list_remove(&ctx->map.link);
+    wl_list_remove(&ctx->destroy.link);
+    free(ctx);
+}
+
+void server_new_toplevel_decoration(struct wl_listener *listener, void *data) {
+    struct buzzay_server *server = wl_container_of(listener, server, new_toplevel_decoration);
+    struct wlr_xdg_toplevel_decoration_v1 *xdg_decoration = data;
+
+    struct buzzay_decoration *ctx = calloc(1, sizeof(*ctx));
+    
+    ctx->server = server;
+    ctx->decoration = xdg_decoration;
+    ctx->map.notify = handle_map_decoration;
+    ctx->destroy.notify = handle_decoration_cleanup;
+    
+    wl_signal_add(&xdg_decoration->toplevel->base->surface->events.map, &ctx->map);
+    wl_signal_add(&xdg_decoration->events.destroy, &ctx->destroy);
+}

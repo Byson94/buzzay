@@ -6,6 +6,7 @@
 #include <wayland-client-core.h>
 #include <wlr/types/wlr_input_device.h>
 #include <wlr/types/wlr_xdg_shell.h>
+#include <wlr/types/wlr_xdg_decoration_v1.h>
 
 // MUST increment once every release
 // IF a change is made to the file
@@ -32,6 +33,10 @@ struct buzzay_server {
 	struct wl_listener new_xdg_toplevel;
 	struct wl_listener new_xdg_popup;
 	struct wl_list toplevels;
+
+    struct wlr_xdg_decoration_manager_v1 *xdg_decoration;
+    enum wlr_xdg_toplevel_decoration_v1_mode decoration_mode;
+    struct wl_listener new_toplevel_decoration;
 
     struct wlr_cursor *cursor;
     struct wlr_xcursor_manager *cursor_mgr;

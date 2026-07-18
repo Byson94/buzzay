@@ -1,5 +1,6 @@
 #pragma once
 
+#include "wlr/types/wlr_xdg_decoration_v1.h"
 #include <wayland-client-core.h>
 #include <wlr/types/wlr_input_device.h>
 
@@ -41,5 +42,12 @@ struct buzzay_popup {
 	struct wlr_xdg_popup *xdg_popup;
 	struct wl_listener commit;
 	struct wl_listener destroy;
+};
+
+struct buzzay_decoration {
+    struct buzzay_server *server;
+    struct wlr_xdg_toplevel_decoration_v1 *decoration;
+    struct wl_listener map;
+    struct wl_listener destroy;
 };
 

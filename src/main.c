@@ -20,6 +20,7 @@
 #include <wlr/types/wlr_output.h>
 #include <wlr/types/wlr_output_layout.h>
 #include <wlr/types/wlr_xcursor_manager.h>
+#include <wlr/types/wlr_xdg_decoration_v1.h>
 #include <wlr/types/wlr_scene.h>
 #include <wlr/render/allocator.h>
 
@@ -169,6 +170,12 @@ int main(int argc, char** argv) {
 	server.new_xdg_popup.notify = server_new_xdg_popup;
     wl_signal_add(&server.xdg_shell->events.new_popup, &server.new_xdg_popup);
 
+    // Setup the xdg-decorations for decoration support
+    server.xdg_decoration = wlr_xdg_decoration_manager_v1_create(server.wl_display);
+    server.decoration_mode = WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE;
+    server.new_toplevel_decoration.notify = server_new_toplevel_decoration;
+    wl_signal_add(&server.xdg_decoration->events.new_toplevel_decoration, &server.new_toplevel_decoration);
+
     // create a cursor (the image)
     server.cursor = wlr_cursor_create();
     wlr_cursor_attach_output_layout(server.cursor, server.output_layout);
@@ -287,6 +294,7 @@ int main(int argc, char** argv) {
 
     wl_list_remove(&server.new_xdg_toplevel.link);
     wl_list_remove(&server.new_xdg_popup.link);
+    wl_list_remove(&server.new_toplevel_decoration.link);
 
 	wl_list_remove(&server.cursor_motion.link);
 	wl_list_remove(&server.cursor_motion_absolute.link);
