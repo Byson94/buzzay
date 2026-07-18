@@ -36,6 +36,7 @@ int ipc_send_msg(char *msg) {
                 printf("%s ", token);
                 token = strtok(NULL, " ");
             }
+            printf("\n");
         }
     }
 

@@ -14,6 +14,9 @@
 #define BZ_API __attribute__((visibility("default")))
 
 // Server is the source of all truth
+// WHEN UPDATING, MAKE SURE TO APPEND THE NEW
+// FIELD AT THE "END OF THE STRUCTURE". DO NOT
+// REORDER ANY FIELD.
 /**
  * The compositor server that contains IMPORTANT
  * data like the `wl_display` that are crucial for 

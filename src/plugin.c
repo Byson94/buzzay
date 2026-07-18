@@ -73,9 +73,15 @@ void handle_plugin(char *path, const char *plugin_name, struct buzzay_server *se
     int api_ver = api_func();
 
     if (api_ver != BUZZAY_API_VERSION) {
-        send_msg_back(client_fd, "Mismatch in buzzay API version found.\n");
-        dlclose(handle);
-        return;
+        char msg[1024];
+        sprintf(msg, "Mismatch in buzzay API version found.\n\n"
+                "BUZZAY='%d'\n"
+                "PLUGIN='%d'\n\n"
+                "Loading anyway...",
+                BUZZAY_API_VERSION,
+                api_ver);
+
+        send_msg_back(client_fd, msg);
     }
 
     // init plugin
