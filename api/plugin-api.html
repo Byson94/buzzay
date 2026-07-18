@@ -286,6 +286,12 @@
 <dd><p>The buzzay server that is required for all the API function calls. Only access and modify this if you know what you are doing and there are no API’s to do what you want. </p>
 </dd></dl>
 
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9bz_plugin4dataE">
+<span id="_CPPv3N9bz_plugin4dataE"></span><span id="_CPPv2N9bz_plugin4dataE"></span><span id="bz_plugin::data__voidP"></span><span class="target" id="structbz__plugin_1a430c1c276758f1fbc7d320a62fefd83c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">data</span></span></span><a class="headerlink" href="#_CPPv4N9bz_plugin4dataE" title="Link to this definition">¶</a><br /></dt>
+<dd><p>Any data that you can insert into the plugin. </p>
+</dd></dl>
+
 </div>
 </dd></dl>
 
@@ -310,14 +316,8 @@
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N13bz_keybinding7handlerE">
-<span id="_CPPv3N13bz_keybinding7handlerE"></span><span id="_CPPv2N13bz_keybinding7handlerE"></span><span class="target" id="structbz__keybinding_1a0ea482d0d1317559583a98410c8644a3"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">handler</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49bz_plugin" title="bz_plugin"><span class="n"><span class="pre">bz_plugin</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">plugin</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N13bz_keybinding7handlerE" title="Link to this definition">¶</a><br /></dt>
+<span id="_CPPv3N13bz_keybinding7handlerE"></span><span id="_CPPv2N13bz_keybinding7handlerE"></span><span class="target" id="structbz__keybinding_1a77b9e916d27ec7b71cee48db094c5f6f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">handler</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49bz_plugin" title="bz_plugin"><span class="n"><span class="pre">bz_plugin</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">plugin</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N13bz_keybinding7handlerE" title="Link to this definition">¶</a><br /></dt>
 <dd><p>Function to execute when keybinding is used. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N13bz_keybinding4dataE">
-<span id="_CPPv3N13bz_keybinding4dataE"></span><span id="_CPPv2N13bz_keybinding4dataE"></span><span id="bz_keybinding::data__voidP"></span><span class="target" id="structbz__keybinding_1a2ae654df29c660a58b59418b9ed0cee8"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">data</span></span></span><a class="headerlink" href="#_CPPv4N13bz_keybinding4dataE" title="Link to this definition">¶</a><br /></dt>
-<dd><p>Data to pass into the handler. </p>
 </dd></dl>
 
 </div>
@@ -467,13 +467,13 @@
 <li><a class="reference internal" href="#_CPPv4N9bz_plugin11plugin_nameE"><code class="docutils literal notranslate"><span class="pre">plugin_name</span></code></a></li>
 <li><a class="reference internal" href="#_CPPv4N9bz_plugin11plugin_pathE"><code class="docutils literal notranslate"><span class="pre">plugin_path</span></code></a></li>
 <li><a class="reference internal" href="#_CPPv4N9bz_plugin6serverE"><code class="docutils literal notranslate"><span class="pre">server</span></code></a></li>
+<li><a class="reference internal" href="#_CPPv4N9bz_plugin4dataE"><code class="docutils literal notranslate"><span class="pre">data</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#_CPPv413bz_keybinding"><code class="docutils literal notranslate"><span class="pre">bz_keybinding</span></code></a><ul>
 <li><a class="reference internal" href="#_CPPv4N13bz_keybinding3symE"><code class="docutils literal notranslate"><span class="pre">sym</span></code></a></li>
 <li><a class="reference internal" href="#_CPPv4N13bz_keybinding9modifiersE"><code class="docutils literal notranslate"><span class="pre">modifiers</span></code></a></li>
 <li><a class="reference internal" href="#_CPPv4N13bz_keybinding7handlerE"><code class="docutils literal notranslate"><span class="pre">handler</span></code></a></li>
-<li><a class="reference internal" href="#_CPPv4N13bz_keybinding4dataE"><code class="docutils literal notranslate"><span class="pre">data</span></code></a></li>
 </ul>
 </li>
 </ul>
