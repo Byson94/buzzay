@@ -36,12 +36,17 @@ int ipc_send_msg(char *msg) {
                 printf("%s ", token);
                 token = strtok(NULL, " ");
             }
-            printf("\n");
         }
     }
 
     close(fd);
     return 0;
+}
+
+void send_msg_back(int client_fd, const char* msg) {
+    char buffer[1024];
+    snprintf(buffer, sizeof(buffer), "response %s", msg);
+    write(client_fd, buffer, strlen(buffer));
 }
 
 int handle_ipc_connection(int fd, uint32_t mask, void *data) {
@@ -64,16 +69,13 @@ int handle_ipc_connection(int fd, uint32_t mask, void *data) {
             printf("Loading plugin: %s\n", plugin);
             char *path = resolve_plugin_path(plugin);
             if (path == NULL) {
-                printf("Path of plugin could not be resolved.\n");
+                send_msg_back(client_fd, "Path of plugin could not be resolved.\n");
                 close(client_fd);
                 return 1;
             }
 
             printf("Resolved plugin path: %s\n", path);
-            handle_plugin(path, plugin, server);
-
-            const char *msg = "response OK!";
-            write(client_fd, msg, strlen(msg));
+            handle_plugin(path, plugin, server, client_fd);
         } else if (strcmp(token, "msg") == 0) {
             token = strtok(NULL, " ");
             const char *plugin_name = token;
@@ -90,7 +92,7 @@ int handle_ipc_connection(int fd, uint32_t mask, void *data) {
 
             // null terminating
             margv[i] = NULL;
-            msg_plugin(plugin_name, i, margv);
+            msg_plugin(plugin_name, i, margv, client_fd);
         }
     }
 
