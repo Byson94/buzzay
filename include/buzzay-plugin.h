@@ -13,6 +13,11 @@
 #define BZ_API __attribute__((visibility("default")))
 
 // Server is the source of all truth
+/**
+ * The compositor server that contains IMPORTANT
+ * data like the `wl_display` that are crucial for 
+ * the functioning of the compositor.
+ */
 struct buzzay_server {
     struct wl_display *wl_display;
     struct wl_event_loop *wl_event_loop;
@@ -48,10 +53,19 @@ struct buzzay_server {
     struct wl_listener new_output;
 };
 
-// The plugin wrapper
+/**
+ *  The plugin wrapper structure that contains important
+ *  metadata like plugin name, path, and the buzzay server.
+ */
 struct bz_plugin {
-    const char *plugin_name;
-    const char *plugin_path;
+    const char *plugin_name; /**< The name of the plugin. */
+    const char *plugin_path; /**< The version number of the plugin. */
+
+    /** 
+     * The buzzay server that is required for all the API function calls.
+     * Only access and modify this if you know what you are doing and there are no
+     * API's to do what you want.
+     */
     struct buzzay_server *server;
 };
 
@@ -65,20 +79,68 @@ typedef enum {
     BZ_MOD_SUPER = WLR_MODIFIER_LOGO,
 } bz_modifier_t;
 
+/**
+ * Buzzay keybinding information.
+ */
 struct bz_keybinding {
+    /**
+     * They key to listen to.
+     */
     xkb_keysym_t sym;
+    /**
+     * The modifier keys to listen to.
+     *
+     * You can listen to multiple modifier keys by using `|`. For example, `BZ_MOD_SHIFT | BZ_MOD_CTRL`.
+     */
     bz_modifier_t modifiers;
-    void (*handler)(struct bz_plugin *plugin, void *data);
-    void *data;
+    void (*handler)(struct bz_plugin *plugin, void *data); /**< Function to execute when keybinding is used. */
+    void *data; /**< Data to pass into the handler. */
 };
 
+/** The binding handle that can be used to unregister a binding. **/
 typedef int bz_binding_handle_t;
 
+/**
+ * Register a keybinding into buzzay.
+ * 
+ * **Example:**
+ * 
+ * ```c
+ * void my_handle(struct bz_plugin *plugin, void *data) {
+ *     // Do something...
+ * }
+ *
+ * void init_plugin(struct bz_plugin *plugin) {
+ *    struct bz_keybinding binding = {
+ *        .sym = XKB_KEY_Q
+ *        .modifiers = BZ_MOD_SHIFT | BZ_MOD_SUPER,
+ *        .handler = my_handle,
+ *        .data = NULL
+ *    };
+ *    bz_register_keybinding(plugin, binding);
+ * }
+```
+*/
 BZ_API bz_binding_handle_t bz_register_keybinding(
     struct bz_plugin *plugin,
     struct bz_keybinding binding
 );
 
+/**
+ * Unregister a binding you registered into buzzay.
+ *
+ * **Example:**
+ *
+ * ```c
+ * void init_plugin(struct bz_plugin *plugin) {
+ *    // ...
+ *    bz_binding_handle_t handle = bz_register_keybinding(plugin, binding);
+ *
+ *    // Unregister with the handle
+ *    bz_unregister_keybinding(handle);
+ * }
+ * ```
+ */
 BZ_API void bz_unregister_keybinding(bz_binding_handle_t handle);
 
 #endif

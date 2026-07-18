@@ -6,6 +6,8 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+import subprocess
+
 project = 'Buzzay'
 copyright = '2026, Byson94'
 author = 'Byson94'
@@ -14,9 +16,17 @@ release = '1.0'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
+subprocess.run(["doxygen", "Doxyfile"], cwd="..")
+
 extensions = [
-    "myst_parser"
+    "myst_parser",
+    "breathe"
 ]
+
+breathe_projects = {
+    "buzzay": "../xml"
+}
+breathe_default_project = "buzzay"
 
 templates_path = ['_templates']
 exclude_patterns = []
@@ -26,6 +36,7 @@ exclude_patterns = []
 
 html_theme = 'furo'
 html_static_path = ['_static']
+html_js_files = ['force-reload.js']
 html_title = "Buzzay Docs"
 
 html_theme_options = {
@@ -39,6 +50,6 @@ html_theme_options = {
     ],
     "source_repository": "https://github.com/byson94/buzzay/",
     "source_branch": "main",
-    "source_directory": "docs/source/",
+    "source_directory": "docs/source",
 }
 

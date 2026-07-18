@@ -1,3 +1,0 @@
-html:not([data-theme]) {
-    visibility: hidden;
-}

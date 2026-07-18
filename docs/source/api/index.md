@@ -1,5 +1,9 @@
-# Developer Documentation
+# Plugin Docs
+
+Documentation on how to write plugins for buzzay.
 
 ```{toctree}
-server
+getting-started
+plugin-api
+extra-info
 ```
