@@ -177,11 +177,11 @@ void msg_plugin(const char *plugin_name, int argc, char **argv, int client_fd) {
         return;
     }
 
-    typedef void (*msg_request)(int argc, char **argv);
+    typedef char *(*msg_request)(int argc, char **argv);
     msg_request msg_func = msg_sym;
-    msg_func(argc, argv);
 
-    send_msg_back(client_fd, "OK!\n");
+    const char *response = msg_func(argc, argv);
+    send_msg_back(client_fd, response);
 }
 
 // == Implement Helpers ==
