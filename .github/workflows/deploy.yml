@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pacman -Syu --noconfirm base-devel doxygen python-pip
+          pacman -Syu --noconfirm base-devel doxygen python-pip git
           pip install --break-system-packages -r docs/requirements.txt
 
       - name: Build docs
