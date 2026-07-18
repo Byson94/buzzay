@@ -4,7 +4,8 @@ Extra information about plugins are handled.
 
 ## Plugin Resolval
 
-For a plugin to be resolved, they must be in the `/usr/lib/buzzay-plugins/` directory root.
+For a plugin to be resolved, they must be in the `/usr/lib/buzzay-plugins/` directory root or
+the `~/.local/share/buzzay-plugins` directory root.
 The name of the plugin is learnt directly from the filename instead of any metadata provided 
 inside the plugin.
 
