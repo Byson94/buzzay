@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <wayland-server-core.h>
+#include <wlr/types/wlr_layer_shell_v1.h>
 
-#include "buzzay-plugin.h"
+#include "server.h"
 #include "layershell.h"
 
 static void layershell_new_popup(struct wl_listener *listener, void *data) {

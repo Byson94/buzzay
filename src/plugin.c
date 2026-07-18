@@ -10,6 +10,7 @@
 
 #include "buzzay-plugin.h"
 #include "handle-plugin.h"
+#include "server.h"
 #include "ipc.h"
 
 struct plugin_data *plugin_array = NULL;
@@ -119,7 +120,7 @@ void handle_plugin(char *path, const char *plugin_name, struct buzzay_server *se
     struct bz_plugin plugin = {
         .plugin_name = plugin_name,
         .plugin_path = path,
-        .server = server,
+        ._internal_server = server,
     };
 
     init_func(&plugin);
@@ -187,16 +188,19 @@ void msg_plugin(const char *plugin_name, int argc, char **argv, int client_fd) {
 // == Implement Helpers ==
 
 BZ_API void bz_quit(struct bz_plugin *plugin) {
-    wl_display_terminate(plugin->server->wl_display);
+    struct buzzay_server *server = plugin->_internal_server;
+    wl_display_terminate(server->wl_display);
 }
 
 BZ_API void bz_set_decoration_mode(struct bz_plugin *plugin, enum bz_decoration_mode mode) {
+    struct buzzay_server *server = plugin->_internal_server;
+
     switch (mode) {
         case BZ_DECORATION_CLIENT_SIDE:
-            plugin->server->decoration_mode = WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_CLIENT_SIDE;
+            server->decoration_mode = WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_CLIENT_SIDE;
             break;
         case BZ_DECORATION_SERVER_SIDE:
-            plugin->server->decoration_mode = WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE;
+            server->decoration_mode = WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE;
             break;
     }
 }

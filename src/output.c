@@ -5,7 +5,7 @@
 #include <wlr/types/wlr_output_layout.h>
 #include <wlr/types/wlr_scene.h>
 
-#include "buzzay-plugin.h"
+#include "server.h"
 #include "output.h"
 
 static void output_frame(struct wl_listener *listener, void *data) {

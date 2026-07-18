@@ -1,6 +1,7 @@
 #pragma once
 
 #include "buzzay-plugin.h"
+#include "server.h"
 
 struct plugin_data {
     const char *name;

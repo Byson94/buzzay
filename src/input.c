@@ -9,6 +9,7 @@
 
 #include "buzzay-plugin.h"
 #include "handle-plugin.h"
+#include "server.h"
 #include "input.h"
 
 static void keyboard_handle_modifiers(
@@ -29,6 +30,15 @@ static void keyboard_handle_modifiers(
 		&keyboard->wlr_keyboard->modifiers);
 }
 
+static uint32_t bz_to_wlr_modifiers(uint32_t bz_mods) {
+    uint32_t wlr_mods = 0;
+    if (bz_mods & BZ_MOD_SHIFT) wlr_mods |= WLR_MODIFIER_SHIFT;
+    if (bz_mods & BZ_MOD_ALT)   wlr_mods |= WLR_MODIFIER_ALT;
+    if (bz_mods & BZ_MOD_CTRL)  wlr_mods |= WLR_MODIFIER_CTRL;
+    if (bz_mods & BZ_MOD_SUPER) wlr_mods |= WLR_MODIFIER_LOGO;
+    return wlr_mods;
+}
+
 bool handle_keybinding(struct buzzay_server *server, xkb_keysym_t sym, uint32_t modifiers, bool is_release) {
     bool is_passthrough = false;
 
@@ -43,7 +53,9 @@ bool handle_keybinding(struct buzzay_server *server, xkb_keysym_t sym, uint32_t 
             continue;
         }
 
-        if (kb->sym == sym && (modifiers & BZ_ALLOWED_MODS) == kb->modifiers) {
+        if (kb->sym == sym 
+                && bz_to_wlr_modifiers(modifiers & BZ_ALLOWED_MODS) 
+                == (kb->modifiers & bz_to_wlr_modifiers(BZ_ALLOWED_MODS))) {
             if (kb->handler) {
                 kb->handler(kb_dat->owner);
 
@@ -79,7 +91,19 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
 			keyboard->wlr_keyboard->xkb_state, keycode, &syms);
 
     // get kb modifiers
-	uint32_t modifiers = wlr_keyboard_get_modifiers(keyboard->wlr_keyboard);
+    uint32_t modifiers = 0;
+    if (xkb_state_mod_index_is_active(keyboard->wlr_keyboard->xkb_state, 
+            xkb_keymap_mod_get_index(keyboard->wlr_keyboard->keymap, XKB_MOD_NAME_SHIFT), 
+            XKB_STATE_MODS_EFFECTIVE)) modifiers |= WLR_MODIFIER_SHIFT;
+    if (xkb_state_mod_index_is_active(keyboard->wlr_keyboard->xkb_state, 
+            xkb_keymap_mod_get_index(keyboard->wlr_keyboard->keymap, XKB_MOD_NAME_ALT), 
+            XKB_STATE_MODS_EFFECTIVE)) modifiers |= WLR_MODIFIER_ALT;
+    if (xkb_state_mod_index_is_active(keyboard->wlr_keyboard->xkb_state, 
+            xkb_keymap_mod_get_index(keyboard->wlr_keyboard->keymap, XKB_MOD_NAME_CTRL), 
+            XKB_STATE_MODS_EFFECTIVE)) modifiers |= WLR_MODIFIER_CTRL;
+    if (xkb_state_mod_index_is_active(keyboard->wlr_keyboard->xkb_state, 
+            xkb_keymap_mod_get_index(keyboard->wlr_keyboard->keymap, XKB_MOD_NAME_LOGO), 
+            XKB_STATE_MODS_EFFECTIVE)) modifiers |= WLR_MODIFIER_LOGO;
 
     // quickly handle tty switching
     if ((modifiers & WLR_MODIFIER_ALT) && 

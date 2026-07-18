@@ -3,67 +3,12 @@
 #ifndef BUZZAY_PLUGIN
 #define BUZZAY_PLUGIN
 
-#include <wayland-client-core.h>
-#include <wlr/types/wlr_input_device.h>
-#include <wlr/types/wlr_xdg_shell.h>
-#include <wlr/types/wlr_xdg_decoration_v1.h>
-#include <wlr/types/wlr_layer_shell_v1.h>
+#include <xkbcommon/xkbcommon.h>
 
 // MUST increment once every release
 // IF a change is made to the file
 #define BUZZAY_API_VERSION 1
 #define BZ_API __attribute__((visibility("default")))
-
-// Server is the source of all truth
-// WHEN UPDATING, MAKE SURE TO APPEND THE NEW
-// FIELD AT THE "END OF THE STRUCTURE". DO NOT
-// REORDER ANY FIELD.
-/**
- * The compositor server that contains IMPORTANT
- * data like the `wl_display` that are crucial for 
- * the functioning of the compositor.
- */
-struct buzzay_server {
-    struct wl_display *wl_display;
-    struct wl_event_loop *wl_event_loop;
-    struct wlr_backend *backend;
-    struct wlr_renderer *renderer;
-    struct wlr_allocator *allocator;
-    struct wlr_session *session;
-    struct wlr_scene *scene;
-	struct wlr_scene_output_layout *scene_layout;
-
-	struct wlr_xdg_shell *xdg_shell;
-	struct wl_listener new_xdg_toplevel;
-	struct wl_listener new_xdg_popup;
-	struct wl_list toplevels;
-
-    struct wlr_xdg_decoration_manager_v1 *xdg_decoration;
-    enum wlr_xdg_toplevel_decoration_v1_mode decoration_mode;
-    struct wl_listener new_toplevel_decoration;
-
-    struct wlr_cursor *cursor;
-    struct wlr_xcursor_manager *cursor_mgr;
-	struct wl_listener cursor_motion;
-	struct wl_listener cursor_motion_absolute;
-	struct wl_listener cursor_button;
-	struct wl_listener cursor_axis;
-	struct wl_listener cursor_frame;
-
-    struct wlr_seat *seat;
-    struct wl_list keyboards;
-    struct wl_listener new_input;
-	struct wl_listener request_cursor;
-	struct wl_listener pointer_focus_change;
-	struct wl_listener request_set_selection;
-
-    struct wlr_output_layout *output_layout;
-    struct wl_list outputs;
-    struct wl_listener new_output;
-
-    struct wlr_layer_shell_v1 *layer_shell;
-    struct wl_listener new_layer_surface;
-};
 
 /**
  *  The plugin wrapper structure that contains important
@@ -73,17 +18,15 @@ struct bz_plugin {
     const char *plugin_name; /**< The name of the plugin. */
     const char *plugin_path; /**< The version number of the plugin. */
 
-    /** 
-     * The buzzay server that is required for all the API function calls.
-     * Only access and modify this if you know what you are doing and there are no
-     * API's to do what you want.
-     */
-    struct buzzay_server *server;
-
     /**
      * Any data that you can insert into the plugin.
      */
     void *data;
+
+    /**
+     * Internal compositor server.
+     */
+    void *_internal_server;
 };
 
 // General
@@ -110,10 +53,10 @@ BZ_API void bz_set_decoration_mode(struct bz_plugin *plugin, enum bz_decoration_
 #define BZ_ALLOWED_MODS (BZ_MOD_SHIFT | BZ_MOD_ALT | BZ_MOD_CTRL | BZ_MOD_SUPER)
 
 typedef enum {
-    BZ_MOD_SHIFT = WLR_MODIFIER_SHIFT,
-    BZ_MOD_ALT   = WLR_MODIFIER_ALT,
-    BZ_MOD_CTRL  = WLR_MODIFIER_CTRL,
-    BZ_MOD_SUPER = WLR_MODIFIER_LOGO,
+    BZ_MOD_SHIFT = 1 << 0, // WLR_MODIFIER_SHIFT
+    BZ_MOD_ALT   = 1 << 1, // WLR_MODIFIER_ALT
+    BZ_MOD_CTRL  = 1 << 2, // WLR_MODIFIER_CTRL
+    BZ_MOD_SUPER = 1 << 3, // WLR_MODIFIER_LOGO
 } bz_modifier_t;
 
 typedef enum {

@@ -25,12 +25,12 @@
 #include <wlr/types/wlr_scene.h>
 #include <wlr/render/allocator.h>
 
-#include "buzzay-plugin.h"
 #include "handle-plugin.h"
 #include "layershell.h"
 #include "input.h"
 #include "output.h"
 #include "cursor.h"
+#include "server.h"
 #include "xdg.h"
 #include "ipc.h"
 
