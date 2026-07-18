@@ -81,6 +81,19 @@ struct bz_plugin {
  */
 BZ_API void bz_quit(struct bz_plugin *plugin);
 
+/** Decoration modes **/
+enum bz_decoration_mode {
+    /** Let the client draw their own decoration **/
+    BZ_DECORATION_CLIENT_SIDE,
+    /** Does not apply any decoration **/
+    BZ_DECORATION_SERVER_SIDE,
+};
+
+/**
+ * Set window decoration mode.
+ */
+BZ_API void bz_set_decoration_mode(struct bz_plugin *plugin, enum bz_decoration_mode mode);
+
 // Keybinding API's
 #define BZ_ALLOWED_MODS (BZ_MOD_SHIFT | BZ_MOD_ALT | BZ_MOD_CTRL | BZ_MOD_SUPER)
 

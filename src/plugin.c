@@ -167,6 +167,17 @@ BZ_API void bz_quit(struct bz_plugin *plugin) {
     wl_display_terminate(plugin->server->wl_display);
 }
 
+BZ_API void bz_set_decoration_mode(struct bz_plugin *plugin, enum bz_decoration_mode mode) {
+    switch (mode) {
+        case BZ_DECORATION_CLIENT_SIDE:
+            plugin->server->decoration_mode = WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_CLIENT_SIDE;
+            break;
+        case BZ_DECORATION_SERVER_SIDE:
+            plugin->server->decoration_mode = WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE;
+            break;
+    }
+}
+
 struct keybinding_data *keybinding_arr = NULL;
 int keybinding_count = 0;
 int keybinding_capacity = 0;

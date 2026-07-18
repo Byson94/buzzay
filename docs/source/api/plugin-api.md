@@ -18,9 +18,20 @@ The API documentation of `buzzay-plugin.h`.
 :members:
 ```
 
+## Enums 
+
+```{doxygenenum} bz_decoration_mode
+:project: buzzay
+:members:
+```
+
 ## API Functions
 
 ```{doxygenfunction} bz_quit 
+:project: buzzay
+```
+
+```{doxygenfunction} bz_set_decoration_mode
 :project: buzzay
 ```
 
