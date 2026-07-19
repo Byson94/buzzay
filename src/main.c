@@ -28,6 +28,7 @@
 #include <wlr/types/wlr_idle_inhibit_v1.h>
 #include <wlr/types/wlr_idle_notify_v1.h>
 #include <wlr/types/wlr_scene.h>
+#include <wlr/types/wlr_viewporter.h>
 #include <wlr/render/allocator.h>
 
 #include "handle-plugin.h"
@@ -185,6 +186,9 @@ int main(int argc, char** argv) {
     server.new_toplevel_decoration.notify = server_new_toplevel_decoration;
     wl_signal_add(&server.xdg_decoration->events.new_toplevel_decoration, &server.new_toplevel_decoration);
 
+    // Setup viewporter
+    wlr_viewporter_create(server.wl_display);
+    
     // Setup layer shell
     server.layer_shell = wlr_layer_shell_v1_create(server.wl_display, 5);
     server.new_layer_surface.notify = server_new_layer_surface;
