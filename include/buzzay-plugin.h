@@ -139,19 +139,62 @@ BZ_API void bz_unregister_keybinding(bz_binding_handle_t handle);
 
 // Window Manager API'S
 
+struct bz_window {
+    const char *name;
+    const int id, x, y;
+};
+
+struct bz_window_anim {
+    struct bz_window *win;
+    int target_x, target_y;
+    double progress;
+};
+
 enum bz_window_hook {
     BZ_WINDOW_RESIZE,
     BZ_WINDOW_MOVE,
     BZ_WINDOW_MAXIMIZE,
     BZ_WINDOW_FULLSCREEN,
+
+    BZ_WINDOW_OPEN,
 };
 
-BZ_API void bz_window_hook(
+// hooks
+
+BZ_API void bz_window_hook_resize(
         struct bz_plugin *plugin, 
         enum bz_window_hook hook,
-        void (*callback)(struct bz_plugin *plugin));
+        void (*callback)(struct bz_plugin *plugin, void *data));
 
-BZ_API void bz_get_active_window(struct bz_plugin *plugin);
+BZ_API void bz_window_hook_move(
+        struct bz_plugin *plugin, 
+        enum bz_window_hook hook,
+        void (*callback)(struct bz_plugin *plugin, void *data));
+
+BZ_API void bz_window_hook_maximize(
+        struct bz_plugin *plugin, 
+        enum bz_window_hook hook,
+        void (*callback)(struct bz_plugin *plugin, void *data));
+
+BZ_API void bz_window_hook_minimize(
+        struct bz_plugin *plugin, 
+        enum bz_window_hook hook,
+        void (*callback)(struct bz_plugin *plugin, void *data));
+
+BZ_API void bz_window_hook_open(
+        struct bz_plugin *plugin, 
+        enum bz_window_hook hook,
+        void (*callback)(struct bz_plugin *plugin, void *data));
+
+// other
+
+BZ_API void bz_window_request_move(
+        struct bz_plugin *plugin, 
+        struct bz_window *window, 
+        int target_x, 
+        int target_y);
+
+BZ_API struct bz_window bz_window_get_active(struct bz_plugin *plugin);
 
 enum bz_window_event {
     BZ_WINDOW_HOVER,
