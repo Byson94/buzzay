@@ -17,3 +17,7 @@ and test it out on your own!
 
 To compile buzzay, just run the `make` command.
 
+## Acknowledgements
+
+Buzzay started out by extending tinywl (CC0) from the sway/wlroots team. This project wouldn't have been 
+possible without the base of tinywl.
