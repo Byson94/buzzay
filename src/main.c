@@ -9,6 +9,7 @@
 #include <sys/un.h>
 #include <sys/socket.h>
 #include <wayland-server-core.h>
+#include <wayland-util.h>
 #include <wlr/backend.h>
 #include <wlr/util/log.h>
 #include <wlr/backend/session.h>
@@ -24,6 +25,8 @@
 #include <wlr/types/wlr_layer_shell_v1.h>
 #include <wlr/types/wlr_gamma_control_v1.h>
 #include <wlr/types/wlr_cursor_shape_v1.h>
+#include <wlr/types/wlr_idle_inhibit_v1.h>
+#include <wlr/types/wlr_idle_notify_v1.h>
 #include <wlr/types/wlr_scene.h>
 #include <wlr/render/allocator.h>
 
@@ -34,6 +37,7 @@
 #include "cursor.h"
 #include "server.h"
 #include "gamma.h"
+#include "idle.h"
 #include "xdg.h"
 #include "ipc.h"
 
@@ -191,6 +195,14 @@ int main(int argc, char** argv) {
     server.set_gamma.notify = server_new_set_gamma;
     wl_signal_add(&server.gamma_mgr->events.set_gamma, &server.set_gamma);
 
+    // setup idle inhibit and notifier
+    server.idle_inhibit_count = 0;
+    server.idle_inhibit_mgr = wlr_idle_inhibit_v1_create(server.wl_display);
+    server.idle_new_inhibitor.notify = server_new_idle_new_inhibitor;
+    wl_signal_add(&server.idle_inhibit_mgr->events.new_inhibitor, &server.idle_new_inhibitor);
+
+    server.idle_notifier = wlr_idle_notifier_v1_create(server.wl_display);
+
     // create a cursor (the image)
     server.cursor = wlr_cursor_create();
     wlr_cursor_attach_output_layout(server.cursor, server.output_layout);
@@ -328,6 +340,7 @@ int main(int argc, char** argv) {
 
     wl_list_remove(&server.new_layer_surface.link);
     wl_list_remove(&server.set_gamma.link);
+    wl_list_remove(&server.idle_new_inhibitor.link);
 
     wlr_scene_node_destroy(&server.scene->tree.node);
     wlr_xcursor_manager_destroy(server.cursor_mgr);

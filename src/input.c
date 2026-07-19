@@ -6,6 +6,7 @@
 #include <wlr/types/wlr_cursor.h>
 #include <wlr/types/wlr_scene.h>
 #include <wlr/types/wlr_xdg_shell.h>
+#include <wlr/types/wlr_idle_notify_v1.h>
 
 #include "buzzay-plugin.h"
 #include "handle-plugin.h"
@@ -140,6 +141,8 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
 		wlr_seat_keyboard_notify_key(seat, event->time_msec,
 			event->keycode, event->state);
 	}
+
+    wlr_idle_notifier_v1_notify_activity(server->idle_notifier, server->seat);
 }
 
 static void keyboard_handle_destroy(struct wl_listener *listener, void *data) {

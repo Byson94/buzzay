@@ -51,5 +51,10 @@ struct buzzay_server {
 
     struct wlr_gamma_control_manager_v1 *gamma_mgr;
     struct wl_listener set_gamma;
+
+    struct wlr_idle_inhibit_manager_v1 *idle_inhibit_mgr;
+    struct wl_listener idle_new_inhibitor;
+    struct wlr_idle_notifier_v1 *idle_notifier;
+    int idle_inhibit_count;
 };
 

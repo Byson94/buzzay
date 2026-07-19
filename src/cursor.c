@@ -7,6 +7,7 @@
 #include <wlr/types/wlr_scene.h>
 #include <wlr/types/wlr_data_device.h>
 #include <wlr/types/wlr_cursor_shape_v1.h>
+#include <wlr/types/wlr_idle_notify_v1.h>
 
 #include "server.h"
 #include "cursor.h"
@@ -71,6 +72,8 @@ static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
 		 * the last client to have the cursor over it. */
 		wlr_seat_pointer_clear_focus(seat);
 	}
+
+    wlr_idle_notifier_v1_notify_activity(server->idle_notifier, server->seat);
 }
 
 void server_cursor_motion(struct wl_listener *listener, void *data) {
