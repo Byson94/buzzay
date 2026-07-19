@@ -4,6 +4,7 @@
 #include <wlr/backend.h>
 
 struct buzzay_gamma {
+    struct wlr_session *session;
     struct wlr_output *output;
     struct wl_listener destroy;
 };

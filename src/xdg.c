@@ -199,6 +199,8 @@ static void xdg_toplevel_request_move(struct wl_listener *listener, void *data) 
     struct wlr_xdg_toplevel_move_event *event = data;
 	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, request_move);
 
+    printf("INPUT!\n");
+
     if (!toplevel->server->enable_xdg_interactive) {
         return;
     } else if (event->serial != toplevel->server->last_serial) {
