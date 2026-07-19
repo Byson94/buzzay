@@ -70,5 +70,6 @@ struct buzzay_server {
 
     // Config
     bool enable_xdg_interactive; // actions like move & resize
+    enum window_active_evt window_active_on;
 };
 

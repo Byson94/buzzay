@@ -121,6 +121,11 @@ static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
 		 * around the screen, not over any toplevels. */
 		wlr_cursor_set_xcursor(server->cursor, server->cursor_mgr, "default");
 	}
+
+    if (server->window_active_on == WINDOW_ACTIVE_ON_HOVER) {
+        focus_toplevel(toplevel);
+    }
+
 	if (surface) {
 		/*
 		 * Send pointer enter and motion events.
@@ -133,6 +138,7 @@ static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
 		 * the surface has already has pointer focus or if the client is already
 		 * aware of the coordinates passed.
 		 */
+
 		wlr_seat_pointer_notify_enter(seat, surface, sx, sy);
 		wlr_seat_pointer_notify_motion(seat, time, sx, sy);
 	} else {
@@ -173,6 +179,7 @@ void server_cursor_motion_absolute(
 	struct wlr_pointer_motion_absolute_event *event = data;
 	wlr_cursor_warp_absolute(server->cursor, &event->pointer->base, event->x,
 		event->y);
+
     process_cursor_motion(server, event->time_msec);
 }
 
@@ -195,13 +202,14 @@ void server_cursor_button(struct wl_listener *listener, void *data) {
             reset_cursor_mode(server);
             server->cursor_recently_reset = true;
         }
-	} else {
+	} else if (server->window_active_on == WINDOW_ACTIVE_ON_CLICK) {
 		/* Focus that client if the button was _pressed_ */
-		double sx, sy;
-		struct wlr_surface *surface = NULL;
-		struct buzzay_toplevel *toplevel = desktop_toplevel_at(server,
-				server->cursor->x, server->cursor->y, &surface, &sx, &sy);
-		focus_toplevel(toplevel);
+        double sx, sy;
+        struct wlr_surface *surface = NULL;
+        struct buzzay_toplevel *toplevel = desktop_toplevel_at(server,
+                server->cursor->x, server->cursor->y, &surface, &sx, &sy);
+
+        focus_toplevel(toplevel);
 	}
 }
 

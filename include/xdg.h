@@ -31,6 +31,11 @@ struct buzzay_decoration {
     struct wl_listener destroy;
 };
 
+enum window_active_evt {
+    WINDOW_ACTIVE_ON_HOVER,
+    WINDOW_ACTIVE_ON_CLICK,
+};
+
 void reset_cursor_mode(struct buzzay_server *server);
 
 void focus_toplevel(struct buzzay_toplevel *toplevel);

@@ -12,6 +12,7 @@
 #include "handle-plugin.h"
 #include "server.h"
 #include "ipc.h"
+#include "xdg.h"
 
 struct plugin_data *plugin_array = NULL;
 int plugin_count = 0;
@@ -249,6 +250,22 @@ BZ_API void bz_unregister_keybinding(bz_binding_handle_t handle) {
 }
 
 // Window API"S
+
+BZ_API void bz_window_active_on(struct bz_plugin *plugin, enum bz_window_event mode) {
+    enum window_active_evt active_mode;
+
+    switch (mode) {
+        case BZ_WINDOW_CLICK:
+            active_mode = WINDOW_ACTIVE_ON_CLICK;
+            break;
+        case BZ_WINDOW_HOVER:
+            active_mode = WINDOW_ACTIVE_ON_HOVER;
+            break;
+    }
+
+    struct buzzay_server *server = plugin->_internal_server;
+    server->window_active_on = active_mode;
+}
 
 // struct window_hook_data *window_hook_array = NULL;
 // int window_hook_count = 0;
