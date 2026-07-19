@@ -41,7 +41,75 @@ static struct buzzay_toplevel *desktop_toplevel_at(
 	return tree->node.data;
 }
 
+static void process_cursor_move(struct buzzay_server *server) {
+	/* Move the grabbed toplevel to the new position. */
+	struct buzzay_toplevel *toplevel = server->grabbed_toplevel;
+	wlr_scene_node_set_position(&toplevel->scene_tree->node,
+		server->cursor->x - server->grab_x,
+		server->cursor->y - server->grab_y);
+}
+
+static void process_cursor_resize(struct buzzay_server *server) {
+	/*
+	 * Resizing the grabbed toplevel can be a little bit complicated, because we
+	 * could be resizing from any corner or edge. This not only resizes the
+	 * toplevel on one or two axes, but can also move the toplevel if you resize
+	 * from the top or left edges (or top-left corner).
+	 *
+	 * Note that some shortcuts are taken here. In a more fleshed-out
+	 * compositor, you'd wait for the client to prepare a buffer at the new
+	 * size, then commit any movement that was prepared.
+	 */
+	struct buzzay_toplevel *toplevel = server->grabbed_toplevel;
+	double border_x = server->cursor->x - server->grab_x;
+	double border_y = server->cursor->y - server->grab_y;
+	int new_left = server->grab_geobox.x;
+	int new_right = server->grab_geobox.x + server->grab_geobox.width;
+	int new_top = server->grab_geobox.y;
+	int new_bottom = server->grab_geobox.y + server->grab_geobox.height;
+
+	if (server->resize_edges & WLR_EDGE_TOP) {
+		new_top = border_y;
+		if (new_top >= new_bottom) {
+			new_top = new_bottom - 1;
+		}
+	} else if (server->resize_edges & WLR_EDGE_BOTTOM) {
+		new_bottom = border_y;
+		if (new_bottom <= new_top) {
+			new_bottom = new_top + 1;
+		}
+	}
+	if (server->resize_edges & WLR_EDGE_LEFT) {
+		new_left = border_x;
+		if (new_left >= new_right) {
+			new_left = new_right - 1;
+		}
+	} else if (server->resize_edges & WLR_EDGE_RIGHT) {
+		new_right = border_x;
+		if (new_right <= new_left) {
+			new_right = new_left + 1;
+		}
+	}
+
+	struct wlr_box *geo_box = &toplevel->xdg_toplevel->base->geometry;
+	wlr_scene_node_set_position(&toplevel->scene_tree->node,
+		new_left - geo_box->x, new_top - geo_box->y);
+
+	int new_width = new_right - new_left;
+	int new_height = new_bottom - new_top;
+	wlr_xdg_toplevel_set_size(toplevel->xdg_toplevel, new_width, new_height);
+}
+
 static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
+	/* If the mode is non-passthrough, delegate to those functions. */
+	if (server->cursor_mode == BUZZAY_CURSOR_MOVE) {
+		process_cursor_move(server);
+		return;
+	} else if (server->cursor_mode == BUZZAY_CURSOR_RESIZE) {
+		process_cursor_resize(server);
+		return;
+	}
+
 	double sx, sy;
 	struct wlr_seat *seat = server->seat;
 	struct wlr_surface *surface = NULL;
@@ -114,10 +182,19 @@ void server_cursor_button(struct wl_listener *listener, void *data) {
 	struct buzzay_server *server =
 		wl_container_of(listener, server, cursor_button);
 	struct wlr_pointer_button_event *event = data;
+
 	/* Notify the client with pointer focus that a button press has occurred */
-	wlr_seat_pointer_notify_button(server->seat,
+	uint32_t serial = wlr_seat_pointer_notify_button(server->seat,
 			event->time_msec, event->button, event->state);
+
+    server->last_serial = serial;
+    server->cursor_recently_reset = false;
+
 	if (event->state == WL_POINTER_BUTTON_STATE_RELEASED) {
+        if (server->cursor_mode != BUZZAY_CURSOR_PASSTHROUGH) {
+            reset_cursor_mode(server);
+            server->cursor_recently_reset = true;
+        }
 	} else {
 		/* Focus that client if the button was _pressed_ */
 		double sx, sy;

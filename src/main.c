@@ -122,6 +122,9 @@ int main(int argc, char** argv) {
 
     struct buzzay_server server = {0};
 
+    // Setup Configs
+    server.enable_xdg_interactive = true;
+
     // - managed by libwayland. 
     // - manages many stuff.
     server.wl_display = wl_display_create();
@@ -235,6 +238,7 @@ int main(int argc, char** argv) {
     wl_signal_add(&server.cursor_shape_mgr->events.request_set_shape, &server.cursor_request_set_shape);
 
     // track cursor movement
+    server.cursor_mode = BUZZAY_CURSOR_PASSTHROUGH;
     server.cursor_motion.notify = server_cursor_motion;
     wl_signal_add(&server.cursor->events.motion, &server.cursor_motion);
     server.cursor_motion_absolute.notify = server_cursor_motion_absolute;

@@ -6,8 +6,10 @@
 #include <wlr/types/wlr_scene.h>
 #include <wlr/types/wlr_xdg_shell.h>
 #include <wlr/types/wlr_xdg_decoration_v1.h>
+#include <wlr/types/wlr_xcursor_manager.h>
 
 #include "server.h"
+#include "cursor.h"
 #include "xdg.h"
 
 void focus_toplevel(struct buzzay_toplevel *toplevel) {
@@ -62,9 +64,22 @@ static void xdg_toplevel_map(struct wl_listener *listener, void *data) {
 	focus_toplevel(toplevel);
 }
 
+void reset_cursor_mode(struct buzzay_server *server) {
+	/* Reset the cursor mode to passthrough. */
+	server->cursor_mode = BUZZAY_CURSOR_PASSTHROUGH;
+	server->grabbed_toplevel = NULL;
+}
+
+
 static void xdg_toplevel_unmap(struct wl_listener *listener, void *data) {
 	/* Called when the surface is unmapped, and should no longer be shown. */
 	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, unmap);
+
+	/* Reset the cursor mode if the grabbed toplevel was unmapped. */
+	if (toplevel == toplevel->server->grabbed_toplevel) {
+		reset_cursor_mode(toplevel->server);
+	}
+
 	wl_list_remove(&toplevel->link);
 }
 
@@ -90,8 +105,8 @@ static void xdg_toplevel_destroy(struct wl_listener *listener, void *data) {
 	wl_list_remove(&toplevel->unmap.link);
 	wl_list_remove(&toplevel->commit.link);
 	wl_list_remove(&toplevel->destroy.link);
-	// wl_list_remove(&toplevel->request_move.link);
-	// wl_list_remove(&toplevel->request_resize.link);
+	wl_list_remove(&toplevel->request_move.link);
+	wl_list_remove(&toplevel->request_resize.link);
 	wl_list_remove(&toplevel->request_maximize.link);
 	wl_list_remove(&toplevel->request_fullscreen.link);
 
@@ -144,6 +159,77 @@ static void xdg_popup_destroy(struct wl_listener *listener, void *data) {
 	free(popup);
 }
 
+static void begin_interactive(struct buzzay_toplevel *toplevel,
+		enum buzzay_cursor_mode mode, uint32_t edges) {
+	/* This function sets up an interactive move or resize operation, where the
+	 * compositor stops propagating pointer events to clients and instead
+	 * consumes them itself, to move or resize windows. */
+	struct buzzay_server *server = toplevel->server;
+
+	server->grabbed_toplevel = toplevel;
+	server->cursor_mode = mode;
+
+	if (mode == BUZZAY_CURSOR_MOVE) {
+		server->grab_x = server->cursor->x - toplevel->scene_tree->node.x;
+		server->grab_y = server->cursor->y - toplevel->scene_tree->node.y;
+	} else {
+		struct wlr_box *geo_box = &toplevel->xdg_toplevel->base->geometry;
+
+		double border_x = (toplevel->scene_tree->node.x + geo_box->x) +
+			((edges & WLR_EDGE_RIGHT) ? geo_box->width : 0);
+		double border_y = (toplevel->scene_tree->node.y + geo_box->y) +
+			((edges & WLR_EDGE_BOTTOM) ? geo_box->height : 0);
+		server->grab_x = server->cursor->x - border_x;
+		server->grab_y = server->cursor->y - border_y;
+
+		server->grab_geobox = *geo_box;
+		server->grab_geobox.x += toplevel->scene_tree->node.x;
+		server->grab_geobox.y += toplevel->scene_tree->node.y;
+
+		server->resize_edges = edges;
+	}
+}
+
+static void xdg_toplevel_request_move(struct wl_listener *listener, void *data) {
+	/* This event is raised when a client would like to begin an interactive
+	 * move, typically because the user clicked on their client-side
+	 * decorations. Note that a more sophisticated compositor should check the
+	 * provided serial against a list of button press serials sent to this
+	 * client, to prevent the client from requesting this whenever they want. */
+    struct wlr_xdg_toplevel_move_event *event = data;
+	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, request_move);
+
+    if (!toplevel->server->enable_xdg_interactive) {
+        return;
+    } else if (event->serial != toplevel->server->last_serial) {
+        return;
+    } else if (toplevel->server->cursor_recently_reset) {
+        return;
+    }
+
+	begin_interactive(toplevel, BUZZAY_CURSOR_MOVE, 0);
+}
+
+static void xdg_toplevel_request_resize(struct wl_listener *listener, void *data) {
+	/* This event is raised when a client would like to begin an interactive
+	 * resize, typically because the user clicked on their client-side
+	 * decorations. Note that a more sophisticated compositor should check the
+	 * provided serial against a list of button press serials sent to this
+	 * client, to prevent the client from requesting this whenever they want. */
+	struct wlr_xdg_toplevel_resize_event *event = data;
+	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, request_resize);
+
+    if (!toplevel->server->enable_xdg_interactive) {
+        return;
+    } else if (event->serial != toplevel->server->last_serial) {
+        return;
+    } else if (toplevel->server->cursor_recently_reset) {
+        return;
+    }
+
+	begin_interactive(toplevel, BUZZAY_CURSOR_RESIZE, event->edges);
+}
+
 void server_new_xdg_toplevel(struct wl_listener *listener, void *data) {
 	/* This event is raised when a client creates a new toplevel (application window). */
 	struct buzzay_server *server = wl_container_of(listener, server, new_xdg_toplevel);
@@ -170,6 +256,10 @@ void server_new_xdg_toplevel(struct wl_listener *listener, void *data) {
 	wl_signal_add(&xdg_toplevel->events.destroy, &toplevel->destroy);
 
 	/* cotd */
+	toplevel->request_move.notify = xdg_toplevel_request_move;
+	wl_signal_add(&xdg_toplevel->events.request_move, &toplevel->request_move);
+	toplevel->request_resize.notify = xdg_toplevel_request_resize;
+	wl_signal_add(&xdg_toplevel->events.request_resize, &toplevel->request_resize);
 	toplevel->request_maximize.notify = xdg_toplevel_request_maximize;
 	wl_signal_add(&xdg_toplevel->events.request_maximize, &toplevel->request_maximize);
 	toplevel->request_fullscreen.notify = xdg_toplevel_request_fullscreen;

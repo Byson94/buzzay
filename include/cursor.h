@@ -2,6 +2,12 @@
 
 #include <wlr/backend.h>
 
+enum buzzay_cursor_mode {
+	BUZZAY_CURSOR_PASSTHROUGH,
+	BUZZAY_CURSOR_MOVE,
+	BUZZAY_CURSOR_RESIZE,
+};
+
 void server_cursor_motion(struct wl_listener *listener, void *data);
 void server_cursor_motion_absolute(struct wl_listener *listener, void *data);
 void server_cursor_button(struct wl_listener *listener, void *data);

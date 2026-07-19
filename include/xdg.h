@@ -31,6 +31,8 @@ struct buzzay_decoration {
     struct wl_listener destroy;
 };
 
+void reset_cursor_mode(struct buzzay_server *server);
+
 void focus_toplevel(struct buzzay_toplevel *toplevel);
 void server_new_xdg_toplevel(struct wl_listener *listener, void *data);
 void server_new_xdg_popup(struct wl_listener *listener, void *data);

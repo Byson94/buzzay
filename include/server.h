@@ -5,6 +5,9 @@
 #include <wayland-client-core.h>
 #include <wlr/types/wlr_xdg_decoration_v1.h>
 
+#include "cursor.h"
+#include "xdg.h"
+
 struct buzzay_server {
     struct wl_display *wl_display;
     struct wl_event_loop *wl_event_loop;
@@ -14,6 +17,7 @@ struct buzzay_server {
     struct wlr_session *session;
     struct wlr_scene *scene;
 	struct wlr_scene_output_layout *scene_layout;
+    struct wl_listener session_active;
 
 	struct wlr_xdg_shell *xdg_shell;
 	struct wl_listener new_xdg_toplevel;
@@ -41,6 +45,13 @@ struct buzzay_server {
 	struct wl_listener request_cursor;
 	struct wl_listener pointer_focus_change;
 	struct wl_listener request_set_selection;
+	enum buzzay_cursor_mode cursor_mode;
+	struct buzzay_toplevel *grabbed_toplevel;
+	double grab_x, grab_y;
+	struct wlr_box grab_geobox;
+	uint32_t resize_edges;
+    uint32_t last_serial;
+    bool cursor_recently_reset;
 
     struct wlr_output_layout *output_layout;
     struct wl_list outputs;
@@ -56,5 +67,8 @@ struct buzzay_server {
     struct wl_listener idle_new_inhibitor;
     struct wlr_idle_notifier_v1 *idle_notifier;
     int idle_inhibit_count;
+
+    // Config
+    bool enable_xdg_interactive; // actions like move & resize
 };
 
