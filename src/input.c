@@ -115,6 +115,7 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
         if (sym >= XKB_KEY_XF86Switch_VT_1 && sym <= XKB_KEY_XF86Switch_VT_12) {
             unsigned int vt = sym - XKB_KEY_XF86Switch_VT_1 + 1;
             wlr_session_change_vt(server->session, vt);
+            return;
         }
     }
 
