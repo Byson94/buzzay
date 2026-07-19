@@ -23,6 +23,7 @@
 #include <wlr/types/wlr_xdg_decoration_v1.h>
 #include <wlr/types/wlr_layer_shell_v1.h>
 #include <wlr/types/wlr_gamma_control_v1.h>
+#include <wlr/types/wlr_cursor_shape_v1.h>
 #include <wlr/types/wlr_scene.h>
 #include <wlr/render/allocator.h>
 
@@ -212,6 +213,11 @@ int main(int argc, char** argv) {
     }
     wlr_cursor_set_xcursor(server.cursor, server.cursor_mgr, "default");
 
+    // setup cursor shape protocol 
+    server.cursor_shape_mgr = wlr_cursor_shape_manager_v1_create(server.wl_display, 2);
+    server.cursor_request_set_shape.notify = server_new_request_cursor_set_shape;
+    wl_signal_add(&server.cursor_shape_mgr->events.request_set_shape, &server.cursor_request_set_shape);
+
     // track cursor movement
     server.cursor_motion.notify = server_cursor_motion;
     wl_signal_add(&server.cursor->events.motion, &server.cursor_motion);
@@ -315,6 +321,7 @@ int main(int argc, char** argv) {
 	wl_list_remove(&server.cursor_button.link);
 	wl_list_remove(&server.cursor_axis.link);
 	wl_list_remove(&server.cursor_frame.link);
+    wl_list_remove(&server.cursor_request_set_shape.link);
 
     wl_list_remove(&server.new_input.link);
     wl_list_remove(&server.new_output.link);

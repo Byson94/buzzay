@@ -32,6 +32,9 @@ struct buzzay_server {
 	struct wl_listener cursor_axis;
 	struct wl_listener cursor_frame;
 
+    struct wlr_cursor_shape_manager_v1 *cursor_shape_mgr;
+    struct wl_listener cursor_request_set_shape;
+
     struct wlr_seat *seat;
     struct wl_list keyboards;
     struct wl_listener new_input;

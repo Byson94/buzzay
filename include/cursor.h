@@ -11,3 +11,8 @@ void server_cursor_frame(struct wl_listener *listener, void *data);
 void seat_request_cursor(struct wl_listener *listener, void *data);
 void seat_pointer_focus_change(struct wl_listener *listener, void *data);
 void seat_request_set_selection(struct wl_listener *listener, void *data);
+
+// Cursor Shape protocol
+void server_new_request_cursor_set_shape(struct wl_listener *listener, void *data);
+
+

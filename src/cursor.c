@@ -1,9 +1,12 @@
 #include <wayland-client-core.h>
 #include <wlr/backend.h>
+#include <wlr/util/log.h>
 #include <wlr/types/wlr_cursor.h>
+#include <wlr/types/wlr_xcursor_manager.h>
 #include <wlr/types/wlr_seat.h>
 #include <wlr/types/wlr_scene.h>
 #include <wlr/types/wlr_data_device.h>
+#include <wlr/types/wlr_cursor_shape_v1.h>
 
 #include "server.h"
 #include "cursor.h"
@@ -190,3 +193,11 @@ void seat_request_set_selection(struct wl_listener *listener, void *data) {
 	wlr_seat_set_selection(server->seat, event->source, event->serial);
 }
 
+// Curosr shape protocol 
+void server_new_request_cursor_set_shape(struct wl_listener *listener, void *data) {
+    struct buzzay_server *server = wl_container_of(listener, server, cursor_request_set_shape);
+    struct wlr_cursor_shape_manager_v1_request_set_shape_event *shape_event = data;
+    const char *shape_name = wlr_cursor_shape_v1_name(shape_event->shape);
+
+    wlr_cursor_set_xcursor(server->cursor, server->cursor_mgr, shape_name);
+}
