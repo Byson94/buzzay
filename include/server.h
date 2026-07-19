@@ -1,5 +1,6 @@
 #pragma once
 
+#include <wayland-server-core.h>
 #include <wlr/backend.h>
 #include <wayland-client-core.h>
 #include <wlr/types/wlr_xdg_decoration_v1.h>
@@ -44,5 +45,8 @@ struct buzzay_server {
 
     struct wlr_layer_shell_v1 *layer_shell;
     struct wl_listener new_layer_surface;
+
+    struct wlr_gamma_control_manager_v1 *gamma_mgr;
+    struct wl_listener set_gamma;
 };
 

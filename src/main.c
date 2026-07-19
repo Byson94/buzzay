@@ -22,6 +22,7 @@
 #include <wlr/types/wlr_xcursor_manager.h>
 #include <wlr/types/wlr_xdg_decoration_v1.h>
 #include <wlr/types/wlr_layer_shell_v1.h>
+#include <wlr/types/wlr_gamma_control_v1.h>
 #include <wlr/types/wlr_scene.h>
 #include <wlr/render/allocator.h>
 
@@ -31,6 +32,7 @@
 #include "output.h"
 #include "cursor.h"
 #include "server.h"
+#include "gamma.h"
 #include "xdg.h"
 #include "ipc.h"
 
@@ -183,6 +185,11 @@ int main(int argc, char** argv) {
     server.new_layer_surface.notify = server_new_layer_surface;
     wl_signal_add(&server.layer_shell->events.new_surface, &server.new_layer_surface);
 
+    // Setup gamma protocol
+    server.gamma_mgr = wlr_gamma_control_manager_v1_create(server.wl_display);
+    server.set_gamma.notify = server_new_set_gamma;
+    wl_signal_add(&server.gamma_mgr->events.set_gamma, &server.set_gamma);
+
     // create a cursor (the image)
     server.cursor = wlr_cursor_create();
     wlr_cursor_attach_output_layout(server.cursor, server.output_layout);
@@ -311,6 +318,9 @@ int main(int argc, char** argv) {
 
     wl_list_remove(&server.new_input.link);
     wl_list_remove(&server.new_output.link);
+
+    wl_list_remove(&server.new_layer_surface.link);
+    wl_list_remove(&server.set_gamma.link);
 
     wlr_scene_node_destroy(&server.scene->tree.node);
     wlr_xcursor_manager_destroy(server.cursor_mgr);
