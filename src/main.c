@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
 
     // Setup Configs
     server.enable_xdg_interactive = true;
-    server.window_active_on = WINDOW_ACTIVE_ON_HOVER;
+    server.window_active_on = WINDOW_ACTIVE_ON_CLICK;
 
     // - managed by libwayland. 
     // - manages many stuff.
