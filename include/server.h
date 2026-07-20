@@ -31,7 +31,8 @@ struct buzzay_server {
 	struct wlr_xdg_shell *xdg_shell;
 	struct wl_listener new_xdg_toplevel;
 	struct wl_listener new_xdg_popup;
-	struct wl_list toplevels;
+    struct wl_list workspaces;
+    uint32_t current_workspace;
 
     struct wlr_xdg_decoration_manager_v1 *xdg_decoration;
     enum wlr_xdg_toplevel_decoration_v1_mode decoration_mode;

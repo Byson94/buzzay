@@ -33,6 +33,7 @@
 
 #include "handle-plugin.h"
 #include "layershell.h"
+#include "workspace.h"
 #include "input.h"
 #include "output.h"
 #include "cursor.h"
@@ -182,7 +183,14 @@ int main(int argc, char** argv) {
 	 * used for application windows. For more detail on shells, refer to
 	 * https://drewdevault.com/2018/07/29/Wayland-shells.html.
 	 */
-    wl_list_init(&server.toplevels);
+    wl_list_init(&server.workspaces);
+    for (int i = 0; i < 10; i++) {
+        struct buzzay_workspace *ws = calloc(1, sizeof(*ws));
+        ws->id = i + 1;
+        wl_list_init(&ws->toplevels);
+        wl_list_insert(server.workspaces.prev, &ws->link);
+    }
+    server.current_workspace = 0;
     server.xdg_shell = wlr_xdg_shell_create(server.wl_display, 7);
     server.new_xdg_toplevel.notify = server_new_xdg_toplevel;
     wl_signal_add(&server.xdg_shell->events.new_toplevel, &server.new_xdg_toplevel);

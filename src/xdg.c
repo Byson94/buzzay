@@ -8,6 +8,7 @@
 #include <wlr/types/wlr_xdg_decoration_v1.h>
 #include <wlr/types/wlr_xcursor_manager.h>
 
+#include "workspace.h"
 #include "server.h"
 #include "cursor.h"
 #include "xdg.h"
@@ -41,7 +42,7 @@ void focus_toplevel(struct buzzay_toplevel *toplevel) {
 	/* Move the toplevel to the front */
 	wlr_scene_node_raise_to_top(&toplevel->scene_tree->node);
 	wl_list_remove(&toplevel->link);
-	wl_list_insert(&server->toplevels, &toplevel->link);
+    workspace_insert_toplevel(&server->workspaces, server->current_workspace, &toplevel->link);
 	/* Activate the new surface */
 	wlr_xdg_toplevel_set_activated(toplevel->xdg_toplevel, true);
 	/*
@@ -58,9 +59,7 @@ void focus_toplevel(struct buzzay_toplevel *toplevel) {
 static void xdg_toplevel_map(struct wl_listener *listener, void *data) {
 	/* Called when the surface is mapped, or ready to display on-screen. */
 	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, map);
-
-	wl_list_insert(&toplevel->server->toplevels, &toplevel->link);
-
+    workspace_insert_toplevel(&toplevel->server->workspaces, toplevel->server->current_workspace, &toplevel->link);
 	focus_toplevel(toplevel);
 }
 
