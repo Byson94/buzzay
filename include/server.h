@@ -16,6 +16,11 @@ struct scene_layers {
     struct wlr_scene_tree *overlay;
 };
 
+enum buzzay_layout_mode {
+    BZ_LAYOUT_MONOCLE,
+    BZ_LAYOUT_TILE
+};
+
 struct buzzay_server {
     struct wl_display *wl_display;
     struct wl_event_loop *wl_event_loop;
@@ -64,6 +69,7 @@ struct buzzay_server {
     bool cursor_recently_reset;
 
     struct wlr_output_layout *output_layout;
+    struct wl_listener output_layout_change;
     struct wl_list outputs;
     struct wl_listener new_output;
 
@@ -81,6 +87,7 @@ struct buzzay_server {
     // Config
     bool enable_xdg_interactive; // actions like move & resize
     enum window_active_evt window_active_on;
+    enum buzzay_layout_mode window_layout_mode;
 
     // Config Exclusive (only used when specific configs are true)
     struct buzzay_toplevel *hovered_toplevel; // window_active_on == WINDOW_ACTIVE_ON_HOVER

@@ -10,6 +10,7 @@
 
 #include "workspace.h"
 #include "server.h"
+#include "tiling.h"
 #include "cursor.h"
 #include "xdg.h"
 
@@ -60,6 +61,7 @@ static void xdg_toplevel_map(struct wl_listener *listener, void *data) {
 	/* Called when the surface is mapped, or ready to display on-screen. */
 	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, map);
     workspace_insert_toplevel(&toplevel->server->workspaces, toplevel->server->current_workspace, &toplevel->link);
+    arrange_workspaces(toplevel->server);
 	focus_toplevel(toplevel);
 }
 
@@ -91,9 +93,6 @@ static void xdg_toplevel_commit(struct wl_listener *listener, void *data) {
 		 * reply with a configure so the client can map the surface. buzzay (temporarily)
 		 * configures the xdg_toplevel with 0,0 size to let the client pick the
 		 * dimensions itself. 
-         *
-         * TODO: Let plugins HOOK into set size event. 
-         * Ideally, biased towards tiling window managers.
         */
 		wlr_xdg_toplevel_set_size(toplevel->xdg_toplevel, 0, 0);
         wlr_xdg_surface_schedule_configure(toplevel->xdg_toplevel->base);

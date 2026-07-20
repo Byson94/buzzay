@@ -34,6 +34,7 @@
 #include "handle-plugin.h"
 #include "layershell.h"
 #include "workspace.h"
+#include "tiling.h"
 #include "input.h"
 #include "output.h"
 #include "cursor.h"
@@ -126,6 +127,7 @@ int main(int argc, char** argv) {
     // Setup Configs
     server.enable_xdg_interactive = true;
     server.window_active_on = WINDOW_ACTIVE_ON_CLICK;
+    server.window_layout_mode = BZ_LAYOUT_TILE;
 
     // - managed by libwayland. 
     // - manages many stuff.
@@ -164,6 +166,8 @@ int main(int argc, char** argv) {
     // output layout helps in working with arrangement of screens in 
     // a physical layout.
     server.output_layout = wlr_output_layout_create(server.wl_display);
+    server.output_layout_change.notify = server_output_layout_changed;
+    wl_signal_add(&server.output_layout->events.change, &server.output_layout_change);
 
     // notify when new listeners are available on backend
     wl_list_init(&server.outputs);
