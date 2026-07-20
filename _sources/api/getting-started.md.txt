@@ -14,7 +14,7 @@ int buzzay_api_version() {
     return BUZZAY_API_VERSION;
 }
 
-char *msg_request(int argc, char **argv) {
+char *msg_request(struct bz_plugin *plugin, int argc, char **argv) {
     return "OK!\n";
 }
 
