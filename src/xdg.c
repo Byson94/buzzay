@@ -121,17 +121,25 @@ static void xdg_toplevel_destroy(struct wl_listener *listener, void *data) {
 	free(toplevel);
 }
 
-static void xdg_toplevel_request_maximize(struct wl_listener *listener, void *data) {
+static void xdg_toplevel_request_maximize(
+		struct wl_listener *listener, void *data) {
+	/* This event is raised when a client would like to maximize itself,
+	 * typically because the user clicked on the maximize button on client-side
+	 * decorations. buzzay doesn't support maximization, but to conform to
+	 * xdg-shell protocol we still must send a configure.
+	 * wlr_xdg_surface_schedule_configure() is used to send an empty reply.
+	 * However, if the request was sent before an initial commit, we don't do
+	 * anything and let the client finish the initial surface setup. */
 	struct buzzay_toplevel *toplevel =
 		wl_container_of(listener, toplevel, request_maximize);
-
-    wlr_xdg_surface_schedule_configure(toplevel->xdg_toplevel->base);
-    wlr_xdg_toplevel_set_maximized(toplevel->xdg_toplevel, true);
+	if (toplevel->xdg_toplevel->base->initialized) {
+		wlr_xdg_surface_schedule_configure(toplevel->xdg_toplevel->base);
+	}
 }
 
 static void xdg_toplevel_request_fullscreen(
 		struct wl_listener *listener, void *data) {
-	/* Just as with request_maximize, we must send a configure here. */
+	/* Stub the full screen implementation for now */
 	struct buzzay_toplevel *toplevel =
 		wl_container_of(listener, toplevel, request_fullscreen);
 
@@ -203,13 +211,12 @@ static void xdg_toplevel_request_move(struct wl_listener *listener, void *data) 
     struct wlr_xdg_toplevel_move_event *event = data;
 	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, request_move);
 
-    if (!toplevel->server->enable_xdg_interactive) {
+    if (!toplevel->is_floating ||
+            !toplevel->server->enable_xdg_interactive ||
+            event->serial != toplevel->server->last_serial ||
+            toplevel->server->cursor_recently_reset) {
         return;
-    } else if (event->serial != toplevel->server->last_serial) {
-        return;
-    } else if (toplevel->server->cursor_recently_reset) {
-        return;
-    }
+    } 
 
 	begin_interactive(toplevel, BUZZAY_CURSOR_MOVE, 0);
 }
@@ -223,13 +230,12 @@ static void xdg_toplevel_request_resize(struct wl_listener *listener, void *data
 	struct wlr_xdg_toplevel_resize_event *event = data;
 	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, request_resize);
 
-    if (!toplevel->server->enable_xdg_interactive) {
+    if (!toplevel->is_floating ||
+            !toplevel->server->enable_xdg_interactive ||
+            event->serial != toplevel->server->last_serial ||
+            toplevel->server->cursor_recently_reset) {
         return;
-    } else if (event->serial != toplevel->server->last_serial) {
-        return;
-    } else if (toplevel->server->cursor_recently_reset) {
-        return;
-    }
+    } 
 
 	begin_interactive(toplevel, BUZZAY_CURSOR_RESIZE, event->edges);
 }
@@ -241,6 +247,7 @@ void server_new_xdg_toplevel(struct wl_listener *listener, void *data) {
 
 	/* Allocate a buzzay_toplevel for this surface */
 	struct buzzay_toplevel *toplevel = calloc(1, sizeof(*toplevel));
+    toplevel->is_floating = false;
 	toplevel->server = server;
 	toplevel->xdg_toplevel = xdg_toplevel;
 	toplevel->scene_tree =

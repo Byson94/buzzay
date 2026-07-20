@@ -244,28 +244,6 @@ void server_cursor_frame(struct wl_listener *listener, void *data) {
 	wlr_seat_pointer_notify_frame(server->seat);
 }
 
-
-
-
-void seat_request_cursor(struct wl_listener *listener, void *data) {
-	struct buzzay_server *server = wl_container_of(
-			listener, server, request_cursor);
-	/* This event is raised by the seat when a client provides a cursor image */
-	struct wlr_seat_pointer_request_set_cursor_event *event = data;
-	struct wlr_seat_client *focused_client =
-		server->seat->pointer_state.focused_client;
-	/* This can be sent by any client, so we check to make sure this one is
-	 * actually has pointer focus first. */
-	if (focused_client == event->seat_client) {
-		/* Once we've vetted the client, we can tell the cursor to use the
-		 * provided surface as the cursor image. It will set the hardware cursor
-		 * on the output that it's currently on and continue to do so as the
-		 * cursor moves between outputs. */
-		wlr_cursor_set_surface(server->cursor, event->surface,
-				event->hotspot_x, event->hotspot_y);
-	}
-}
-
 void seat_pointer_focus_change(struct wl_listener *listener, void *data) {
 	struct buzzay_server *server = wl_container_of(
 			listener, server, pointer_focus_change);
@@ -289,11 +267,33 @@ void seat_request_set_selection(struct wl_listener *listener, void *data) {
 	wlr_seat_set_selection(server->seat, event->source, event->serial);
 }
 
+void seat_request_cursor(struct wl_listener *listener, void *data) {
+	struct buzzay_server *server = wl_container_of(
+			listener, server, request_cursor);
+	/* This event is raised by the seat when a client provides a cursor image */
+	struct wlr_seat_pointer_request_set_cursor_event *event = data;
+	struct wlr_seat_client *focused_client =
+		server->seat->pointer_state.focused_client;
+	/* This can be sent by any client, so we check to make sure this one is
+	 * actually has pointer focus first. */
+	if (focused_client == event->seat_client) {
+		/* Once we've vetted the client, we can tell the cursor to use the
+		 * provided surface as the cursor image. It will set the hardware cursor
+		 * on the output that it's currently on and continue to do so as the
+		 * cursor moves between outputs. */
+		wlr_cursor_set_surface(server->cursor, event->surface,
+				event->hotspot_x, event->hotspot_y);
+	}
+}
+
 // Curosr shape protocol 
 void server_new_request_cursor_set_shape(struct wl_listener *listener, void *data) {
     struct buzzay_server *server = wl_container_of(listener, server, cursor_request_set_shape);
     struct wlr_cursor_shape_manager_v1_request_set_shape_event *shape_event = data;
     const char *shape_name = wlr_cursor_shape_v1_name(shape_event->shape);
 
-    wlr_cursor_set_xcursor(server->cursor, server->cursor_mgr, shape_name);
+    struct wlr_seat_client *focused_client  = server->seat->pointer_state.focused_client;
+    if (focused_client == shape_event->seat_client) {
+        wlr_cursor_set_xcursor(server->cursor, server->cursor_mgr, shape_name);
+    }
 }

@@ -16,6 +16,8 @@ struct buzzay_toplevel {
 	struct wl_listener request_resize;
 	struct wl_listener request_maximize;
 	struct wl_listener request_fullscreen;
+
+    bool is_floating;
 };
 
 struct buzzay_popup {
