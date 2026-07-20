@@ -80,5 +80,8 @@ struct buzzay_server {
     // Config
     bool enable_xdg_interactive; // actions like move & resize
     enum window_active_evt window_active_on;
+
+    // Config Exclusive (only used when specific configs are true)
+    struct buzzay_toplevel *hovered_toplevel; // window_active_on == WINDOW_ACTIVE_ON_HOVER
 };
 

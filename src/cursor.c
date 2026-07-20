@@ -1,4 +1,5 @@
 #include <wayland-client-core.h>
+#include <wayland-server-protocol.h>
 #include <wlr/backend.h>
 #include <wlr/util/log.h>
 #include <wlr/types/wlr_cursor.h>
@@ -124,6 +125,12 @@ static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
 
     if (server->window_active_on == WINDOW_ACTIVE_ON_HOVER) {
         focus_toplevel(toplevel);
+        if (toplevel != NULL && server->hovered_toplevel != toplevel) {
+            focus_toplevel(toplevel);
+            server->hovered_toplevel = toplevel;
+        } else if (toplevel == NULL) {
+            server->hovered_toplevel = NULL;
+        }
     }
 
 	if (surface) {
