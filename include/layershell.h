@@ -4,8 +4,11 @@
 #include <wayland-client-core.h>
 
 struct buzzay_layer_surface {
+    struct wlr_layer_surface_v1 *surface;
+    struct wlr_scene_layer_surface_v1 *scene_layer;
     struct buzzay_server *server;
-    struct wl_listener new_popup;
+    struct wl_listener unmap;
+    struct wl_listener commit;
     struct wl_listener destroy;
 };
 

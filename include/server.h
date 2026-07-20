@@ -8,6 +8,14 @@
 #include "cursor.h"
 #include "xdg.h"
 
+struct scene_layers {
+    struct wlr_scene_tree *background;
+    struct wlr_scene_tree *bottom;
+    struct wlr_scene_tree *workspace;
+    struct wlr_scene_tree *top;
+    struct wlr_scene_tree *overlay;
+};
+
 struct buzzay_server {
     struct wl_display *wl_display;
     struct wl_event_loop *wl_event_loop;
@@ -16,6 +24,7 @@ struct buzzay_server {
     struct wlr_allocator *allocator;
     struct wlr_session *session;
     struct wlr_scene *scene;
+    struct scene_layers layers;
 	struct wlr_scene_output_layout *scene_layout;
     struct wl_listener session_active;
 

@@ -171,6 +171,11 @@ int main(int argc, char** argv) {
 
     // fun stuff: scene graph. This handles all damage and rendering tracking.
     server.scene = wlr_scene_create();
+    server.layers.background = wlr_scene_tree_create(&server.scene->tree);
+    server.layers.bottom = wlr_scene_tree_create(&server.scene->tree);
+    server.layers.workspace = wlr_scene_tree_create(&server.scene->tree);
+    server.layers.top = wlr_scene_tree_create(&server.scene->tree);
+    server.layers.overlay = wlr_scene_tree_create(&server.scene->tree);
     server.scene_layout  = wlr_scene_attach_output_layout(server.scene, server.output_layout);
 
 	/* Set up xdg-shell version 7. The xdg-shell is a Wayland protocol which is

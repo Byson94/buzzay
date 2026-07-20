@@ -199,8 +199,6 @@ static void xdg_toplevel_request_move(struct wl_listener *listener, void *data) 
     struct wlr_xdg_toplevel_move_event *event = data;
 	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, request_move);
 
-    printf("INPUT!\n");
-
     if (!toplevel->server->enable_xdg_interactive) {
         return;
     } else if (event->serial != toplevel->server->last_serial) {
@@ -242,7 +240,7 @@ void server_new_xdg_toplevel(struct wl_listener *listener, void *data) {
 	toplevel->server = server;
 	toplevel->xdg_toplevel = xdg_toplevel;
 	toplevel->scene_tree =
-		wlr_scene_xdg_surface_create(&toplevel->server->scene->tree, xdg_toplevel->base);
+		wlr_scene_xdg_surface_create(toplevel->server->layers.workspace, xdg_toplevel->base);
 	toplevel->scene_tree->node.data = toplevel;
 	xdg_toplevel->base->data = toplevel->scene_tree;
 
