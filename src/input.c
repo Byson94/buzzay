@@ -58,7 +58,7 @@ bool handle_keybinding(struct buzzay_server *server, xkb_keysym_t sym, uint32_t 
                 && bz_to_wlr_modifiers(modifiers & BZ_ALLOWED_MODS) 
                 == (kb->modifiers & bz_to_wlr_modifiers(BZ_ALLOWED_MODS))) {
             if (kb->handler) {
-                kb->handler(kb_dat->owner);
+                kb->handler(kb_dat->owner, kb->data);
 
                 if (binding_wants_passthrough) {
                     is_passthrough = true;

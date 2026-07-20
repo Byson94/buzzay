@@ -4,7 +4,7 @@
 #include "server.h"
 
 struct plugin_data {
-    const char *name;
+    struct bz_plugin *plugin;
     void *handle;
 };
 

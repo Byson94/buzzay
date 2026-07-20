@@ -92,7 +92,8 @@ struct bz_keybinding {
      */
     bz_modifier_t modifiers;
     bz_binding_flags_t flags;
-    void (*handler)(struct bz_plugin *plugin); /**< Function to execute when keybinding is used. */
+    void (*handler)(struct bz_plugin *plugin, void *data); /**< Function to execute when keybinding is used. */
+    void *data;
 };
 
 /** The binding handle that can be used to unregister a binding. **/

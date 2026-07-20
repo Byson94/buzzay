@@ -143,13 +143,7 @@ void handle_plugin(char *path, const char *plugin_name, struct buzzay_server *se
         plugin_capacity = new_capacity;
     }
 
-    plugin_array[plugin_count].name = strdup(plugin_name); 
-    if (plugin_array[plugin_count].name == NULL) {
-        const char *msg = "Failed to allocate memory for plugin name\n";
-        fprintf(stderr, "%s", msg);
-        send_msg_back(client_fd, msg);
-        return;
-    }
+    plugin_array[plugin_count].plugin = &plugin;
     plugin_array[plugin_count].handle = handle;
     plugin_count++;
 
@@ -158,9 +152,11 @@ void handle_plugin(char *path, const char *plugin_name, struct buzzay_server *se
 
 void msg_plugin(const char *plugin_name, int argc, char **argv, int client_fd) {
     void *handle = NULL;
+    struct bz_plugin *plugin = NULL;
     for (int i = 0; i < plugin_count; i++) {
-        if (strcmp(plugin_array[i].name, plugin_name) == 0) {
+        if (strcmp(plugin_array[i].plugin->plugin_name, plugin_name) == 0) {
             handle = plugin_array[i].handle;
+            plugin = plugin_array[i].plugin;
         }
     }
 
@@ -180,10 +176,10 @@ void msg_plugin(const char *plugin_name, int argc, char **argv, int client_fd) {
         return;
     }
 
-    typedef char *(*msg_request)(int argc, char **argv);
+    typedef char *(*msg_request)(struct bz_plugin *plugin, int argc, char **argv);
     msg_request msg_func = msg_sym;
 
-    const char *response = msg_func(argc, argv);
+    const char *response = msg_func(plugin, argc, argv);
     send_msg_back(client_fd, response);
 }
 
