@@ -89,9 +89,13 @@ static void xdg_toplevel_commit(struct wl_listener *listener, void *data) {
 
 	if (toplevel->xdg_toplevel->base->initial_commit) {
 		/* When an xdg_surface performs an initial commit, the compositor must
-		 * reply with a configure so the client can map the surface. buzzay
+		 * reply with a configure so the client can map the surface. buzzay (temporarily)
 		 * configures the xdg_toplevel with 0,0 size to let the client pick the
-		 * dimensions itself. */
+		 * dimensions itself. 
+         *
+         * TODO: Let plugins HOOK into set size event. 
+         * Ideally, biased towards tiling window managers.
+        */
 		wlr_xdg_toplevel_set_size(toplevel->xdg_toplevel, 0, 0);
         wlr_xdg_surface_schedule_configure(toplevel->xdg_toplevel->base);
 	}
@@ -132,7 +136,7 @@ static void xdg_toplevel_request_fullscreen(
 		wl_container_of(listener, toplevel, request_fullscreen);
 
     wlr_xdg_surface_schedule_configure(toplevel->xdg_toplevel->base);
-    wlr_xdg_toplevel_set_maximized(toplevel->xdg_toplevel, true);
+    wlr_xdg_toplevel_set_fullscreen(toplevel->xdg_toplevel, true);
 }
 
 static void xdg_popup_commit(struct wl_listener *listener, void *data) {

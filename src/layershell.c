@@ -11,7 +11,6 @@
 static void layershell_commit(struct wl_listener *listener, void *data) {
     struct buzzay_layer_surface *bz_layer_surface = wl_container_of(listener, bz_layer_surface, commit);
     struct wlr_layer_surface_v1 *layer_surface = bz_layer_surface->surface;
-    struct buzzay_server *server = bz_layer_surface->server;
 
     if (layer_surface->current.actual_width == layer_surface->pending.desired_width &&
         layer_surface->current.actual_height == layer_surface->pending.desired_height &&
@@ -19,12 +18,14 @@ static void layershell_commit(struct wl_listener *listener, void *data) {
         return;
     }
 
-    struct wlr_box full_size = {
-        .width = layer_surface->pending.desired_width,
-        .height = layer_surface->pending.desired_height
-    };
+    if (layer_surface->initial_commit) {
+        struct wlr_output *mon_output = layer_surface->output;
+        uint32_t screen_width = mon_output->width;
+        uint32_t screen_height = mon_output->height;
 
-    wlr_scene_layer_surface_v1_configure(bz_layer_surface->scene_layer, &full_size, &full_size);
+        struct wlr_box full_area = { .width = screen_width, .height = screen_height };
+        wlr_scene_layer_surface_v1_configure(bz_layer_surface->scene_layer, &full_area, &full_area);
+    }
 }
 
 static void layershell_unmap(struct wl_listener *listener, void *data) {
