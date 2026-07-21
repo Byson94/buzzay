@@ -1,4 +1,4 @@
-#pragma
+#pragma once
 
 #include "server.h"
 
@@ -8,3 +8,4 @@ void arrange_workspaces_tiling(struct buzzay_server *server);
 void arrange_workspaces(struct buzzay_server *server);
 
 void focus_next_monocle(struct buzzay_server *server);
+void update_border_colors(struct buzzay_server *server);

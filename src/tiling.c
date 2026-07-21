@@ -16,6 +16,101 @@ void server_output_layout_changed(struct wl_listener *listener, void *data) {
     arrange_workspaces(server);
 }
 
+void arrange_workspaces_tiling(struct buzzay_server *server) {
+    struct buzzay_output *output;
+    wl_list_for_each(output, &server->outputs, link) {
+        struct wlr_box output_box;
+        wlr_output_layout_get_box(server->output_layout, output->wlr_output, &output_box);
+        
+        struct buzzay_workspace *wp = get_workspace_at_index(&server->workspaces, server->current_workspace);
+        if (!wp) continue;
+
+        int total_windows = 0;
+        struct buzzay_toplevel *toplevel;
+        wl_list_for_each(toplevel, &wp->toplevels, link) {
+            if (toplevel->xdg_toplevel == NULL || 
+                !toplevel->xdg_toplevel->base->surface->mapped ||
+                !toplevel->xdg_toplevel->base->initialized) {
+                continue; 
+            }
+            total_windows++;
+        }
+
+        if (total_windows == 0) continue;
+
+        int gap = server->eyecandies.gap;
+        struct wlr_box padded_box = {
+            .x = output_box.x + gap,
+            .y = output_box.y + gap,
+            .width = output_box.width - (gap * 2),
+            .height = output_box.height - (gap * 2)
+        };
+
+        // apply geometry in second loop
+        int i = 0;
+        wl_list_for_each(toplevel, &wp->toplevels, link) {
+            if (toplevel->xdg_toplevel == NULL || 
+                !toplevel->xdg_toplevel->base->surface->mapped ||
+                !toplevel->xdg_toplevel->base->initialized) {
+                continue; 
+            }
+
+            // Ensure the window is enabled in the scene graph
+            wlr_scene_node_set_enabled(&toplevel->scene_tree->node, true);
+
+            struct wlr_box box;
+
+            if (total_windows == 1) {
+                // one window = whole screen
+                box = padded_box;
+            } else if (i == 0) {
+                // master window takes left half of screen
+                int total_available_width = padded_box.width - gap;
+                box.x = padded_box.x;
+                box.y = padded_box.y;
+                box.width = total_available_width / 2;
+                box.height = padded_box.height;
+            } else {
+                // slave stack takes right half and is split vertically
+                int total_available_width = padded_box.width - gap;
+                int master_width = total_available_width / 2;
+                int stack_width = total_available_width - master_width;
+                
+                int stack_count = total_windows - 1;
+                int stack_index = i - 1;
+
+                // Total vertical space available for the stack, accounting for gaps *between* stack items
+                int total_stack_height = padded_box.height - (gap * (stack_count - 1));
+                int item_height = total_stack_height / stack_count;
+
+                box.x = padded_box.x + master_width + gap;
+                box.width = stack_width;
+                box.height = item_height;
+                box.y = padded_box.y + (item_height + gap) * stack_index;
+            }
+
+            wlr_xdg_toplevel_set_size(toplevel->xdg_toplevel, box.width, box.height);
+            wlr_scene_node_set_position(&toplevel->scene_tree->node, box.x, box.y);
+
+            int border_size = server->eyecandies.border_size;
+
+            wlr_scene_rect_set_size(
+                toplevel->border_rect, 
+                box.width + (border_size * 2), 
+                box.height + (border_size * 2)
+            );
+
+            wlr_scene_node_set_position(
+                &toplevel->border_rect->node, 
+                -border_size, 
+                -border_size
+            );
+
+            i++;
+        }
+    }
+}
+
 void arrange_workspaces_monocle(struct buzzay_server *server) {
     struct buzzay_output *output;
     wl_list_for_each(output, &server->outputs, link) {
@@ -58,7 +153,7 @@ void arrange_workspaces(struct buzzay_server *server) {
             arrange_workspaces_monocle(server);
             break;
         case BZ_LAYOUT_TILE:
-            // arrange_workspaces_tiling(server);
+            arrange_workspaces_tiling(server);
             break;
     };
 }
@@ -95,5 +190,31 @@ void focus_next_monocle(struct buzzay_server *server) {
 
         focus_toplevel(next);
         arrange_workspaces_monocle(server);
+    }
+}
+
+void update_border_colors(struct buzzay_server *server) {
+    struct buzzay_output *output;
+    wl_list_for_each(output, &server->outputs, link) {
+        struct wlr_box output_box;
+        wlr_output_layout_get_box(server->output_layout, output->wlr_output, &output_box);
+        
+        struct buzzay_workspace *wp = get_workspace_at_index(&server->workspaces, server->current_workspace);
+        if (!wp) continue;
+
+        struct buzzay_toplevel *toplevel;
+        wl_list_for_each(toplevel, &wp->toplevels, link) {
+            if (toplevel->xdg_toplevel == NULL || 
+                !toplevel->xdg_toplevel->base->surface->mapped ||
+                !toplevel->xdg_toplevel->base->initialized) {
+                continue; 
+            }
+
+            if (toplevel == wp->focused_window) {
+                wlr_scene_rect_set_color(toplevel->border_rect, server->eyecandies.active_border);
+            } else {
+                wlr_scene_rect_set_color(toplevel->border_rect, server->eyecandies.inactive_border);
+            }
+        }
     }
 }

@@ -56,11 +56,23 @@ void focus_toplevel(struct buzzay_toplevel *toplevel) {
 		wlr_seat_keyboard_notify_enter(seat, surface,
 			keyboard->keycodes, keyboard->num_keycodes, &keyboard->modifiers);
 	}
+
+    update_border_colors(server);
 }
 
 static void xdg_toplevel_map(struct wl_listener *listener, void *data) {
 	/* Called when the surface is mapped, or ready to display on-screen. */
 	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, map);
+
+    // setup border
+    toplevel->border_rect = wlr_scene_rect_create(
+        toplevel->scene_tree, 
+        100, 100,
+        toplevel->server->eyecandies.active_border
+    );
+    wlr_scene_node_lower_to_bottom(&toplevel->border_rect->node);
+
+    // add to workspace and tile
     workspace_insert_toplevel(&toplevel->server->workspaces, toplevel->server->current_workspace, &toplevel->link);
 	focus_toplevel(toplevel);
     arrange_workspaces(toplevel->server);

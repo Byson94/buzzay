@@ -10,6 +10,7 @@ struct buzzay_toplevel {
 	struct buzzay_server *server;
 	struct wlr_xdg_toplevel *xdg_toplevel;
 	struct wlr_scene_tree *scene_tree;
+    struct wlr_scene_rect *border_rect;
 	struct wl_listener map;
 	struct wl_listener unmap;
 	struct wl_listener commit;

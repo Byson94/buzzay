@@ -59,8 +59,6 @@ void print_help() {
 
 int main(int argc, char** argv) {
     int opt;
-    int option_index = 0;
-
     static struct option long_options[] = {
         { "load", required_argument, 0, 'l' },
         { "msg", required_argument, 0, 'm' },
@@ -127,7 +125,15 @@ int main(int argc, char** argv) {
     // Setup Configs
     server.enable_xdg_interactive = true;
     server.window_active_on = WINDOW_ACTIVE_ON_CLICK;
-    server.window_layout_mode = BZ_LAYOUT_MONOCLE;
+    server.window_layout_mode = BZ_LAYOUT_TILE;
+
+    struct buzzay_eyecandies default_eyecandy = {
+        .gap = 5,
+        .active_border = { 0.8f, 0.5f, 0.2f, 1.0f },
+        .inactive_border = { 0.2f, 0.2f, 0.25f, 1.0f },
+        .border_size = 2,
+    };
+    server.eyecandies = default_eyecandy;
 
     // - managed by libwayland. 
     // - manages many stuff.
@@ -203,7 +209,7 @@ int main(int argc, char** argv) {
 
     // Setup the xdg-decorations for decoration support
     server.xdg_decoration = wlr_xdg_decoration_manager_v1_create(server.wl_display);
-    server.decoration_mode = WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_CLIENT_SIDE;
+    server.decoration_mode = WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE;
     server.new_toplevel_decoration.notify = server_new_toplevel_decoration;
     wl_signal_add(&server.xdg_decoration->events.new_toplevel_decoration, &server.new_toplevel_decoration);
 
