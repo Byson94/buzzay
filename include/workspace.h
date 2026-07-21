@@ -4,10 +4,13 @@
 #include <wayland-client.h>
 #include <wayland-util.h>
 
+#include "xdg.h"
+
 struct buzzay_workspace {
     uint32_t id;
     struct wl_list link;
     struct wl_list toplevels;
+    struct buzzay_toplevel *focused_window;
 };
 
 struct buzzay_workspace *get_workspace_at_index(struct wl_list *list, uint32_t index);

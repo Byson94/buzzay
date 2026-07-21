@@ -3,6 +3,8 @@
 #include <wlr/backend.h>
 #include <wayland-client-core.h>
 
+#include "workspace.h"
+
 struct buzzay_toplevel {
 	struct wl_list link;
 	struct buzzay_server *server;
@@ -18,6 +20,7 @@ struct buzzay_toplevel {
 	struct wl_listener request_fullscreen;
 
     bool is_floating;
+    struct buzzay_workspace *in_workspace;
 };
 
 struct buzzay_popup {

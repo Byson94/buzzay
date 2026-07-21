@@ -43,6 +43,7 @@ void focus_toplevel(struct buzzay_toplevel *toplevel) {
 	/* Move the toplevel to the front */
 	wlr_scene_node_raise_to_top(&toplevel->scene_tree->node);
 	wl_list_remove(&toplevel->link);
+    toplevel->in_workspace->focused_window = toplevel;
     workspace_insert_toplevel(&server->workspaces, server->current_workspace, &toplevel->link);
 	/* Activate the new surface */
 	wlr_xdg_toplevel_set_activated(toplevel->xdg_toplevel, true);
@@ -61,8 +62,8 @@ static void xdg_toplevel_map(struct wl_listener *listener, void *data) {
 	/* Called when the surface is mapped, or ready to display on-screen. */
 	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, map);
     workspace_insert_toplevel(&toplevel->server->workspaces, toplevel->server->current_workspace, &toplevel->link);
-    arrange_workspaces(toplevel->server);
 	focus_toplevel(toplevel);
+    arrange_workspaces(toplevel->server);
 }
 
 void reset_cursor_mode(struct buzzay_server *server) {
@@ -115,6 +116,13 @@ static void xdg_toplevel_destroy(struct wl_listener *listener, void *data) {
     if (toplevel->scene_tree) {
         wlr_scene_node_destroy(&toplevel->scene_tree->node);
     }
+
+    struct buzzay_toplevel *last_toplevel = NULL;
+    if (!wl_list_empty(&toplevel->in_workspace->toplevels)) {
+        last_toplevel = wl_container_of(toplevel->in_workspace->toplevels.prev, toplevel, link);
+    }
+    focus_toplevel(last_toplevel);
+    arrange_workspaces(toplevel->server);
 
 	free(toplevel);
 }
@@ -243,8 +251,11 @@ void server_new_xdg_toplevel(struct wl_listener *listener, void *data) {
 	struct buzzay_server *server = wl_container_of(listener, server, new_xdg_toplevel);
 	struct wlr_xdg_toplevel *xdg_toplevel = data;
 
+    struct buzzay_workspace *workspace = get_workspace_at_index(&server->workspaces, server->current_workspace);
+
 	/* Allocate a buzzay_toplevel for this surface */
 	struct buzzay_toplevel *toplevel = calloc(1, sizeof(*toplevel));
+    toplevel->in_workspace = workspace;
     toplevel->is_floating = false;
 	toplevel->server = server;
 	toplevel->xdg_toplevel = xdg_toplevel;

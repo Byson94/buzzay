@@ -127,7 +127,7 @@ int main(int argc, char** argv) {
     // Setup Configs
     server.enable_xdg_interactive = true;
     server.window_active_on = WINDOW_ACTIVE_ON_CLICK;
-    server.window_layout_mode = BZ_LAYOUT_TILE;
+    server.window_layout_mode = BZ_LAYOUT_MONOCLE;
 
     // - managed by libwayland. 
     // - manages many stuff.
