@@ -3,11 +3,51 @@
 #include <wlr/backend.h>
 #include <wlr/types/wlr_output.h>
 #include <wlr/types/wlr_output_layout.h>
-#include <wlr/types/wlr_scene.h>
+#include <scenefx/types/wlr_scene.h>
 
 #include "macro-utils.h"
 #include "server.h"
 #include "output.h"
+
+static void output_configure_scene(struct wlr_scene_node *node,
+		struct buzzay_toplevel *toplevel) {
+	if (!node->enabled) {
+		return;
+	}
+
+	struct buzzay_toplevel *_toplevel = node->data;
+	if (_toplevel) {
+		toplevel = _toplevel;
+	}
+
+	if (node->type == WLR_SCENE_NODE_BUFFER) {
+		struct wlr_scene_buffer *buffer = wlr_scene_buffer_from_node(node);
+
+		struct wlr_scene_surface * scene_surface =
+			wlr_scene_surface_try_from_buffer(buffer);
+		if (!scene_surface) {
+			return;
+		}
+
+		struct wlr_xdg_surface *xdg_surface =
+			wlr_xdg_surface_try_from_wlr_surface(scene_surface->surface);
+
+		if (toplevel &&
+				xdg_surface &&
+				xdg_surface->role == WLR_XDG_SURFACE_ROLE_TOPLEVEL) {
+			// wlr_scene_buffer_set_opacity(buffer, toplevel->opacity);
+
+            wlr_scene_buffer_set_corner_radii(
+                    buffer, corner_radii_all(toplevel->server->eyecandies.corner_radius));
+		}
+	} else if (node->type == WLR_SCENE_NODE_TREE) {
+		struct wlr_scene_tree *tree = wl_container_of(node, tree, node);
+		struct wlr_scene_node *node;
+		wl_list_for_each(node, &tree->children, link) {
+			output_configure_scene(node, toplevel);
+		}
+	}
+}
 
 static void output_frame(struct wl_listener *listener, void *data) {
     UNUSED(data);
@@ -18,6 +58,8 @@ static void output_frame(struct wl_listener *listener, void *data) {
 	struct wlr_scene *scene = output->server->scene;
 
 	struct wlr_scene_output *scene_output = wlr_scene_get_scene_output(scene, output->wlr_output);
+
+    output_configure_scene(&scene_output->scene->tree.node, NULL);
 
 	/* Render the scene if needed and commit the output */
 	wlr_scene_output_commit(scene_output, NULL);
