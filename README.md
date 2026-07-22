@@ -24,5 +24,5 @@ $ ninja -C build
 
 ## Acknowledgements
 
-Buzzay started out by extending tinywl (CC0) from the sway/wlroots team. This project wouldn't have been 
-possible without the base of tinywl.
+Buzzay started out by extending tinywl (CC0) from the sway/wlroots team. The most of the eyecandy like blur, rounded
+corners, opacity, etc. are made possible with the help of [scenefx](https://github.com/wlrfx/scenefx).
