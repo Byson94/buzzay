@@ -22,6 +22,8 @@ add_project_link_arguments([
 wlroots_dep = dependency('wlroots-0.20')
 wayland_server_dep = dependency('wayland-server')
 xkbcommon_dep = dependency('xkbcommon')
+scenefx_proj = subproject('scenefx')
+scene_fx_dep = scenefx_proj.get_variable('scenefx')
 
 # Wayland protocol generation
 wayland_scanner_dep = dependency('wayland-scanner', native: true)
@@ -55,6 +57,7 @@ executable(
         wlroots_dep,
         wayland_server_dep,
         xkbcommon_dep,
+        scene_fx_dep
     ],
     install: true
 )

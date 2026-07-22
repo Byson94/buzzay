@@ -30,6 +30,7 @@
 #include <wlr/types/wlr_scene.h>
 #include <wlr/types/wlr_viewporter.h>
 #include <wlr/render/allocator.h>
+#include <scenefx/render/fx_renderer/fx_renderer.h>
 
 #include "handle-plugin.h"
 #include "layershell.h"
@@ -149,7 +150,7 @@ int main(int argc, char** argv) {
 
     // Create a renderer.
     // WLR_RENDERER env var can be set to specify one.
-	server.renderer = wlr_renderer_autocreate(server.backend);
+	server.renderer = fx_renderer_create(server.backend);
 	if (server.renderer == NULL) {
 		wlr_log(WLR_ERROR, "failed to create wlr_renderer");
 		return 1;
