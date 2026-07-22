@@ -72,6 +72,13 @@ int handle_ipc_connection(int fd, uint32_t mask, void *data) {
             const char *plugin = token;
 
             printf("Loading plugin: %s\n", plugin);
+
+            // reexecute the plugin if it already exists
+            if (handle_if_plugin_exists(plugin)) {
+                close(client_fd);
+                return 0;
+            }
+
             char *path = resolve_plugin_path(plugin);
             if (path == NULL) {
                 send_msg_back(client_fd, "Path of plugin could not be resolved.\n");

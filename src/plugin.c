@@ -64,6 +64,30 @@ char *resolve_plugin_path(const char* plugin) {
     return result;
 }
 
+bool handle_if_plugin_exists(const char *plugin_name) {
+    for (int i = 0; i < plugin_count; i++) {
+        struct plugin_data dat = plugin_array[i];
+        if (strcmp(dat.plugin->plugin_name, plugin_name) == 0) {
+            void *handle = dat.handle;
+            char *init_sym_str = "init_plugin";
+            void *init_sym = dlsym(handle, init_sym_str);
+            if (!init_sym) {
+                // weird. A plugin cannot have the symbol not defined if it is already
+                // loaded into the compositor. Just log it out if this matches.
+                printf("Unreachable case: plugin does not have symbol defined.\n");
+                return false;
+            }
+
+            typedef void (*init_plugin)(struct bz_plugin *plugin);
+            init_plugin init_func = init_sym;
+
+            init_func(dat.plugin);
+        }
+    }
+
+    return false;
+}
+
 void handle_plugin(char *path, const char *plugin_name, struct buzzay_server *server, int client_fd) {
     void *handle = dlopen(path, RTLD_LAZY);
     if (!handle) {
