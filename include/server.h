@@ -17,10 +17,11 @@ struct scene_layers {
 };
 
 struct buzzay_eyecandies {
-    int gap;
+    uint32_t gap;
     float active_border[4];
     float inactive_border[4];
-    int border_size;
+    uint32_t border_thickness;
+    uint32_t corner_radius;
 };
 
 enum buzzay_layout_mode {

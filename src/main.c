@@ -132,7 +132,8 @@ int main(int argc, char** argv) {
         .gap = 5,
         .active_border = { 0.8f, 0.5f, 0.2f, 1.0f },
         .inactive_border = { 0.2f, 0.2f, 0.25f, 1.0f },
-        .border_size = 2,
+        .border_thickness = 2,
+        .corner_radius = 5,
     };
     server.eyecandies = default_eyecandy;
 

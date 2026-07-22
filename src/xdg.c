@@ -3,10 +3,10 @@
 #include <wayland-server-core.h>
 #include <wlr/backend.h>
 #include <wlr/types/wlr_cursor.h>
-#include <wlr/types/wlr_scene.h>
 #include <wlr/types/wlr_xdg_shell.h>
 #include <wlr/types/wlr_xdg_decoration_v1.h>
 #include <wlr/types/wlr_xcursor_manager.h>
+#include <scenefx/types/wlr_scene.h>
 
 #include "macro-utils.h"
 #include "workspace.h"
@@ -74,6 +74,7 @@ static void xdg_toplevel_map(struct wl_listener *listener, void *data) {
         toplevel->server->eyecandies.active_border
     );
     wlr_scene_node_lower_to_bottom(&toplevel->border_rect->node);
+    wlr_scene_rect_set_corner_radius(toplevel->border_rect, toplevel->server->eyecandies.corner_radius);
 
     // add to workspace and tile
     workspace_insert_toplevel(&toplevel->server->workspaces, toplevel->server->current_workspace, &toplevel->link);

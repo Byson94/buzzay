@@ -92,18 +92,18 @@ void arrange_workspaces_tiling(struct buzzay_server *server) {
             wlr_xdg_toplevel_set_size(toplevel->xdg_toplevel, box.width, box.height);
             wlr_scene_node_set_position(&toplevel->scene_tree->node, box.x, box.y);
 
-            int border_size = server->eyecandies.border_size;
+            int border_thickness = server->eyecandies.border_thickness;
 
             wlr_scene_rect_set_size(
                 toplevel->border_rect, 
-                box.width + (border_size * 2), 
-                box.height + (border_size * 2)
+                box.width + (border_thickness * 2), 
+                box.height + (border_thickness * 2)
             );
 
             wlr_scene_node_set_position(
                 &toplevel->border_rect->node, 
-                -border_size, 
-                -border_size
+                -border_thickness, 
+                -border_thickness
             );
 
             i++;
