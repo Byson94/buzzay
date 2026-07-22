@@ -129,7 +129,7 @@ int main(int argc, char** argv) {
     server.window_layout_mode = BZ_LAYOUT_TILE;
 
     struct buzzay_eyecandies default_eyecandy = {
-        .gap = 5,
+        .gap = 15,
         .active_border = { 0.8f, 0.5f, 0.2f, 1.0f },
         .inactive_border = { 0.2f, 0.2f, 0.25f, 1.0f },
         .border_thickness = 2,

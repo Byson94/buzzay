@@ -96,6 +96,11 @@ void arrange_workspaces_tiling(struct buzzay_server *server) {
             wlr_scene_node_set_position(&toplevel->scene_tree->node, box.x, box.y);
 
             uint32_t border_thickness = server->eyecandies.border_thickness;
+            wlr_scene_rect_set_clipped_region(toplevel->border_rect, (struct clipped_region) {
+                .corners = corner_radii_all(toplevel->server->eyecandies.corner_radius),
+                .area = { border_thickness, border_thickness, box.width, box.height }
+            });
+
             wlr_scene_rect_set_size(
                 toplevel->border_rect, 
                 box.width + (border_thickness * 2), 
@@ -107,11 +112,6 @@ void arrange_workspaces_tiling(struct buzzay_server *server) {
                 -border_thickness, 
                 -border_thickness
             );
-
-            wlr_scene_rect_set_clipped_region(toplevel->border_rect, (struct clipped_region) {
-                .corners = corner_radii_all(toplevel->server->eyecandies.corner_radius),
-                .area = { border_thickness, border_thickness, box.width, box.height }
-            });
 
             i++;
         }
