@@ -8,6 +8,7 @@
 #include <wlr/types/wlr_xdg_decoration_v1.h>
 #include <wlr/types/wlr_xcursor_manager.h>
 
+#include "macro-utils.h"
 #include "workspace.h"
 #include "server.h"
 #include "tiling.h"
@@ -61,6 +62,8 @@ void focus_toplevel(struct buzzay_toplevel *toplevel) {
 }
 
 static void xdg_toplevel_map(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
 	/* Called when the surface is mapped, or ready to display on-screen. */
 	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, map);
 
@@ -86,6 +89,8 @@ void reset_cursor_mode(struct buzzay_server *server) {
 
 
 static void xdg_toplevel_unmap(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
 	/* Called when the surface is unmapped, and should no longer be shown. */
 	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, unmap);
 
@@ -98,6 +103,8 @@ static void xdg_toplevel_unmap(struct wl_listener *listener, void *data) {
 }
 
 static void xdg_toplevel_commit(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
 	/* Called when a new surface state is committed. */
 	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, commit);
 
@@ -113,8 +120,16 @@ static void xdg_toplevel_commit(struct wl_listener *listener, void *data) {
 }
 
 static void xdg_toplevel_destroy(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
 	/* Called when the xdg_toplevel is destroyed. */
 	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, destroy);
+
+    if (toplevel->scene_tree) {
+        wlr_scene_node_destroy(&toplevel->scene_tree->node);
+        toplevel->scene_tree = NULL;
+        toplevel->border_rect = NULL;
+    }
 
 	wl_list_remove(&toplevel->map.link);
 	wl_list_remove(&toplevel->unmap.link);
@@ -124,10 +139,6 @@ static void xdg_toplevel_destroy(struct wl_listener *listener, void *data) {
 	wl_list_remove(&toplevel->request_resize.link);
 	wl_list_remove(&toplevel->request_maximize.link);
 	wl_list_remove(&toplevel->request_fullscreen.link);
-
-    if (toplevel->scene_tree) {
-        wlr_scene_node_destroy(&toplevel->scene_tree->node);
-    }
 
     struct buzzay_toplevel *last_toplevel = NULL;
     if (!wl_list_empty(&toplevel->in_workspace->toplevels)) {
@@ -139,8 +150,9 @@ static void xdg_toplevel_destroy(struct wl_listener *listener, void *data) {
 	free(toplevel);
 }
 
-static void xdg_toplevel_request_maximize(
-		struct wl_listener *listener, void *data) {
+static void xdg_toplevel_request_maximize(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
 	/* This event is raised when a client would like to maximize itself,
 	 * typically because the user clicked on the maximize button on client-side
 	 * decorations. buzzay doesn't support maximization, but to conform to
@@ -155,8 +167,9 @@ static void xdg_toplevel_request_maximize(
 	}
 }
 
-static void xdg_toplevel_request_fullscreen(
-		struct wl_listener *listener, void *data) {
+static void xdg_toplevel_request_fullscreen(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
 	/* Stub the full screen implementation for now */
 	struct buzzay_toplevel *toplevel =
 		wl_container_of(listener, toplevel, request_fullscreen);
@@ -166,6 +179,8 @@ static void xdg_toplevel_request_fullscreen(
 }
 
 static void xdg_popup_commit(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
 	/* Called when a new surface state is committed. */
 	struct buzzay_popup *popup = wl_container_of(listener, popup, commit);
 
@@ -180,6 +195,8 @@ static void xdg_popup_commit(struct wl_listener *listener, void *data) {
 }
 
 static void xdg_popup_destroy(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
 	/* Called when the xdg_popup is destroyed. */
 	struct buzzay_popup *popup = wl_container_of(listener, popup, destroy);
 
@@ -299,6 +316,8 @@ void server_new_xdg_toplevel(struct wl_listener *listener, void *data) {
 }
 
 void server_new_xdg_popup(struct wl_listener *listener, void *data) {
+    UNUSED(listener);
+
 	/* This event is raised when a client creates a new popup. */
 	struct wlr_xdg_popup *xdg_popup = data;
 
@@ -323,11 +342,15 @@ void server_new_xdg_popup(struct wl_listener *listener, void *data) {
 }
 
 static void handle_map_decoration(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
     struct buzzay_decoration *ctx = wl_container_of(listener, ctx, map);
     wlr_xdg_toplevel_decoration_v1_set_mode(ctx->decoration, ctx->server->decoration_mode);
 }
 
 static void handle_decoration_cleanup(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
     struct buzzay_decoration *ctx = wl_container_of(listener, ctx, destroy);
     
     wl_list_remove(&ctx->map.link);

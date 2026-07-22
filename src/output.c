@@ -5,10 +5,13 @@
 #include <wlr/types/wlr_output_layout.h>
 #include <wlr/types/wlr_scene.h>
 
+#include "macro-utils.h"
 #include "server.h"
 #include "output.h"
 
 static void output_frame(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
 	/* This function is called every time an output is ready to display a frame,
 	 * generally at the output's refresh rate (e.g. 60Hz). */
 	struct buzzay_output *output = wl_container_of(listener, output, frame);
@@ -34,6 +37,8 @@ static void output_request_state(struct wl_listener *listener, void *data) {
 }
 
 static void output_destroy(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
 	struct buzzay_output *output = wl_container_of(listener, output, destroy);
 
 	wl_list_remove(&output->frame.link);

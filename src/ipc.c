@@ -8,6 +8,7 @@
 #include "ipc.h"
 #include "server.h"
 #include "handle-plugin.h"
+#include "macro-utils.h"
 
 const char *ipc_socket_file = "/tmp/buzzay.sock";
 
@@ -52,6 +53,8 @@ void send_msg_back(int client_fd, const char* msg) {
 }
 
 int handle_ipc_connection(int fd, uint32_t mask, void *data) {
+    UNUSED(mask);
+
     struct buzzay_server *server = (struct buzzay_server *)data;
 
     int client_fd = accept(fd, NULL, NULL);
