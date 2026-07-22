@@ -4,7 +4,7 @@
 
 struct buzzay_workspace *get_workspace_at_index(struct wl_list *list, uint32_t index) {
     struct buzzay_workspace *workspace;
-    int current_index = 0;
+    uint32_t current_index = 0;
 
     wl_list_for_each(workspace, list, link) {
         if (current_index == index) {

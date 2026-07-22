@@ -4,11 +4,14 @@
 #include <wlr/types/wlr_scene.h>
 #include <wlr/types/wlr_output_layout.h>
 
+#include "macro-utils.h"
 #include "server.h"
 #include "output.h"
 #include "layershell.h"
 
 static void layershell_commit(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
     struct buzzay_layer_surface *bz_layer_surface = wl_container_of(listener, bz_layer_surface, commit);
     struct wlr_layer_surface_v1 *layer_surface = bz_layer_surface->surface;
 
@@ -29,11 +32,15 @@ static void layershell_commit(struct wl_listener *listener, void *data) {
 }
 
 static void layershell_unmap(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
     struct buzzay_layer_surface *bz_layer_surface = wl_container_of(listener, bz_layer_surface, unmap);
     wlr_scene_node_set_enabled(&bz_layer_surface->scene_layer->tree->node, 0);
 }
 
 static void layershell_destroy(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
     struct buzzay_layer_surface *bz_layer_surface = wl_container_of(listener, bz_layer_surface, destroy);
 
     wl_list_remove(&bz_layer_surface->commit.link);

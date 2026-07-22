@@ -6,10 +6,13 @@
 #include <wlr/types/wlr_gamma_control_v1.h>
 #include <wlr/render/color.h>
 
+#include "macro-utils.h"
 #include "server.h"
 #include "gamma.h"
 
 static void handle_gamma_control_destroy(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
     struct buzzay_gamma *bz_gamma = wl_container_of(listener, bz_gamma, destroy);
     
     // check if the user changed TTY

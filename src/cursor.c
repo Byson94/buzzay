@@ -10,6 +10,7 @@
 #include <wlr/types/wlr_cursor_shape_v1.h>
 #include <wlr/types/wlr_idle_notify_v1.h>
 
+#include "macro-utils.h"
 #include "server.h"
 #include "cursor.h"
 #include "xdg.h"
@@ -234,6 +235,8 @@ void server_cursor_axis(struct wl_listener *listener, void *data) {
 }
 
 void server_cursor_frame(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
 	/* This event is forwarded by the cursor when a pointer emits an frame
 	 * event. Frame events are sent after regular pointer events to group
 	 * multiple events together. For instance, two axis events may happen at the

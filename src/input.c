@@ -8,13 +8,15 @@
 #include <wlr/types/wlr_xdg_shell.h>
 #include <wlr/types/wlr_idle_notify_v1.h>
 
+#include "macro-utils.h"
 #include "buzzay-plugin.h"
 #include "handle-plugin.h"
 #include "server.h"
 #include "input.h"
 
-static void keyboard_handle_modifiers(
-		struct wl_listener *listener, void *data) {
+static void keyboard_handle_modifiers(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
 	/* This event is raised when a modifier key, such as shift or alt, is
 	 * pressed. We simply communicate this to the client. */
 	struct buzzay_keyboard *keyboard =
@@ -41,6 +43,8 @@ static uint32_t bz_to_wlr_modifiers(uint32_t bz_mods) {
 }
 
 bool handle_keybinding(struct buzzay_server *server, xkb_keysym_t sym, uint32_t modifiers, bool is_release) {
+    UNUSED(server);
+
     bool is_passthrough = false;
 
     for (int i = 0; i < keybinding_count; i++) {
@@ -147,6 +151,8 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
 }
 
 static void keyboard_handle_destroy(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
 	/* This event is raised by the keyboard base wlr_input_device to signal
 	 * the destruction of the wlr_keyboard. It will no longer receive events
 	 * and should be destroyed.

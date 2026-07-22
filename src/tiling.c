@@ -5,6 +5,7 @@
 #include <wlr/types/wlr_output.h>
 #include <wlr/types/wlr_output_layout.h>
 
+#include "macro-utils.h"
 #include "server.h"
 #include "workspace.h"
 #include "tiling.h"
@@ -12,6 +13,8 @@
 #include "xdg.h"
 
 void server_output_layout_changed(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
     struct buzzay_server *server = wl_container_of(listener, server, output_layout_change);
     arrange_workspaces(server);
 }
