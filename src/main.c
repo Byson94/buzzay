@@ -134,6 +134,7 @@ int main(int argc, char** argv) {
         .inactive_border = { 0.2f, 0.2f, 0.25f, 1.0f },
         .border_thickness = 2,
         .corner_radius = 5,
+        .window_opacity = 1
     };
     server.eyecandies = default_eyecandy;
 

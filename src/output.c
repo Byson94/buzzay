@@ -35,7 +35,7 @@ static void output_configure_scene(struct wlr_scene_node *node,
 		if (toplevel &&
 				xdg_surface &&
 				xdg_surface->role == WLR_XDG_SURFACE_ROLE_TOPLEVEL) {
-			// wlr_scene_buffer_set_opacity(buffer, toplevel->opacity);
+			wlr_scene_buffer_set_opacity(buffer, toplevel->server->eyecandies.window_opacity);
 
             wlr_scene_buffer_set_corner_radii(
                     buffer, corner_radii_all(toplevel->server->eyecandies.corner_radius));

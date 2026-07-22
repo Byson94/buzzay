@@ -74,6 +74,13 @@ static void xdg_toplevel_map(struct wl_listener *listener, void *data) {
         toplevel->server->eyecandies.active_border
     );
     wlr_scene_node_lower_to_bottom(&toplevel->border_rect->node);
+
+    struct wlr_box *geometry = &toplevel->xdg_toplevel->base->geometry;
+    uint32_t border_thickness = toplevel->server->eyecandies.border_thickness;
+	wlr_scene_rect_set_clipped_region(toplevel->border_rect, (struct clipped_region) {
+        .corners = corner_radii_all(toplevel->server->eyecandies.corner_radius),
+        .area = { border_thickness, border_thickness, geometry->width, geometry->height }
+	});
     wlr_scene_rect_set_corner_radius(toplevel->border_rect, toplevel->server->eyecandies.corner_radius);
 
     // add to workspace and tile

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdint.h>
 #include <wayland-server-core.h>
 #include <wlr/backend.h>
 #include <wayland-client-core.h>
@@ -22,6 +23,7 @@ struct buzzay_eyecandies {
     float inactive_border[4];
     uint32_t border_thickness;
     uint32_t corner_radius;
+    float window_opacity;
 };
 
 enum buzzay_layout_mode {
