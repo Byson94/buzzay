@@ -15,7 +15,12 @@ compositor where each component is optional.
 Buzzay is currently under development and not yet available for download. But you can still compile it 
 and test it out on your own!
 
-To compile buzzay, just run the `make` command.
+To compile buzzay, just run the following commands.
+
+```bash
+$ meson setup build
+$ ninja -C build
+```
 
 ## Acknowledgements
 
