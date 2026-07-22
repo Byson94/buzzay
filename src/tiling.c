@@ -1,9 +1,9 @@
 #include <wayland-util.h>
 #include <wlr/backend.h>
 #include <wayland-client.h>
-#include <wlr/types/wlr_scene.h>
 #include <wlr/types/wlr_output.h>
 #include <wlr/types/wlr_output_layout.h>
+#include <scenefx/types/wlr_scene.h>
 
 #include "macro-utils.h"
 #include "server.h"
@@ -95,8 +95,7 @@ void arrange_workspaces_tiling(struct buzzay_server *server) {
             wlr_xdg_toplevel_set_size(toplevel->xdg_toplevel, box.width, box.height);
             wlr_scene_node_set_position(&toplevel->scene_tree->node, box.x, box.y);
 
-            int border_thickness = server->eyecandies.border_thickness;
-
+            uint32_t border_thickness = server->eyecandies.border_thickness;
             wlr_scene_rect_set_size(
                 toplevel->border_rect, 
                 box.width + (border_thickness * 2), 
@@ -108,6 +107,11 @@ void arrange_workspaces_tiling(struct buzzay_server *server) {
                 -border_thickness, 
                 -border_thickness
             );
+
+            wlr_scene_rect_set_clipped_region(toplevel->border_rect, (struct clipped_region) {
+                .corners = corner_radii_all(toplevel->server->eyecandies.corner_radius),
+                .area = { border_thickness, border_thickness, box.width, box.height }
+            });
 
             i++;
         }
