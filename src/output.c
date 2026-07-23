@@ -25,19 +25,18 @@ static void output_configure_scene(struct wlr_scene_node *node,
 
 		struct wlr_scene_surface * scene_surface =
 			wlr_scene_surface_try_from_buffer(buffer);
-		if (!scene_surface) {
+		if (!scene_surface && !scene_surface->surface) {
 			return;
 		}
 
-		struct wlr_xdg_surface *xdg_surface =
-			wlr_xdg_surface_try_from_wlr_surface(scene_surface->surface);
+        struct wlr_xdg_surface *xdg_surface =
+            wlr_xdg_surface_try_from_wlr_surface(scene_surface->surface);
 
-		if (toplevel &&
-				xdg_surface &&
-				xdg_surface->role == WLR_XDG_SURFACE_ROLE_TOPLEVEL) {
-			wlr_scene_buffer_set_opacity(buffer, toplevel->server->eyecandies.window_opacity);
+        if (xdg_surface &&
+                xdg_surface->role == WLR_XDG_SURFACE_ROLE_TOPLEVEL) {
+            wlr_scene_buffer_set_opacity(buffer, toplevel->server->eyecandies.window_opacity);
             wlr_scene_buffer_set_corner_radii(buffer, corner_radii_all(toplevel->server->eyecandies.corner_radius));
-		}
+        }
 	} else if (node->type == WLR_SCENE_NODE_TREE) {
 		struct wlr_scene_tree *tree = wl_container_of(node, tree, node);
 		struct wlr_scene_node *node;
@@ -115,6 +114,7 @@ void server_new_output(struct wl_listener *listener, void *data) {
     struct buzzay_output *output = calloc(1, sizeof(*output));
     output->wlr_output = wlr_output;
     output->server = server;
+    wlr_output->data = output;
 
     output->frame.notify = output_frame;
     wl_signal_add(&wlr_output->events.frame, &output->frame);

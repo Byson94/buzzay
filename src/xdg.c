@@ -6,6 +6,7 @@
 #include <wlr/types/wlr_xdg_shell.h>
 #include <wlr/types/wlr_xdg_decoration_v1.h>
 #include <wlr/types/wlr_xcursor_manager.h>
+#include <wlr/types/wlr_layer_shell_v1.h>
 #include <scenefx/types/wlr_scene.h>
 
 #include "macro-utils.h"
@@ -344,16 +345,6 @@ void server_new_xdg_popup(struct wl_listener *listener, void *data) {
 
 	struct buzzay_popup *popup = calloc(1, sizeof(*popup));
 	popup->xdg_popup = xdg_popup;
-
-	/* We must add xdg popups to the scene graph so they get rendered. The
-	 * wlroots scene graph provides a helper for this, but to use it we must
-	 * provide the proper parent scene node of the xdg popup. To enable this,
-	 * we always set the user data field of xdg_surfaces to the corresponding
-	 * scene node. */
-	struct wlr_xdg_surface *parent = wlr_xdg_surface_try_from_wlr_surface(xdg_popup->parent);
-	assert(parent != NULL);
-	struct wlr_scene_tree *parent_tree = parent->data;
-	xdg_popup->base->data = wlr_scene_xdg_surface_create(parent_tree, xdg_popup->base);
 
 	popup->commit.notify = xdg_popup_commit;
 	wl_signal_add(&xdg_popup->base->surface->events.commit, &popup->commit);
