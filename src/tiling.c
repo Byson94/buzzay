@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <wayland-util.h>
 #include <wlr/backend.h>
 #include <wayland-client.h>
@@ -17,6 +18,26 @@ void server_output_layout_changed(struct wl_listener *listener, void *data) {
 
     struct buzzay_server *server = wl_container_of(listener, server, output_layout_change);
     arrange_workspaces(server);
+}
+
+static void apply_borders(struct buzzay_toplevel *toplevel, struct wlr_box box) {
+    uint32_t border_thickness = toplevel->server->eyecandies.border_thickness;
+    wlr_scene_rect_set_clipped_region(toplevel->border_rect, (struct clipped_region) {
+        .corners = corner_radii_all(toplevel->server->eyecandies.corner_radius),
+        .area = { border_thickness, border_thickness, box.width, box.height }
+    });
+
+    wlr_scene_rect_set_size(
+        toplevel->border_rect, 
+        box.width + (border_thickness * 2), 
+        box.height + (border_thickness * 2)
+    );
+
+    wlr_scene_node_set_position(
+        &toplevel->border_rect->node, 
+        -border_thickness, 
+        -border_thickness
+    );
 }
 
 void arrange_workspaces_tiling(struct buzzay_server *server) {
@@ -96,23 +117,7 @@ void arrange_workspaces_tiling(struct buzzay_server *server) {
             wlr_xdg_toplevel_set_size(toplevel->xdg_toplevel, box.width, box.height);
             wlr_scene_node_set_position(&toplevel->scene_tree->node, box.x, box.y);
 
-            uint32_t border_thickness = server->eyecandies.border_thickness;
-            wlr_scene_rect_set_clipped_region(toplevel->border_rect, (struct clipped_region) {
-                .corners = corner_radii_all(toplevel->server->eyecandies.corner_radius),
-                .area = { border_thickness, border_thickness, box.width, box.height }
-            });
-
-            wlr_scene_rect_set_size(
-                toplevel->border_rect, 
-                box.width + (border_thickness * 2), 
-                box.height + (border_thickness * 2)
-            );
-
-            wlr_scene_node_set_position(
-                &toplevel->border_rect->node, 
-                -border_thickness, 
-                -border_thickness
-            );
+            apply_borders(toplevel, box);
 
             i++;
         }
@@ -132,9 +137,22 @@ void arrange_workspaces_monocle(struct buzzay_server *server) {
             if (wp->focused_window->xdg_toplevel != NULL && 
                 wp->focused_window->xdg_toplevel->base->surface->mapped &&
                 wp->focused_window->xdg_toplevel->base->initialized) {
+
+                uint32_t gap = wp->focused_window->server->eyecandies.gap;
+                struct wlr_box padded_box = {
+                    .x = output_box.x + gap,
+                    .y = output_box.y + gap,
+                    .width = output_box.width - (gap * 2),
+                    .height = output_box.height - (gap * 2)
+                };
+
                 wlr_scene_node_set_enabled(&wp->focused_window->scene_tree->node, true);
-                wlr_xdg_toplevel_set_size(wp->focused_window->xdg_toplevel, output_box.width, output_box.height);
-                wlr_scene_node_set_position(&wp->focused_window->scene_tree->node, output_box.x, output_box.y);
+
+                wlr_scene_blur_set_size(wp->focused_window->blur, padded_box.width, padded_box.height);
+                wlr_xdg_toplevel_set_size(wp->focused_window->xdg_toplevel, padded_box.width, padded_box.height);
+                wlr_scene_node_set_position(&wp->focused_window->scene_tree->node, padded_box.x, padded_box.y);
+
+                apply_borders(wp->focused_window, padded_box);
             }
         }
 
