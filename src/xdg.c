@@ -15,6 +15,12 @@
 #include "cursor.h"
 #include "xdg.h"
 
+// Helpers
+void toplevel_apply_blur_confs(struct buzzay_toplevel *toplevel) {
+    wlr_scene_blur_set_strength(toplevel->blur, toplevel->server->eyecandies.blur_strength);
+    wlr_scene_blur_set_alpha(toplevel->blur, toplevel->server->eyecandies.blur_alpha);
+}
+
 void focus_toplevel(struct buzzay_toplevel *toplevel) {
 	/* Note: this function only deals with keyboard focus. */
 	if (toplevel == NULL) {
@@ -82,6 +88,12 @@ static void xdg_toplevel_map(struct wl_listener *listener, void *data) {
         .area = { border_thickness, border_thickness, geometry->width, geometry->height }
 	});
     wlr_scene_rect_set_corner_radius(toplevel->border_rect, toplevel->server->eyecandies.corner_radius);
+
+    // setup blur
+    toplevel->blur = wlr_scene_blur_create(toplevel->scene_tree, 0, 0);
+    toplevel_apply_blur_confs(toplevel);
+    wlr_scene_blur_set_size(toplevel->blur, geometry->width, geometry->height);
+    wlr_scene_node_lower_to_bottom(&toplevel->blur->node);
 
     // add to workspace and tile
     workspace_insert_toplevel(&toplevel->server->workspaces, toplevel->server->current_workspace, &toplevel->link);

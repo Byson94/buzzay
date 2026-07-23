@@ -36,9 +36,7 @@ static void output_configure_scene(struct wlr_scene_node *node,
 				xdg_surface &&
 				xdg_surface->role == WLR_XDG_SURFACE_ROLE_TOPLEVEL) {
 			wlr_scene_buffer_set_opacity(buffer, toplevel->server->eyecandies.window_opacity);
-
-            wlr_scene_buffer_set_corner_radii(
-                    buffer, corner_radii_all(toplevel->server->eyecandies.corner_radius));
+            wlr_scene_buffer_set_corner_radii(buffer, corner_radii_all(toplevel->server->eyecandies.corner_radius));
 		}
 	} else if (node->type == WLR_SCENE_NODE_TREE) {
 		struct wlr_scene_tree *tree = wl_container_of(node, tree, node);
@@ -58,7 +56,6 @@ static void output_frame(struct wl_listener *listener, void *data) {
 	struct wlr_scene *scene = output->server->scene;
 
 	struct wlr_scene_output *scene_output = wlr_scene_get_scene_output(scene, output->wlr_output);
-
     output_configure_scene(&scene_output->scene->tree.node, NULL);
 
 	/* Render the scene if needed and commit the output */
@@ -76,6 +73,9 @@ static void output_request_state(struct wl_listener *listener, void *data) {
 	struct buzzay_output *output = wl_container_of(listener, output, request_state);
 	const struct wlr_output_event_request_state *event = data;
 	wlr_output_commit_state(output->wlr_output, event->state);
+
+	wlr_scene_optimized_blur_set_size(output->server->layers.blur,
+			output->wlr_output->width, output->wlr_output->height);
 }
 
 static void output_destroy(struct wl_listener *listener, void *data) {
@@ -130,5 +130,8 @@ void server_new_output(struct wl_listener *listener, void *data) {
     struct wlr_scene_output *scene_output = wlr_scene_output_create(server->scene, wlr_output);
 
     wlr_scene_output_layout_add_output(server->scene_layout, l_output, scene_output);
+
+	wlr_scene_optimized_blur_set_size(output->server->layers.blur,
+			output->wlr_output->width, output->wlr_output->height);
 }
 

@@ -12,6 +12,7 @@
 struct scene_layers {
     struct wlr_scene_tree *background;
     struct wlr_scene_tree *bottom;
+    struct wlr_scene_optimized_blur *blur;
     struct wlr_scene_tree *workspace;
     struct wlr_scene_tree *top;
     struct wlr_scene_tree *overlay;
@@ -24,6 +25,8 @@ struct buzzay_eyecandies {
     uint32_t border_thickness;
     uint32_t corner_radius;
     float window_opacity;
+    float blur_strength;
+    float blur_alpha;
 };
 
 enum buzzay_layout_mode {

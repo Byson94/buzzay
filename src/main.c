@@ -27,10 +27,10 @@
 #include <wlr/types/wlr_cursor_shape_v1.h>
 #include <wlr/types/wlr_idle_inhibit_v1.h>
 #include <wlr/types/wlr_idle_notify_v1.h>
-#include <wlr/types/wlr_scene.h>
 #include <wlr/types/wlr_viewporter.h>
 #include <wlr/render/allocator.h>
 #include <scenefx/render/fx_renderer/fx_renderer.h>
+#include <scenefx/types/wlr_scene.h>
 
 #include "handle-plugin.h"
 #include "layershell.h"
@@ -129,12 +129,14 @@ int main(int argc, char** argv) {
     server.window_layout_mode = BZ_LAYOUT_TILE;
 
     struct buzzay_eyecandies default_eyecandy = {
-        .gap = 15,
+        .gap = 5,
         .active_border = { 0.8f, 0.5f, 0.2f, 1.0f },
         .inactive_border = { 0.2f, 0.2f, 0.25f, 1.0f },
         .border_thickness = 2,
         .corner_radius = 5,
-        .window_opacity = 1
+        .window_opacity = 1,
+        .blur_strength = 1,
+        .blur_alpha = 1
     };
     server.eyecandies = default_eyecandy;
 
@@ -187,6 +189,7 @@ int main(int argc, char** argv) {
     server.scene = wlr_scene_create();
     server.layers.background = wlr_scene_tree_create(&server.scene->tree);
     server.layers.bottom = wlr_scene_tree_create(&server.scene->tree);
+    server.layers.blur = wlr_scene_optimized_blur_create(&server.scene->tree, 0, 0);
     server.layers.workspace = wlr_scene_tree_create(&server.scene->tree);
     server.layers.top = wlr_scene_tree_create(&server.scene->tree);
     server.layers.overlay = wlr_scene_tree_create(&server.scene->tree);

@@ -2,10 +2,13 @@
 #include <wlr/types/wlr_idle_inhibit_v1.h>
 #include <wlr/types/wlr_idle_notify_v1.h>
 
+#include "macro-utils.h"
 #include "server.h"
 #include "idle.h"
 
 static void handle_inhibitor_destroy(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
     struct buzzay_inhibitor *inhib = wl_container_of(listener, inhib, destroy);
     struct buzzay_server *server = inhib->server;
 

@@ -11,7 +11,6 @@ struct buzzay_toplevel {
 	struct wlr_xdg_toplevel *xdg_toplevel;
 	struct wlr_scene_tree *scene_tree;
     struct wlr_scene_rect *border_rect;
-    struct wlr_scene_shadow *shadow;
     struct wlr_scene_blur *blur;
 	struct wl_listener map;
 	struct wl_listener unmap;
