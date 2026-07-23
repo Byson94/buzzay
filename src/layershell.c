@@ -9,6 +9,7 @@
 #include "server.h"
 #include "output.h"
 #include "layershell.h"
+#include "tiling.h"
 
 static void layershell_commit(struct wl_listener *listener, void *data) {
     UNUSED(data);
@@ -42,11 +43,19 @@ static void layershell_commit(struct wl_listener *listener, void *data) {
     }
 
     struct wlr_output *mon_output = layer_surface->output;
+    struct buzzay_output *output = mon_output->data;
     uint32_t screen_width = mon_output->width;
     uint32_t screen_height = mon_output->height;
 
-    struct wlr_box full_area = { .width = screen_width, .height = screen_height };
+    struct wlr_box full_area = {
+        .x = 0,
+        .y = 0,
+        .width = screen_width, 
+        .height = screen_height 
+    };
     wlr_scene_layer_surface_v1_configure(bz_layer_surface->scene_layer, &full_area, &full_area);
+    arrange_workspaces(bz_layer_surface->server);
+    output->usable_area = full_area;
 }
 
 static void layershell_unmap(struct wl_listener *listener, void *data) {

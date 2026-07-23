@@ -46,6 +46,13 @@ void arrange_workspaces_tiling(struct buzzay_server *server) {
         struct wlr_box output_box;
         wlr_output_layout_get_box(server->output_layout, output->wlr_output, &output_box);
         
+        if (output->usable_area.width > 0) {
+            output_box.width = output->usable_area.width;
+        }
+        if (output->usable_area.height > 0) {
+            output_box.height = output->usable_area.height;
+        }
+
         struct buzzay_workspace *wp = get_workspace_at_index(&server->workspaces, server->current_workspace);
         if (!wp) continue;
 
@@ -64,8 +71,8 @@ void arrange_workspaces_tiling(struct buzzay_server *server) {
 
         int gap = server->eyecandies.gap;
         struct wlr_box padded_box = {
-            .x = output_box.x + gap,
-            .y = output_box.y + gap,
+            .x = output->usable_area.x + gap,
+            .y = output->usable_area.y + gap,
             .width = output_box.width - (gap * 2),
             .height = output_box.height - (gap * 2)
         };
@@ -129,6 +136,13 @@ void arrange_workspaces_monocle(struct buzzay_server *server) {
     wl_list_for_each(output, &server->outputs, link) {
         struct wlr_box output_box;
         wlr_output_layout_get_box(server->output_layout, output->wlr_output, &output_box);
+
+        if (output->usable_area.width > 0) {
+            output_box.width = output->usable_area.width;
+        }
+        if (output->usable_area.height > 0) {
+            output_box.height = output->usable_area.height;
+        }
         
         struct buzzay_workspace *wp = get_workspace_at_index(&server->workspaces, server->current_workspace);
         if (!wp) continue;
@@ -140,9 +154,9 @@ void arrange_workspaces_monocle(struct buzzay_server *server) {
 
                 uint32_t gap = wp->focused_window->server->eyecandies.gap;
                 struct wlr_box padded_box = {
-                    .x = output_box.x + gap,
-                    .y = output_box.y + gap,
-                    .width = output_box.width - (gap * 2),
+                    .x = output->usable_area.x + gap,
+                    .y = output->usable_area.y + gap,
+                    .width = output_box.width  - (gap * 2),
                     .height = output_box.height - (gap * 2)
                 };
 
