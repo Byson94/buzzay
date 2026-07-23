@@ -92,6 +92,7 @@ void arrange_workspaces_tiling(struct buzzay_server *server) {
                 box.y = padded_box.y + (item_height + gap) * stack_index;
             }
 
+            wlr_scene_blur_set_size(toplevel->blur, box.width, box.height);
             wlr_xdg_toplevel_set_size(toplevel->xdg_toplevel, box.width, box.height);
             wlr_scene_node_set_position(&toplevel->scene_tree->node, box.x, box.y);
 

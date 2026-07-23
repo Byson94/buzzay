@@ -94,6 +94,7 @@ static void xdg_toplevel_map(struct wl_listener *listener, void *data) {
     toplevel_apply_blur_confs(toplevel);
     wlr_scene_blur_set_size(toplevel->blur, geometry->width, geometry->height);
     wlr_scene_node_lower_to_bottom(&toplevel->blur->node);
+    wlr_scene_blur_set_corner_radius(toplevel->blur, toplevel->server->eyecandies.corner_radius);
 
     // add to workspace and tile
     workspace_insert_toplevel(&toplevel->server->workspaces, toplevel->server->current_workspace, &toplevel->link);

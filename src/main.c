@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
         .active_border = { 0.8f, 0.5f, 0.2f, 1.0f },
         .inactive_border = { 0.2f, 0.2f, 0.25f, 1.0f },
         .border_thickness = 2,
-        .corner_radius = 5,
+        .corner_radius = 50,
         .window_opacity = 1,
         .blur_strength = 1,
         .blur_alpha = 1
