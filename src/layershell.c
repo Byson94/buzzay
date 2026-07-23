@@ -11,6 +11,24 @@
 #include "layershell.h"
 #include "tiling.h"
 
+static void reset_usable_area(struct buzzay_layer_surface *bz_layer_surface) {
+    struct wlr_layer_surface_v1 *layer_surface = bz_layer_surface->surface;
+    struct wlr_output *mon_output = layer_surface->output;
+    struct buzzay_output *output = mon_output->data;
+    uint32_t screen_width = mon_output->width;
+    uint32_t screen_height = mon_output->height;
+
+    struct wlr_box full_area = {
+        .x = 0,
+        .y = 0,
+        .width = screen_width, 
+        .height = screen_height 
+    };
+
+    output->usable_area = full_area;
+    arrange_workspaces(bz_layer_surface->server);
+}
+
 static void layershell_commit(struct wl_listener *listener, void *data) {
     UNUSED(data);
 
@@ -63,6 +81,7 @@ static void layershell_unmap(struct wl_listener *listener, void *data) {
 
     struct buzzay_layer_surface *bz_layer_surface = wl_container_of(listener, bz_layer_surface, unmap);
     wlr_scene_node_set_enabled(&bz_layer_surface->scene_layer->tree->node, 0);
+    reset_usable_area(bz_layer_surface);
 }
 
 static void layershell_destroy(struct wl_listener *listener, void *data) {
@@ -76,6 +95,7 @@ static void layershell_destroy(struct wl_listener *listener, void *data) {
     wl_list_remove(&bz_layer_surface->new_popup.link);
     wl_list_remove(&bz_layer_surface->destroy_popup.link);
 
+    reset_usable_area(bz_layer_surface);
     free(bz_layer_surface);
 }
 
