@@ -22,6 +22,10 @@ The API documentation of `buzzay-plugin.h`.
 
 ## API Functions
 
+```{doxygenfunction} write_ipc_response
+:project: buzzay
+```
+
 ```{doxygenfunction} bz_quit 
 :project: buzzay
 ```
