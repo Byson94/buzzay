@@ -200,14 +200,32 @@ void msg_plugin(const char *plugin_name, int argc, char **argv, int client_fd) {
         return;
     }
 
-    typedef char *(*msg_request)(struct bz_plugin *plugin, int argc, char **argv);
+    typedef void (*msg_request)(struct bz_plugin *plugin, int client_fd, int argc, char **argv);
     msg_request msg_func = msg_sym;
 
-    const char *response = msg_func(plugin, argc, argv);
-    send_msg_back(client_fd, response);
+    msg_func(plugin, client_fd, argc, argv);
 }
 
 // == Implement Helpers ==
+
+BZ_API void write_ipc_response(int client_fd, const char* msg) {
+    int needed = snprintf(NULL, 0, "response %s", msg);
+    if (needed < 0) {
+        // formatting error encountered
+        return;
+    }
+    
+    // +1 to account for null terminator.
+    char *buffer = malloc(needed + 1);
+    if (buffer == NULL) {
+        // allocation failed
+        return;
+    }
+    
+    snprintf(buffer, needed + 1, "response %s", msg);
+    write(client_fd, buffer, needed);
+    free(buffer);
+}
 
 BZ_API void bz_quit(struct bz_plugin *plugin) {
     struct buzzay_server *server = plugin->_internal_server;

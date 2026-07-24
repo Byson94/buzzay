@@ -39,6 +39,11 @@ struct bz_plugin {
 // General
 
 /**
+ * Send a message back to the IPC client.
+ */
+BZ_API void write_ipc_response(int client_fd, const char* msg);
+
+/**
  * Quit buzzay.
  */
 BZ_API void bz_quit(struct bz_plugin *plugin);
