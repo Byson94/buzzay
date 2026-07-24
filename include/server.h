@@ -107,3 +107,4 @@ struct buzzay_server {
     struct buzzay_toplevel *hovered_toplevel; // window_active_on == WINDOW_ACTIVE_ON_HOVER
 };
 
+

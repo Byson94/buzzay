@@ -232,6 +232,31 @@ BZ_API void bz_quit(struct bz_plugin *plugin) {
     wl_display_terminate(server->wl_display);
 }
 
+BZ_API void bz_abort_plugin(struct bz_plugin *plugin) {
+    int found_index = -1;
+
+    for (int i = 0; i < plugin_count; i++) {
+        if (strcmp(plugin_array[i].plugin->plugin_name, plugin->plugin_name) == 0) {
+            found_index = i;
+            break; 
+        }
+    }
+
+    if (found_index != -1) {
+        int num_elements_to_move = plugin_count - found_index - 1;
+
+        if (num_elements_to_move > 0) {
+            memmove(
+                &plugin_array[found_index], 
+                &plugin_array[found_index + 1], 
+                num_elements_to_move * sizeof(plugin_array[0])
+            );
+        }
+
+        plugin_count--;
+    }
+}
+
 BZ_API void bz_set_decoration_mode(struct bz_plugin *plugin, enum bz_decoration_mode mode) {
     struct buzzay_server *server = plugin->_internal_server;
 

@@ -48,6 +48,11 @@ BZ_API void write_ipc_response(int client_fd, const char* msg);
  */
 BZ_API void bz_quit(struct bz_plugin *plugin);
 
+/**
+ * Abort the plugin.
+ */
+BZ_API void bz_abort_plugin(struct bz_plugin *plugin);
+
 /** Decoration modes **/
 enum bz_decoration_mode {
     /** Let the client draw their own decoration **/

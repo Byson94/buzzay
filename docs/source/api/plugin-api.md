@@ -30,6 +30,10 @@ The API documentation of `buzzay-plugin.h`.
 :project: buzzay
 ```
 
+```{doxygenfunction} bz_abort_plugin
+:project: buzzay
+```
+
 ```{doxygenfunction} bz_set_decoration_mode
 :project: buzzay
 ```
