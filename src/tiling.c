@@ -40,6 +40,49 @@ static void apply_borders(struct buzzay_toplevel *toplevel, struct wlr_box box) 
     );
 }
 
+static void arrange_node_recursive(struct layout_node *node, struct wlr_box box, struct buzzay_eyecandies *eyecandies) {
+    if (!node) return;
+
+    node->box = box;
+    uint32_t gap = eyecandies->gap;
+
+    if (node->split_type == SPLIT_NONE) {
+        if (node->toplevel && node->toplevel->xdg_toplevel) {
+            wlr_scene_node_set_enabled(&node->toplevel->scene_tree->node, true);
+
+            wlr_scene_blur_set_size(node->toplevel->blur, box.width, box.height);
+            wlr_xdg_toplevel_set_size(node->toplevel->xdg_toplevel, box.width, box.height);
+            wlr_scene_node_set_position(&node->toplevel->scene_tree->node, box.x, box.y);
+            apply_borders(node->toplevel, box);
+        }
+        return;
+    }
+
+    if (!node->first_child || !node->second_child) return;
+
+    struct wlr_box box1 = box;
+    struct wlr_box box2 = box;
+
+    float ratio = (node->split_ratio > 0.0f) ? node->split_ratio : 0.5f;
+
+    if (node->split_type == SPLIT_HORIZ) {
+        // Horizontal split (Left / Right)
+        int total_width = box.width - gap;
+        box1.width = (int)(total_width * ratio);
+        box2.x = box.x + box1.width + gap;
+        box2.width = box.width - box1.width - gap;
+    } else if (node->split_type == SPLIT_VERT) {
+        // Vertical split (Top / Bottom)
+        int total_height = box.height - gap;
+        box1.height = (int)(total_height * ratio);
+        box2.y = box.y + box1.height + gap;
+        box2.height = box.height - box1.height - gap;
+    }
+
+    arrange_node_recursive(node->first_child, box1, eyecandies);
+    arrange_node_recursive(node->second_child, box2, eyecandies);
+}
+
 void arrange_workspaces_tiling(struct buzzay_server *server) {
     struct buzzay_output *output;
     wl_list_for_each(output, &server->outputs, link) {
@@ -56,19 +99,6 @@ void arrange_workspaces_tiling(struct buzzay_server *server) {
         struct buzzay_workspace *wp = get_workspace_at_index(&server->workspaces, server->current_workspace);
         if (!wp) continue;
 
-        int total_windows = 0;
-        struct buzzay_toplevel *toplevel;
-        wl_list_for_each(toplevel, &wp->toplevels, link) {
-            if (toplevel->xdg_toplevel == NULL || 
-                !toplevel->xdg_toplevel->base->surface->mapped ||
-                !toplevel->xdg_toplevel->base->initialized) {
-                continue; 
-            }
-            total_windows++;
-        }
-
-        if (total_windows == 0) continue;
-
         int gap = server->eyecandies.gap;
         struct wlr_box padded_box = {
             .x = output->usable_area.x + gap,
@@ -77,57 +107,7 @@ void arrange_workspaces_tiling(struct buzzay_server *server) {
             .height = output_box.height - (gap * 2)
         };
 
-        // apply geometry in second loop
-        int i = 0;
-        wl_list_for_each(toplevel, &wp->toplevels, link) {
-            if (toplevel->xdg_toplevel == NULL || 
-                !toplevel->xdg_toplevel->base->surface->mapped ||
-                !toplevel->xdg_toplevel->base->initialized) {
-                continue; 
-            }
-
-            // Ensure the window is enabled in the scene graph
-            wlr_scene_node_set_enabled(&toplevel->scene_tree->node, true);
-
-            struct wlr_box box;
-
-            if (total_windows == 1) {
-                // one window = whole screen
-                box = padded_box;
-            } else if (i == 0) {
-                // master window takes left half of screen
-                int total_available_width = padded_box.width - gap;
-                box.x = padded_box.x;
-                box.y = padded_box.y;
-                box.width = total_available_width / 2;
-                box.height = padded_box.height;
-            } else {
-                // slave stack takes right half and is split vertically
-                int total_available_width = padded_box.width - gap;
-                int master_width = total_available_width / 2;
-                int stack_width = total_available_width - master_width;
-                
-                int stack_count = total_windows - 1;
-                int stack_index = i - 1;
-
-                // Total vertical space available for the stack, accounting for gaps *between* stack items
-                int total_stack_height = padded_box.height - (gap * (stack_count - 1));
-                int item_height = total_stack_height / stack_count;
-
-                box.x = padded_box.x + master_width + gap;
-                box.width = stack_width;
-                box.height = item_height;
-                box.y = padded_box.y + (item_height + gap) * stack_index;
-            }
-
-            wlr_scene_blur_set_size(toplevel->blur, box.width, box.height);
-            wlr_xdg_toplevel_set_size(toplevel->xdg_toplevel, box.width, box.height);
-            wlr_scene_node_set_position(&toplevel->scene_tree->node, box.x, box.y);
-
-            apply_borders(toplevel, box);
-
-            i++;
-        }
+        arrange_node_recursive(&wp->layout, padded_box, &server->eyecandies);
     }
 }
 

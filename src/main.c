@@ -204,6 +204,7 @@ int main(int argc, char** argv) {
         struct buzzay_workspace *ws = calloc(1, sizeof(*ws));
         ws->id = i + 1;
         wl_list_init(&ws->toplevels);
+        workspace_init(ws);
         wl_list_insert(server.workspaces.prev, &ws->link);
     }
     server.current_workspace = 0;

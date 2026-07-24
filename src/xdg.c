@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <wayland-server-core.h>
+#include <wayland-util.h>
 #include <wlr/backend.h>
 #include <wlr/types/wlr_cursor.h>
 #include <wlr/types/wlr_xdg_shell.h>
@@ -50,9 +51,7 @@ void focus_toplevel(struct buzzay_toplevel *toplevel) {
 	struct wlr_keyboard *keyboard = wlr_seat_get_keyboard(seat);
 	/* Move the toplevel to the front */
 	wlr_scene_node_raise_to_top(&toplevel->scene_tree->node);
-	wl_list_remove(&toplevel->link);
     toplevel->in_workspace->focused_window = toplevel;
-    workspace_insert_toplevel(&server->workspaces, server->current_workspace, &toplevel->link);
 	/* Activate the new surface */
 	wlr_xdg_toplevel_set_activated(toplevel->xdg_toplevel, true);
 	/*
@@ -98,7 +97,7 @@ static void xdg_toplevel_map(struct wl_listener *listener, void *data) {
     wlr_scene_blur_set_corner_radius(toplevel->blur, toplevel->server->eyecandies.corner_radius);
 
     // add to workspace and tile
-    workspace_insert_toplevel(&toplevel->server->workspaces, toplevel->server->current_workspace, &toplevel->link);
+    workspace_insert_toplevel(&toplevel->server->workspaces, toplevel->server->current_workspace, toplevel);
 	focus_toplevel(toplevel);
     arrange_workspaces(toplevel->server);
 }
@@ -146,6 +145,7 @@ static void xdg_toplevel_destroy(struct wl_listener *listener, void *data) {
 
 	/* Called when the xdg_toplevel is destroyed. */
 	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, destroy);
+    workspace_remove_toplevel(toplevel);
 
     if (toplevel->scene_tree) {
         wlr_scene_node_destroy(&toplevel->scene_tree->node);
