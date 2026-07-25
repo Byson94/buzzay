@@ -149,7 +149,7 @@ static void xdg_toplevel_destroy(struct wl_listener *listener, void *data) {
 
     struct buzzay_toplevel *last_toplevel = NULL;
     if (!wl_list_empty(&toplevel->in_workspace->toplevels)) {
-        last_toplevel = wl_container_of(toplevel->in_workspace->toplevels.prev, toplevel, link);
+        last_toplevel = wl_container_of(toplevel->in_workspace->toplevels.next, toplevel, link);
     }
 
     workspace_remove_toplevel(toplevel);

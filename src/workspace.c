@@ -34,7 +34,7 @@ void workspace_insert_toplevel(struct wl_list *workspaces, uint32_t current_work
     struct buzzay_workspace *workspace = get_workspace_at_index(workspaces, current_workspace);
     wl_list_insert(&workspace->toplevels, &toplevel->link);
 
-    struct layout_node *root = workspace->layout;
+    struct layout_node *root = &workspace->layout;
 
     if (root->split_type == SPLIT_NONE && root->toplevel == NULL) {
         // First window takes over root
@@ -103,7 +103,7 @@ void workspace_remove_toplevel(struct buzzay_toplevel *toplevel) {
     struct buzzay_workspace *workspace = toplevel->in_workspace;
     if (!workspace) return;
 
-    struct layout_node *root = workspace->layout;
+    struct layout_node *root = &workspace->layout;
     if (root->split_type == SPLIT_NONE && root->toplevel == toplevel) {
         root->toplevel = NULL;
         return;
@@ -122,11 +122,10 @@ void workspace_remove_toplevel(struct buzzay_toplevel *toplevel) {
 }
 
 void workspace_init(struct buzzay_workspace *wp) {
-    wp->layout = calloc(1, sizeof(struct layout_node));
-    wp->layout->split_type = SPLIT_NONE;
-    wp->layout->toplevel = NULL;
-    wp->layout->split_ratio = 0.5f;
-    wp->layout->first_child = NULL;
-    wp->layout->second_child = NULL;
-    wp->layout->is_root = true;
+    wp->layout.split_type = SPLIT_NONE;
+    wp->layout.toplevel = NULL;
+    wp->layout.split_ratio = 0.5f;
+    wp->layout.first_child = NULL;
+    wp->layout.second_child = NULL;
+    wp->layout.is_root = true;
 }

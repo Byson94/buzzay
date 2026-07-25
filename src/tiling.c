@@ -108,7 +108,7 @@ void arrange_workspaces_tiling(struct buzzay_server *server) {
             .height = output_box.height - (gap * 2)
         };
 
-        arrange_node_recursive(wp->layout, padded_box, &server->eyecandies);
+        arrange_node_recursive(&wp->layout, padded_box, &server->eyecandies);
     }
 }
 
