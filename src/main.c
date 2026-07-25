@@ -40,6 +40,7 @@
 #include "output.h"
 #include "cursor.h"
 #include "server.h"
+#include "config.h"
 #include "gamma.h"
 #include "idle.h"
 #include "xdg.h"
@@ -128,6 +129,14 @@ int main(int argc, char** argv) {
     server.window_active_on = WINDOW_ACTIVE_ON_CLICK;
     server.window_layout_mode = BZ_LAYOUT_TILE;
 
+    server.xcursor_theme = getenv("XCURSOR_THEME");
+    server.xcursor_size = 24;
+
+    const char* xcursor_size_str = getenv("XCURSOR_SIZE");
+    if (xcursor_size_str != NULL) {
+        server.xcursor_size = atoi(xcursor_size_str);
+    }
+
     struct buzzay_eyecandies default_eyecandy = {
         .gap = 5,
         .active_border = { 0.8f, 0.5f, 0.2f, 1.0f },
@@ -139,6 +148,9 @@ int main(int argc, char** argv) {
         .blur_alpha = 1
     };
     server.eyecandies = default_eyecandy;
+
+    // Parse config
+    handle_config("test.toml", &server);
 
     // - managed by libwayland. 
     // - manages many stuff.
@@ -245,18 +257,11 @@ int main(int argc, char** argv) {
     server.cursor = wlr_cursor_create();
     wlr_cursor_attach_output_layout(server.cursor, server.output_layout);
 
-    const char* xcursor_theme = getenv("XCURSOR_THEME");
-    const char* xcursor_size_str = getenv("XCURSOR_SIZE");
-    int xcursor_size = 24;
-    if (xcursor_size_str != NULL) {
-        xcursor_size = atoi(xcursor_size_str);
-    }
-
-    server.cursor_mgr = wlr_xcursor_manager_create(xcursor_theme, xcursor_size);
+    server.cursor_mgr = wlr_xcursor_manager_create(server.xcursor_theme, server.xcursor_size);
     if (!wlr_xcursor_manager_load(server.cursor_mgr, 1.0f)) {
         wlr_log(WLR_ERROR, "Failed to load XCursor theme");
     }
-    wlr_log(WLR_INFO, "Theme: %s, Size: %d", xcursor_theme ? xcursor_theme : "default", xcursor_size);
+    wlr_log(WLR_INFO, "Theme: %s, Size: %d", server.xcursor_theme ? server.xcursor_theme : "default", server.xcursor_size);
     if (server.cursor_mgr) {
         bool loaded = wlr_xcursor_manager_load(server.cursor_mgr, 1.0f);
         wlr_log(WLR_INFO, "Manager loaded: %s", loaded ? "YES" : "NO");

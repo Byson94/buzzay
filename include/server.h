@@ -102,6 +102,8 @@ struct buzzay_server {
     enum window_active_evt window_active_on;
     enum buzzay_layout_mode window_layout_mode;
     struct buzzay_eyecandies eyecandies;
+    const char *xcursor_theme;
+    uint32_t xcursor_size;
 
     // Config Exclusive (only used when specific configs are true)
     struct buzzay_toplevel *hovered_toplevel; // window_active_on == WINDOW_ACTIVE_ON_HOVER

@@ -24,6 +24,8 @@ wayland_server_dep = dependency('wayland-server')
 xkbcommon_dep = dependency('xkbcommon')
 scenefx_proj = subproject('scenefx')
 scene_fx_dep = scenefx_proj.get_variable('scenefx')
+tomlc17_proj = subproject('tomlc17')
+tomlc17_dep = tomlc17_proj.get_variable('tomlc17_dep')
 
 # Wayland protocol generation
 wayland_scanner_dep = dependency('wayland-scanner', native: true)
@@ -57,7 +59,8 @@ executable(
         wlroots_dep,
         wayland_server_dep,
         xkbcommon_dep,
-        scene_fx_dep
+        scene_fx_dep,
+        tomlc17_dep
     ],
     install: true
 )
