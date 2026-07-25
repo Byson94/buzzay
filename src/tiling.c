@@ -45,6 +45,7 @@ static void arrange_node_recursive(struct layout_node *node, struct wlr_box box,
 
     node->box = box;
     uint32_t gap = eyecandies->gap;
+    uint32_t border_thickness = eyecandies->border_thickness;
 
     if (node->split_type == SPLIT_NONE) {
         if (node->toplevel && node->toplevel->xdg_toplevel) {
@@ -69,13 +70,13 @@ static void arrange_node_recursive(struct layout_node *node, struct wlr_box box,
         // Horizontal split (Left / Right)
         int total_width = box.width - gap;
         box1.width = (int)(total_width * ratio);
-        box2.x = box.x + box1.width + gap;
+        box2.x = box.x + box1.width + gap + border_thickness;
         box2.width = box.width - box1.width - gap;
     } else if (node->split_type == SPLIT_VERT) {
         // Vertical split (Top / Bottom)
         int total_height = box.height - gap;
         box1.height = (int)(total_height * ratio);
-        box2.y = box.y + box1.height + gap;
+        box2.y = box.y + box1.height + gap + border_thickness;
         box2.height = box.height - box1.height - gap;
     }
 
@@ -107,7 +108,7 @@ void arrange_workspaces_tiling(struct buzzay_server *server) {
             .height = output_box.height - (gap * 2)
         };
 
-        arrange_node_recursive(&wp->layout, padded_box, &server->eyecandies);
+        arrange_node_recursive(wp->layout, padded_box, &server->eyecandies);
     }
 }
 
@@ -224,7 +225,8 @@ void update_border_colors(struct buzzay_server *server) {
 
         struct buzzay_toplevel *toplevel;
         wl_list_for_each(toplevel, &wp->toplevels, link) {
-            if (toplevel->xdg_toplevel == NULL || 
+            if (!toplevel ||
+                !toplevel->xdg_toplevel || 
                 !toplevel->xdg_toplevel->base->surface->mapped ||
                 !toplevel->xdg_toplevel->base->initialized) {
                 continue; 

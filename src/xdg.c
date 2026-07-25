@@ -145,6 +145,13 @@ static void xdg_toplevel_destroy(struct wl_listener *listener, void *data) {
 
 	/* Called when the xdg_toplevel is destroyed. */
 	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, destroy);
+    struct buzzay_server *saved_server = toplevel->server;
+
+    struct buzzay_toplevel *last_toplevel = NULL;
+    if (!wl_list_empty(&toplevel->in_workspace->toplevels)) {
+        last_toplevel = wl_container_of(toplevel->in_workspace->toplevels.prev, toplevel, link);
+    }
+
     workspace_remove_toplevel(toplevel);
 
     if (toplevel->scene_tree) {
@@ -162,14 +169,10 @@ static void xdg_toplevel_destroy(struct wl_listener *listener, void *data) {
 	wl_list_remove(&toplevel->request_maximize.link);
 	wl_list_remove(&toplevel->request_fullscreen.link);
 
-    struct buzzay_toplevel *last_toplevel = NULL;
-    if (!wl_list_empty(&toplevel->in_workspace->toplevels)) {
-        last_toplevel = wl_container_of(toplevel->in_workspace->toplevels.prev, toplevel, link);
-    }
-    focus_toplevel(last_toplevel);
-    arrange_workspaces(toplevel->server);
+    free(toplevel);
 
-	free(toplevel);
+    focus_toplevel(last_toplevel);
+    arrange_workspaces(saved_server);
 }
 
 static void xdg_toplevel_request_maximize(struct wl_listener *listener, void *data) {

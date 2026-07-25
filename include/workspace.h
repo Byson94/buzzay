@@ -24,6 +24,7 @@ struct layout_node {
     
     struct wlr_box box; 
     float split_ratio;
+    bool is_root;
 };
 
 struct buzzay_workspace {
@@ -31,7 +32,7 @@ struct buzzay_workspace {
     struct wl_list link;
     struct wl_list toplevels;
     struct buzzay_toplevel *focused_window;
-    struct layout_node layout;
+    struct layout_node *layout;
 };
 
 struct buzzay_workspace *get_workspace_at_index(struct wl_list *list, uint32_t index);
