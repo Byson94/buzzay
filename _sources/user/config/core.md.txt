@@ -30,6 +30,17 @@ What the default layout mode should be. Available options:
 layout-mode = "tiling"
 ```
 
+## prefer-csd
+
+Prefer client side decorations.
+
+**Example:**
+
+```toml
+[core]
+prefer-csd = true
+```
+
 ## spawn
 
 The shell commands to run on startup. This option takes an array of strings that are executed when compositor loads.

@@ -6,6 +6,7 @@ Buzzay is configured in TOML, a simple configuration language. The configuration
 ```{toctree}
 core
 env
+input/index
 eyecandy/index
 bindings
 example
