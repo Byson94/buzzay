@@ -6,7 +6,7 @@ xcursor_size = 24
 # Eye Candy and Effects
 [candy]
 gap = 2
-opacity = 0.8
+opacity = 1.0
 
 [candy.border]
 active = "#fff"
