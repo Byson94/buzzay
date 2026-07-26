@@ -10,7 +10,7 @@ A plugin-first wayland compositor.
 :hidden:
 
 user/getting-started
-user/configuration
+user/config/index
 user/env-vars
 ```
 
