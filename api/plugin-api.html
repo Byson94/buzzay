@@ -283,34 +283,10 @@
 </div>
 </dd></dl>
 
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv413bz_keybinding">
-<span id="_CPPv313bz_keybinding"></span><span id="_CPPv213bz_keybinding"></span><span id="bz_keybinding"></span><span class="target" id="structbz__keybinding"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bz_keybinding</span></span></span><a class="headerlink" href="#_CPPv413bz_keybinding" title="Link to this definition">¶</a><br /></dt>
-<dd><p>Buzzay keybinding information. </p>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N13bz_keybinding3symE">
-<span id="_CPPv3N13bz_keybinding3symE"></span><span id="_CPPv2N13bz_keybinding3symE"></span><span id="bz_keybinding::sym__xkb_keysym_t"></span><span class="target" id="structbz__keybinding_1ae3881e154ad18d6612a0394dc15be468"></span><span class="n"><span class="pre">xkb_keysym_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sym</span></span></span><a class="headerlink" href="#_CPPv4N13bz_keybinding3symE" title="Link to this definition">¶</a><br /></dt>
-<dd><p>They key to listen to. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N13bz_keybinding9modifiersE">
-<span id="_CPPv3N13bz_keybinding9modifiersE"></span><span id="_CPPv2N13bz_keybinding9modifiersE"></span><span id="bz_keybinding::modifiers__bz_modifier_t"></span><span class="target" id="structbz__keybinding_1a5e216fef237e2d475c7fe24f7bc6b08c"></span><span class="n"><span class="pre">bz_modifier_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">modifiers</span></span></span><a class="headerlink" href="#_CPPv4N13bz_keybinding9modifiersE" title="Link to this definition">¶</a><br /></dt>
-<dd><p>The modifier keys to listen to.</p>
-<p>You can listen to multiple modifier keys by using <code class="docutils literal notranslate"><span class="pre">|</span></code>. For example, <code class="docutils literal notranslate"><span class="pre">BZ_MOD_SHIFT</span> <span class="pre">|</span> <span class="pre">BZ_MOD_CTRL</span></code>. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N13bz_keybinding7handlerE">
-<span id="_CPPv3N13bz_keybinding7handlerE"></span><span id="_CPPv2N13bz_keybinding7handlerE"></span><span class="target" id="structbz__keybinding_1a0ea482d0d1317559583a98410c8644a3"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">handler</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49bz_plugin" title="bz_plugin"><span class="n"><span class="pre">bz_plugin</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">plugin</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N13bz_keybinding7handlerE" title="Link to this definition">¶</a><br /></dt>
-<dd><p>Function to execute when keybinding is used. </p>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenstruct: Cannot find class “bz_keybinding” in doxygen xml output for project “buzzay” from directory: ../xml</p>
 </div>
-</dd></dl>
-
 </section>
 <section id="enums">
 <h2>Enums<a class="headerlink" href="#enums" title="Link to this heading">¶</a></h2>
@@ -360,45 +336,14 @@
 <dd><p>Set window decoration mode. </p>
 </dd></dl>
 
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv422bz_register_keybindingP9bz_plugin13bz_keybinding">
-<span id="_CPPv322bz_register_keybindingP9bz_plugin13bz_keybinding"></span><span id="_CPPv222bz_register_keybindingP9bz_plugin13bz_keybinding"></span><span id="bz_register_keybinding__bz_pluginP.bz_keybinding"></span><span class="target" id="buzzay-plugin_8h_1aa1e31b162ceda8574ac594571b9f4a55"></span><span class="n"><span class="pre">bz_binding_handle_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bz_register_keybinding</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49bz_plugin" title="bz_plugin"><span class="n"><span class="pre">bz_plugin</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">plugin</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv413bz_keybinding" title="bz_keybinding"><span class="n"><span class="pre">bz_keybinding</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">binding</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422bz_register_keybindingP9bz_plugin13bz_keybinding" title="Link to this definition">¶</a><br /></dt>
-<dd><p>Register a keybinding into buzzay.</p>
-<p><strong>Example:</strong></p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">my_handle</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">bz_plugin</span><span class="w"> </span><span class="o">*</span><span class="n">plugin</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="c1">// Do something...</span>
-<span class="p">}</span>
-
-<span class="kt">void</span><span class="w"> </span><span class="nf">init_plugin</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">bz_plugin</span><span class="w"> </span><span class="o">*</span><span class="n">plugin</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="k">struct</span><span class="w"> </span><span class="nc">bz_keybinding</span><span class="w"> </span><span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="p">.</span><span class="n">sym</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">XKB_KEY_Q</span><span class="p">,</span>
-<span class="w">       </span><span class="p">.</span><span class="n">modifiers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BZ_MOD_SHIFT</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">BZ_MOD_SUPER</span><span class="p">,</span>
-<span class="w">       </span><span class="p">.</span><span class="n">flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BZ_BINDING_NONE</span><span class="p">,</span>
-<span class="w">       </span><span class="p">.</span><span class="n">handler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">my_handle</span><span class="p">,</span>
-<span class="w">       </span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span>
-<span class="w">   </span><span class="p">};</span>
-<span class="w">   </span><span class="n">bz_register_keybinding</span><span class="p">(</span><span class="n">plugin</span><span class="p">,</span><span class="w"> </span><span class="n">binding</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenfunction: Cannot find function “bz_register_keybinding” in doxygen xml output for project “buzzay” from directory: ../xml</p>
 </div>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv424bz_unregister_keybinding19bz_binding_handle_t">
-<span id="_CPPv324bz_unregister_keybinding19bz_binding_handle_t"></span><span id="_CPPv224bz_unregister_keybinding19bz_binding_handle_t"></span><span id="bz_unregister_keybinding__bz_binding_handle_t"></span><span class="target" id="buzzay-plugin_8h_1a4b488408e5ddf81c04caa8c2ab839df6"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bz_unregister_keybinding</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">bz_binding_handle_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424bz_unregister_keybinding19bz_binding_handle_t" title="Link to this definition">¶</a><br /></dt>
-<dd><p>Unregister a binding you registered into buzzay.</p>
-<p><strong>Example:</strong></p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">init_plugin</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">bz_plugin</span><span class="w"> </span><span class="o">*</span><span class="n">plugin</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="c1">// ...</span>
-<span class="w">   </span><span class="n">bz_binding_handle_t</span><span class="w"> </span><span class="n">handle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bz_register_keybinding</span><span class="p">(</span><span class="n">plugin</span><span class="p">,</span><span class="w"> </span><span class="n">binding</span><span class="p">);</span>
-
-<span class="w">   </span><span class="c1">// Unregister with the handle</span>
-<span class="w">   </span><span class="n">bz_unregister_keybinding</span><span class="p">(</span><span class="n">handle</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenfunction: Cannot find function “bz_unregister_keybinding” in doxygen xml output for project “buzzay” from directory: ../xml</p>
 </div>
-</dd></dl>
-
 </section>
 </section>
 
@@ -468,12 +413,6 @@
 <li><a class="reference internal" href="#_CPPv4N9bz_plugin4dataE"><code class="docutils literal notranslate"><span class="pre">data</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#_CPPv413bz_keybinding"><code class="docutils literal notranslate"><span class="pre">bz_keybinding</span></code></a><ul>
-<li><a class="reference internal" href="#_CPPv4N13bz_keybinding3symE"><code class="docutils literal notranslate"><span class="pre">sym</span></code></a></li>
-<li><a class="reference internal" href="#_CPPv4N13bz_keybinding9modifiersE"><code class="docutils literal notranslate"><span class="pre">modifiers</span></code></a></li>
-<li><a class="reference internal" href="#_CPPv4N13bz_keybinding7handlerE"><code class="docutils literal notranslate"><span class="pre">handler</span></code></a></li>
-</ul>
-</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#enums">Enums</a><ul>
@@ -489,8 +428,6 @@
 <li><a class="reference internal" href="#_CPPv47bz_quitP9bz_plugin"><code class="docutils literal notranslate"><span class="pre">bz_quit()</span></code></a></li>
 <li><a class="reference internal" href="#_CPPv415bz_abort_pluginP9bz_plugin"><code class="docutils literal notranslate"><span class="pre">bz_abort_plugin()</span></code></a></li>
 <li><a class="reference internal" href="#_CPPv422bz_set_decoration_modeP9bz_plugin18bz_decoration_mode"><code class="docutils literal notranslate"><span class="pre">bz_set_decoration_mode()</span></code></a></li>
-<li><a class="reference internal" href="#_CPPv422bz_register_keybindingP9bz_plugin13bz_keybinding"><code class="docutils literal notranslate"><span class="pre">bz_register_keybinding()</span></code></a></li>
-<li><a class="reference internal" href="#_CPPv424bz_unregister_keybinding19bz_binding_handle_t"><code class="docutils literal notranslate"><span class="pre">bz_unregister_keybinding()</span></code></a></li>
 </ul>
 </li>
 </ul>
