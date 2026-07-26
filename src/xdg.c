@@ -169,8 +169,10 @@ static void xdg_toplevel_destroy(struct wl_listener *listener, void *data) {
 	wl_list_remove(&toplevel->request_maximize.link);
 	wl_list_remove(&toplevel->request_fullscreen.link);
 
-    free(toplevel);
+    wlr_seat_pointer_clear_focus(toplevel->server->seat);
+    wlr_seat_keyboard_notify_clear_focus(toplevel->server->seat);
 
+    free(toplevel);
     focus_toplevel(last_toplevel);
     arrange_workspaces(saved_server);
 }
@@ -199,8 +201,10 @@ static void xdg_toplevel_request_fullscreen(struct wl_listener *listener, void *
 	struct buzzay_toplevel *toplevel =
 		wl_container_of(listener, toplevel, request_fullscreen);
 
-    wlr_xdg_surface_schedule_configure(toplevel->xdg_toplevel->base);
-    wlr_xdg_toplevel_set_fullscreen(toplevel->xdg_toplevel, true);
+    if (toplevel->xdg_toplevel->base->initialized) {
+        wlr_xdg_surface_schedule_configure(toplevel->xdg_toplevel->base);
+        wlr_xdg_toplevel_set_fullscreen(toplevel->xdg_toplevel, true);
+    }
 }
 
 static void xdg_popup_commit(struct wl_listener *listener, void *data) {
