@@ -15,6 +15,31 @@ struct keybinding *keybinding_arr = NULL;
 int keybinding_count = 0;
 int keybinding_capacity = 0;
 
+void apply_keyboard_config_to_device(struct wlr_keyboard *keyboard, const char *layout, const char *variant, const char *options) {
+    struct xkb_context *context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
+    if (!context) {
+        return;
+    }
+
+    struct xkb_rule_names rules = {
+        .model = "pc105",
+        .layout = layout,
+        .variant = variant,
+        .options = options
+    };
+
+    struct xkb_keymap *keymap = xkb_keymap_new_from_names(
+        context, &rules, XKB_KEYMAP_COMPILE_NO_FLAGS
+    );
+
+    if (keymap) {
+        wlr_keyboard_set_keymap(keyboard, keymap);
+        xkb_keymap_unref(keymap);
+    }
+
+    xkb_context_unref(context);
+}
+
 void register_keybinding(struct keybinding binding) {
     // save the keybinding
     if (keybinding_count >= keybinding_capacity) {

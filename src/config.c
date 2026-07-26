@@ -455,6 +455,25 @@ int handle_config(const char *path, struct buzzay_server *server) {
     if (not_unknown(blur_strength)) server->eyecandies.blur_strength = blur_strength.u.fp64;
     if (not_unknown(blur_alpha)) server->eyecandies.blur_alpha = blur_alpha.u.fp64;
 
+    // Handle inputs
+    toml_datum_t input_keyboard_layout = toml_seek(result.toptab, "input.keyboard.layout");
+    toml_datum_t input_keyboard_variant = toml_seek(result.toptab, "input.keyboard.variant");
+    toml_datum_t input_keyboard_options = toml_seek(result.toptab, "input.keyboard.options");
+    CHECK_TOML_TYPE(input_keyboard_layout, TOML_STRING, "input.keyboard.layout");
+    CHECK_TOML_TYPE(input_keyboard_variant, TOML_STRING, "input.keyboard.variant");
+    CHECK_TOML_TYPE(input_keyboard_options, TOML_STRING, "input.keyboard.options");
+
+    if (not_unknown(input_keyboard_layout)) {
+        const char *layout = input_keyboard_layout.u.s;
+        const char *variant = not_unknown(input_keyboard_variant) ? input_keyboard_variant.u.s : "";
+        const char *options = not_unknown(input_keyboard_options) ? input_keyboard_options.u.s : "";
+
+        struct buzzay_keyboard *device;
+        wl_list_for_each(device, &server->keyboards, link) {
+            apply_keyboard_config_to_device(device->wlr_keyboard, layout, variant, options);
+        }
+    }
+
     // Handle keybindings
     toml_datum_t bindings = toml_seek(result.toptab, "bindings");
     CHECK_TOML_TYPE(bindings, TOML_TABLE, "bindings");
