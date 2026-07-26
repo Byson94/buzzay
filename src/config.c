@@ -12,6 +12,7 @@
 #include <wlr/types/wlr_output_layout.h>
 #include <wlr/types/wlr_scene.h>
 
+#include "buzzay-plugin.h"
 #include "macro-utils.h"
 #include "input.h"
 #include "output.h"
@@ -314,14 +315,16 @@ int handle_config(const char *path, struct buzzay_server *server) {
     toml_datum_t core_focuson = toml_seek(result.toptab, "core.focus-on");
     toml_datum_t core_xdg_interactive = toml_seek(result.toptab, "core.xdg-interactive");
     toml_datum_t core_layout_mode = toml_seek(result.toptab, "core.layout-mode");
+    toml_datum_t core_prefer_csd = toml_seek(result.toptab, "core.prever-csd");
     toml_datum_t core_spawn = toml_seek(result.toptab, "core.spawn");
     toml_datum_t core_include = toml_seek(result.toptab, "core.include");
 
-    CHECK_TOML_TYPE(core_focuson, TOML_STRING, "focus-on");
-    CHECK_TOML_TYPE(core_xdg_interactive, TOML_BOOLEAN, "xdg-interactive");
-    CHECK_TOML_TYPE(core_layout_mode, TOML_STRING, "layout-mode");
-    CHECK_TOML_TYPE(core_spawn, TOML_ARRAY, "spawn");
-    CHECK_TOML_TYPE(core_include, TOML_ARRAY, "include");
+    CHECK_TOML_TYPE(core_focuson, TOML_STRING, "core.focus-on");
+    CHECK_TOML_TYPE(core_xdg_interactive, TOML_BOOLEAN, "core.xdg-interactive");
+    CHECK_TOML_TYPE(core_layout_mode, TOML_STRING, "core.layout-mode");
+    CHECK_TOML_TYPE(core_prefer_csd, TOML_BOOLEAN, "core.prefer-csd");
+    CHECK_TOML_TYPE(core_spawn, TOML_ARRAY, "core.spawn");
+    CHECK_TOML_TYPE(core_include, TOML_ARRAY, "core.include");
 
     if (not_unknown(core_xdg_interactive)) 
         server->enable_xdg_interactive = core_xdg_interactive.u.boolean;
@@ -345,6 +348,14 @@ int handle_config(const char *path, struct buzzay_server *server) {
         } else {
             printf("Unknown mode found in 'layout-mode'.\n");
             return 1;
+        }
+    }
+
+    if (not_unknown(core_prefer_csd)) {
+        if (core_prefer_csd.u.boolean) {
+            server->decoration_mode = WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_CLIENT_SIDE;
+        } else {
+            server->decoration_mode = WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE;
         }
     }
 
