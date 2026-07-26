@@ -50,75 +50,22 @@ const char *program_name = "buzzay";
 const char *program_ver = "0.1.0";
 
 void print_help() {
-    printf("A very extensible wayland compositor.\n\n");
-    printf("Usage: %s [OPTIONS]\n\n", program_name);
+    printf("%s - An extensible wayland compositor.\n\n", program_name);
+    printf("Usage:\n");
+    printf("  %s\n", program_name);
+    printf("  %s plugin load <plugin_name>\n", program_name);
+    printf("  %s plugin msg <messages...>\n", program_name);
+    printf("  %s -h, --help\n", program_name);
+    printf("  %s -v, --version\n\n", program_name);
+    printf("Commands:\n");
+    printf("  plugin load    Load a plugin\n");
+    printf("  plugin msg     Send a message to a plugin\n\n");
     printf("Options:\n");
-    printf("  -l, --load     Load a plugin\n");
-    printf("  -m, --msg      Send a message to a plugin\n");
     printf("  -h, --help     Show this help message and exit\n");
     printf("  -v, --version  Print the program version\n");
 }
 
-int main(int argc, char** argv) {
-    int opt;
-    static struct option long_options[] = {
-        { "load", required_argument, 0, 'l' },
-        { "msg", required_argument, 0, 'm' },
-        { "help", no_argument, 0, 'h' },
-        { "version", no_argument, 0, 'v' },
-        {0, 0, 0, 0}
-    };
-
-    while ((opt = getopt_long(argc, argv, "+hvlm", long_options, NULL)) != -1) {
-        switch (opt) {
-            case 'l':
-                if ((argc - optind) > 1) {
-                    printf("'%s' accepts only one argument.\n", argv[optind - 1]);
-                    return 1;
-                }
-
-                const char* plugin = argv[optind];
-                if (strlen(plugin) > 100) {
-                    printf("Plugin name must not exceed 100 characters.\n");
-                    return 1;
-                }
-
-                char msg[100+5] = "load ";
-                strcat(msg, plugin);
-                int ret = ipc_send_msg(msg);
-
-                return ret;
-            case 'm': {
-                if ((argc - optind) >= 100) {
-                    printf("Only a maximum of 100 arguments can be passed.\n");
-                    return 1;
-                }
-
-                char msg[100+5] = "msg ";
-                for (int i = optind; i < argc; i++) {
-                    strcat(msg, argv[i]);
-                    strcat(msg, " ");
-                }
-
-                int ret = ipc_send_msg(msg);
-                return ret;
-            }
-            case 'h':
-                print_help();
-                return 0;
-            case 'v': 
-                printf("%s v%s\n", program_name, program_ver);
-                return 0;
-        }
-    }
-
-    for (int i = optind; i < argc; i++) {
-        if (argv[i][0] == '-') {
-            fprintf(stderr, "Warning: Unexpected '%s' flag. "
-                            "Only one option must be used in each command.\n", argv[i]);
-        }
-    }
-
+static int start_compositor() {
     // setup compositor
     wlr_log_init(WLR_DEBUG, NULL);
 
@@ -398,6 +345,78 @@ int main(int argc, char** argv) {
     wl_display_destroy(server.wl_display);
 
     free(plugin_array);
+    return 0;
+}
 
+int main(int argc, char** argv) {
+    if (argc < 2) {
+        return start_compositor();
+    }
+
+    if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
+        print_help();
+        return 0;
+    }
+
+    if (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0) {
+        printf("%s v%s\n", program_name, program_ver);
+        return 0;
+    }
+
+    // Handle plugins
+    if (strcmp(argv[1], "plugin") == 0) {
+        if (argc < 3) {
+            fprintf(stderr, "Error: 'plugin' subcommand requires an action (load, msg).\n");
+            return 1;
+        }
+
+        // Action: plugin load <name>
+        if (strcmp(argv[2], "load") == 0) {
+            if (argc != 4) {
+                printf("'plugin load' accepts only one argument.\n");
+                return 1;
+            }
+
+            const char *plugin = argv[3];
+            if (strlen(plugin) > 100) {
+                printf("Plugin name must not exceed 100 characters.\n");
+                return 1;
+            }
+
+            char msg[100 + 5] = "load ";
+            strcat(msg, plugin);
+            return ipc_send_msg(msg);
+        }
+        
+        // Action: plugin msg <messages...>
+        else if (strcmp(argv[2], "msg") == 0) {
+            int num_args = argc - 3;
+            if (num_args <= 0) {
+                printf("Error: 'plugin msg' requires at least one message argument.\n");
+                return 1;
+            }
+            if (num_args >= 100) {
+                printf("Only a maximum of 100 arguments can be passed.\n");
+                return 1;
+            }
+
+            char msg[4096] = "msg ";
+            for (int i = 3; i < argc; i++) {
+                if (strlen(msg) + strlen(argv[i]) + 1 >= sizeof(msg)) {
+                    printf("Error: Combined message string too long.\n");
+                    return 1;
+                }
+                strcat(msg, argv[i]);
+                strcat(msg, " ");
+            }
+
+            return ipc_send_msg(msg);
+        } else {
+            fprintf(stderr, "Error: Unknown plugin action '%s'.\n", argv[2]);
+            return 1;
+        }
+    }
+
+    fprintf(stderr, "Error: Unknown command '%s'. Use -h for help.\n", argv[1]);
     return 0;
 }
