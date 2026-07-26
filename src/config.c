@@ -11,8 +11,8 @@
 #include <wlr/util/log.h>
 #include <wlr/types/wlr_output_layout.h>
 #include <wlr/types/wlr_scene.h>
+#include <wlr/backend/wayland.h>
 
-#include "buzzay-plugin.h"
 #include "macro-utils.h"
 #include "input.h"
 #include "output.h"
@@ -196,7 +196,12 @@ static void parse_color(const char *color, float out_color[4]) {
     }
 }
 
-static int parse_keybinding_string(const char *key_str, xkb_keysym_t *out_sym, enum wlr_keyboard_modifier *out_mods) {
+static int parse_keybinding_string(
+    const char *key_str, 
+    xkb_keysym_t *out_sym, 
+    enum wlr_keyboard_modifier *out_mods,
+    bool is_nested
+) {
     *out_sym = XKB_KEY_NoSymbol;
 
     char *dup = strdup(key_str);
@@ -210,7 +215,13 @@ static int parse_keybinding_string(const char *key_str, xkb_keysym_t *out_sym, e
         token = strtok(NULL, "+");
         
         if (token != NULL) {
-            if (strcasecmp(last_token, "Super") == 0 || strcasecmp(last_token, "Mod4") == 0) {
+            if (strcmp(last_token, "ADPT") == 0) {
+                if (is_nested) {
+                    *out_mods |= WLR_MODIFIER_ALT;
+                } else {
+                    *out_mods |= WLR_MODIFIER_LOGO;
+                }
+            } else if (strcasecmp(last_token, "Super") == 0 || strcasecmp(last_token, "Mod4") == 0) {
                 *out_mods |= WLR_MODIFIER_LOGO;
             } else if (strcasecmp(last_token, "Ctrl") == 0 || strcasecmp(last_token, "Control") == 0) {
                 *out_mods |= WLR_MODIFIER_CTRL;
@@ -523,7 +534,20 @@ int handle_config(const char *path, struct buzzay_server *server) {
         }
 
         struct keybinding binding = {0};
-        if (parse_keybinding_string(key, &binding.sym, &binding.modifiers) != 0) {
+        bool is_nested = false;
+
+        if (!wl_list_empty(&server->outputs)) {
+            struct buzzay_output *first_item = wl_container_of(
+                server->outputs.next, first_item, link
+            );
+
+            is_nested = wlr_output_is_wl(first_item->wlr_output);
+        }
+
+        if (parse_keybinding_string(
+                    key, &binding.sym, 
+                    &binding.modifiers, 
+                    is_nested) != 0) {
             fprintf(stderr, "Error: Failed to parse keybinding string '%s'\n", key);
             free(kb_cmd);
             continue;
