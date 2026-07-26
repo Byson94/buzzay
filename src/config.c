@@ -216,11 +216,13 @@ int handle_config(const char *path, struct buzzay_server *server) {
     toml_datum_t core_xdg_interactive = toml_seek(result.toptab, "core.xdg-interactive");
     toml_datum_t core_layout_mode = toml_seek(result.toptab, "core.layout-mode");
     toml_datum_t core_spawn = toml_seek(result.toptab, "core.spawn");
+    toml_datum_t core_include = toml_seek(result.toptab, "core.include");
 
     CHECK_TOML_TYPE(core_focuson, TOML_STRING, "focus-on");
     CHECK_TOML_TYPE(core_xdg_interactive, TOML_BOOLEAN, "xdg-interactive");
     CHECK_TOML_TYPE(core_layout_mode, TOML_STRING, "layout-mode");
     CHECK_TOML_TYPE(core_spawn, TOML_ARRAY, "spawn");
+    CHECK_TOML_TYPE(core_include, TOML_ARRAY, "include");
 
     if (not_unknown(core_xdg_interactive)) 
         server->enable_xdg_interactive = core_xdg_interactive.u.boolean;
@@ -247,10 +249,20 @@ int handle_config(const char *path, struct buzzay_server *server) {
         }
     }
 
-    for (int i = 0; i < core_spawn.u.arr.size; i++) {
-        toml_datum_t item = core_spawn.u.arr.elem[i];
-        if (item.type != TOML_STRING) continue;
-        spawn_command(item.u.s);
+    if (not_unknown(core_spawn)) {
+        for (int i = 0; i < core_spawn.u.arr.size; i++) {
+            toml_datum_t item = core_spawn.u.arr.elem[i];
+            if (item.type != TOML_STRING) continue;
+            spawn_command(item.u.s);
+        }
+    }
+
+    if (not_unknown(core_include)) {
+        for (int i = 0; i < core_include.u.arr.size; i++) {
+            toml_datum_t item = core_include.u.arr.elem[i];
+            if (item.type != TOML_STRING) continue;
+            handle_config(item.u.s, server);
+        }
     }
 
     // Apply monitors

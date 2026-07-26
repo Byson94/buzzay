@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <sys/un.h>
 #include <sys/socket.h>
+#include <sys/inotify.h>
 #include <wayland-server-core.h>
 #include <wayland-util.h>
 #include <wlr/backend.h>
@@ -296,7 +297,7 @@ static int start_compositor() {
     // setup WAYLAND_DISPLAY env var and run init script
     setenv("WAYLAND_DISPLAY", wayland_socket, true);
 
-    // Parse config
+    // Parse config and setup watcher
     handle_config(conf_file_path, &server);
 
     // Finally, run the wayland event loop.

@@ -43,3 +43,14 @@ spawn = [
     "waybar" # Start waybar
 ]
 ```
+
+## include
+
+Include other configuration files. Must be an array like `spawn`.
+
+**Example:**
+
+```toml
+[core]
+include = ["other.toml"]
+```
