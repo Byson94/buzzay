@@ -6,6 +6,7 @@
 #include <wayland-client-core.h>
 #include <wlr/types/wlr_xdg_decoration_v1.h>
 
+#include "buzzay-plugin.h"
 #include "cursor.h"
 #include "xdg.h"
 

@@ -96,7 +96,7 @@ static int start_compositor() {
     };
     server.eyecandies = default_eyecandy;
 
-    // setup the envs
+    // setup the envs & server plugin
     handle_config_only_envs("test.toml", &server);
 
     // - managed by libwayland. 
@@ -166,7 +166,7 @@ static int start_compositor() {
         workspace_init(ws);
         wl_list_insert(server.workspaces.prev, &ws->link);
     }
-    server.current_workspace = 0;
+    server.current_workspace = 1;
     server.xdg_shell = wlr_xdg_shell_create(server.wl_display, 7);
     server.new_xdg_toplevel.notify = server_new_xdg_toplevel;
     wl_signal_add(&server.xdg_shell->events.new_toplevel, &server.new_xdg_toplevel);

@@ -8,10 +8,31 @@
 #include <wlr/types/wlr_idle_notify_v1.h>
 
 #include "macro-utils.h"
-#include "buzzay-plugin.h"
-#include "handle-plugin.h"
 #include "server.h"
 #include "input.h"
+
+struct keybinding *keybinding_arr = NULL;
+int keybinding_count = 0;
+int keybinding_capacity = 0;
+
+void register_keybinding(struct keybinding binding) {
+    // save the keybinding
+    if (keybinding_count >= keybinding_capacity) {
+        int new_capacity = (keybinding_capacity == 0) ? 1 : keybinding_capacity * 2;
+        struct keybinding *temp = realloc(keybinding_arr, new_capacity * sizeof(struct keybinding));
+        
+        if (temp == NULL) {
+            fprintf(stderr, "Failed to grow array\n");
+            return; 
+        }
+        
+        keybinding_arr = temp;
+        keybinding_capacity = new_capacity;
+    }
+
+    keybinding_arr[keybinding_count] = binding;
+    keybinding_count++;
+}
 
 static void keyboard_handle_modifiers(struct wl_listener *listener, void *data) {
     UNUSED(data);
@@ -32,48 +53,20 @@ static void keyboard_handle_modifiers(struct wl_listener *listener, void *data) 
 		&keyboard->wlr_keyboard->modifiers);
 }
 
-static uint32_t bz_to_wlr_modifiers(uint32_t bz_mods) {
-    uint32_t wlr_mods = 0;
-    if (bz_mods & BZ_MOD_SHIFT) wlr_mods |= WLR_MODIFIER_SHIFT;
-    if (bz_mods & BZ_MOD_ALT)   wlr_mods |= WLR_MODIFIER_ALT;
-    if (bz_mods & BZ_MOD_CTRL)  wlr_mods |= WLR_MODIFIER_CTRL;
-    if (bz_mods & BZ_MOD_SUPER) wlr_mods |= WLR_MODIFIER_LOGO;
-    return wlr_mods;
-}
-
-bool handle_keybinding(struct buzzay_server *server, xkb_keysym_t sym, uint32_t modifiers, bool is_release) {
+bool handle_keybinding(struct buzzay_server *server, xkb_keysym_t sym, uint32_t modifiers) {
     UNUSED(server);
-
-    bool is_passthrough = false;
-
     for (int i = 0; i < keybinding_count; i++) {
-        struct keybinding_data *kb_dat = &keybinding_arr[i];
-        struct bz_keybinding *kb = &kb_dat->binding;
+        struct keybinding *kb = &keybinding_arr[i];
 
-        bool binding_wants_release = (kb->flags & BZ_BINDING_ONRELEASE) != 0;
-        bool binding_wants_passthrough = (kb->flags & BZ_BINDING_PASSTHROUGH) != 0;
+        uint32_t event_mods = modifiers & BZ_ALLOWED_MODS;
+        uint32_t req_mods = kb->modifiers & BZ_ALLOWED_MODS;
 
-        if (binding_wants_release != is_release) {
-            continue;
-        }
-
-        if (kb->sym == sym 
-                && bz_to_wlr_modifiers(modifiers & BZ_ALLOWED_MODS) 
-                == (kb->modifiers & bz_to_wlr_modifiers(BZ_ALLOWED_MODS))) {
+        if (kb->sym == sym && event_mods == req_mods) {
             if (kb->handler) {
-                kb->handler(kb_dat->owner, kb->data);
-
-                if (binding_wants_passthrough) {
-                    is_passthrough = true;
-                } else {
-                    return true;
-                }
+                kb->handler(server, kb->data);
+                return true;
             }
         }
-    }
-    
-    if (is_passthrough) {
-        return true;
     }
 
     return false;
@@ -95,19 +88,7 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
 			keyboard->wlr_keyboard->xkb_state, keycode, &syms);
 
     // get kb modifiers
-    uint32_t modifiers = 0;
-    if (xkb_state_mod_index_is_active(keyboard->wlr_keyboard->xkb_state, 
-            xkb_keymap_mod_get_index(keyboard->wlr_keyboard->keymap, XKB_MOD_NAME_SHIFT), 
-            XKB_STATE_MODS_EFFECTIVE)) modifiers |= WLR_MODIFIER_SHIFT;
-    if (xkb_state_mod_index_is_active(keyboard->wlr_keyboard->xkb_state, 
-            xkb_keymap_mod_get_index(keyboard->wlr_keyboard->keymap, XKB_MOD_NAME_ALT), 
-            XKB_STATE_MODS_EFFECTIVE)) modifiers |= WLR_MODIFIER_ALT;
-    if (xkb_state_mod_index_is_active(keyboard->wlr_keyboard->xkb_state, 
-            xkb_keymap_mod_get_index(keyboard->wlr_keyboard->keymap, XKB_MOD_NAME_CTRL), 
-            XKB_STATE_MODS_EFFECTIVE)) modifiers |= WLR_MODIFIER_CTRL;
-    if (xkb_state_mod_index_is_active(keyboard->wlr_keyboard->xkb_state, 
-            xkb_keymap_mod_get_index(keyboard->wlr_keyboard->keymap, XKB_MOD_NAME_LOGO), 
-            XKB_STATE_MODS_EFFECTIVE)) modifiers |= WLR_MODIFIER_LOGO;
+    uint32_t modifiers = wlr_keyboard_get_modifiers(keyboard->wlr_keyboard);
 
     // quickly handle tty switching
     if ((modifiers & WLR_MODIFIER_ALT) && 
@@ -124,18 +105,12 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
 
     // else handling compositor key binding
     bool handled = false;
-    bool is_release = false;
-
     if (event->state == WL_KEYBOARD_KEY_STATE_PRESSED) {
-        is_release = false;
-    } else {
-        is_release = true;
-    }
-
-    for (int i = 0; i < nsyms; i++) {
-        if (handle_keybinding(server, syms[i], modifiers, is_release)) {
-            handled = true;
-            break;
+        for (int i = 0; i < nsyms; i++) {
+            if (handle_keybinding(server, syms[i], modifiers)) {
+                handled = true;
+                break;
+            }
         }
     }
 
