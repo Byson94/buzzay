@@ -16,6 +16,7 @@ There are four modifier keys:
 - `Alt` or `Mod1`: The alt key.
 - `Ctrl` or `Control`: The control key.
 - `Shift`: The shift key.
+- `ADPT`: Adaptive key that chooses between `Super` and `Alt` based on whether the compositor is running nested or not.
 
 These keys can be paired with keys to get a keybinding. Example: `Super+Return`. The key names
 are provided by xkbcommon, so you should follow those names for the keybinding to function. 
