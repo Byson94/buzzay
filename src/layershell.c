@@ -11,24 +11,6 @@
 #include "layershell.h"
 #include "tiling.h"
 
-static void reset_usable_area(struct buzzay_layer_surface *bz_layer_surface) {
-    struct wlr_layer_surface_v1 *layer_surface = bz_layer_surface->surface;
-    struct wlr_output *mon_output = layer_surface->output;
-    struct buzzay_output *output = mon_output->data;
-    uint32_t screen_width = mon_output->width;
-    uint32_t screen_height = mon_output->height;
-
-    struct wlr_box full_area = {
-        .x = 0,
-        .y = 0,
-        .width = screen_width, 
-        .height = screen_height 
-    };
-
-    output->usable_area = full_area;
-    arrange_workspaces(bz_layer_surface->server);
-}
-
 static void layershell_commit(struct wl_listener *listener, void *data) {
     UNUSED(data);
 
@@ -74,13 +56,39 @@ static void layershell_commit(struct wl_listener *listener, void *data) {
     output->usable_area = full_area;
 
     struct buzzay_layer_surface *bz_surf;
-        wl_list_for_each(bz_surf, &output->layer_surfaces, link) {
-            wlr_scene_layer_surface_v1_configure(
-                bz_surf->scene_layer, 
-                &full_area, 
-                &output->usable_area
-            );
+
+    // Let the exclusive windows claim the space first.
+    // Do it in reverse because idk, it seems to be doing it nicely.
+    wl_list_for_each_reverse(bz_surf, &output->layer_surfaces, link) {
+        struct wlr_layer_surface_v1 *l_surf = bz_surf->surface;
+        
+        if (l_surf->current.exclusive_zone <= 0) {
+            continue;
         }
+
+        wlr_scene_layer_surface_v1_configure(
+            bz_surf->scene_layer,
+            &full_area,
+            &output->usable_area
+        );
+    }
+
+    // Now that exclusive windows have the exclusive zone all set up,
+    // we can configure non-exclusive windows that will follow the
+    // available space.
+    wl_list_for_each(bz_surf, &output->layer_surfaces, link) {
+        struct wlr_layer_surface_v1 *l_surf = bz_surf->surface;
+        
+        if (l_surf->current.exclusive_zone > 0) {
+            continue;
+        }
+
+        wlr_scene_layer_surface_v1_configure(
+            bz_surf->scene_layer,
+            &full_area,
+            &output->usable_area
+        );
+    }
     
     arrange_workspaces(bz_layer_surface->server);
 }
@@ -90,7 +98,6 @@ static void layershell_unmap(struct wl_listener *listener, void *data) {
 
     struct buzzay_layer_surface *bz_layer_surface = wl_container_of(listener, bz_layer_surface, unmap);
     wlr_scene_node_set_enabled(&bz_layer_surface->scene_layer->tree->node, 0);
-    reset_usable_area(bz_layer_surface);
 }
 
 static void layershell_destroy(struct wl_listener *listener, void *data) {
@@ -103,9 +110,7 @@ static void layershell_destroy(struct wl_listener *listener, void *data) {
     wl_list_remove(&bz_layer_surface->unmap.link);
     wl_list_remove(&bz_layer_surface->destroy.link);
     wl_list_remove(&bz_layer_surface->new_popup.link);
-    wl_list_remove(&bz_layer_surface->destroy_popup.link);
 
-    reset_usable_area(bz_layer_surface);
     free(bz_layer_surface);
 }
 
@@ -114,12 +119,6 @@ static void layershell_new_popup(struct wl_listener *listener, void *data) {
     struct wlr_xdg_popup *popup = data;
     struct wlr_scene_tree *parent_tree = bz_layer_surface->scene_layer->tree;
     wlr_scene_xdg_surface_create(parent_tree, popup->base);
-}
-
-static void layershell_destroy_popup(struct wl_listener *listener, void *data) {
-    UNUSED(data);
-    UNUSED(listener);
-    // there isn't really anything to do.
 }
 
 void server_new_layer_surface(struct wl_listener *listener, void *data) {
@@ -163,6 +162,4 @@ void server_new_layer_surface(struct wl_listener *listener, void *data) {
 
     bz_layer_surface->new_popup.notify = layershell_new_popup;
     wl_signal_add(&layer_surface->events.new_popup, &bz_layer_surface->new_popup);
-    bz_layer_surface->destroy_popup.notify = layershell_destroy_popup;
-    wl_signal_add(&layer_surface->events.destroy, &bz_layer_surface->destroy_popup);
 }

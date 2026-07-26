@@ -13,7 +13,6 @@ struct buzzay_layer_surface {
     struct wl_listener commit;
     struct wl_listener destroy;
     struct wl_listener new_popup;
-    struct wl_listener destroy_popup;
 
     enum zwlr_layer_shell_v1_layer current_layer;
 };

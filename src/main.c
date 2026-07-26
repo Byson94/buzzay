@@ -68,7 +68,7 @@ void print_help() {
 
 static int start_compositor() {
     // setup compositor
-    wlr_log_init(WLR_DEBUG, NULL);
+    wlr_log_init(WLR_INFO, NULL);
 
     struct buzzay_server server = {0};
 
