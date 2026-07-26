@@ -115,6 +115,7 @@ void server_new_output(struct wl_listener *listener, void *data) {
     output->wlr_output = wlr_output;
     output->server = server;
     wlr_output->data = output;
+    wl_list_init(&output->layer_surfaces);
 
     output->frame.notify = output_frame;
     wl_signal_add(&wlr_output->events.frame, &output->frame);

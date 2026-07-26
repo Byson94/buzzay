@@ -34,11 +34,10 @@ static void layershell_commit(struct wl_listener *listener, void *data) {
 
     struct buzzay_layer_surface *bz_layer_surface = wl_container_of(listener, bz_layer_surface, commit);
     struct wlr_layer_surface_v1 *layer_surface = bz_layer_surface->surface;
+    struct buzzay_server *server = bz_layer_surface->server;
 
     if (bz_layer_surface->current_layer != layer_surface->pending.layer) {
-        struct buzzay_server *server = bz_layer_surface->server;
         struct wlr_scene_tree *target_tree = NULL;
-
         switch (layer_surface->pending.layer) {
             case ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND:
                 target_tree = server->layers.background;
@@ -71,9 +70,19 @@ static void layershell_commit(struct wl_listener *listener, void *data) {
         .width = screen_width, 
         .height = screen_height 
     };
-    wlr_scene_layer_surface_v1_configure(bz_layer_surface->scene_layer, &full_area, &full_area);
-    arrange_workspaces(bz_layer_surface->server);
+
     output->usable_area = full_area;
+
+    struct buzzay_layer_surface *bz_surf;
+        wl_list_for_each(bz_surf, &output->layer_surfaces, link) {
+            wlr_scene_layer_surface_v1_configure(
+                bz_surf->scene_layer, 
+                &full_area, 
+                &output->usable_area
+            );
+        }
+    
+    arrange_workspaces(bz_layer_surface->server);
 }
 
 static void layershell_unmap(struct wl_listener *listener, void *data) {
@@ -89,6 +98,7 @@ static void layershell_destroy(struct wl_listener *listener, void *data) {
 
     struct buzzay_layer_surface *bz_layer_surface = wl_container_of(listener, bz_layer_surface, destroy);
 
+    wl_list_remove(&bz_layer_surface->link);
     wl_list_remove(&bz_layer_surface->commit.link);
     wl_list_remove(&bz_layer_surface->unmap.link);
     wl_list_remove(&bz_layer_surface->destroy.link);
@@ -138,6 +148,9 @@ void server_new_layer_surface(struct wl_listener *listener, void *data) {
     bz_layer_surface->scene_layer = wlr_scene_layer_surface_v1_create(target_tree, layer_surface);
     bz_layer_surface->current_layer = layer_surface->pending.layer;
     bz_layer_surface->server = server;
+
+    struct buzzay_output *output = layer_surface->output->data;
+    wl_list_insert(&output->layer_surfaces, &bz_layer_surface->link);
 
     bz_layer_surface->commit.notify = layershell_commit;
     wl_signal_add(&layer_surface->surface->events.commit, &bz_layer_surface->commit);

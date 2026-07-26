@@ -12,6 +12,7 @@ struct buzzay_output {
     struct wl_listener destroy;
 
     struct wlr_box usable_area;
+    struct wl_list layer_surfaces;
 };
 
 void server_new_output(struct wl_listener *listener, void *data);

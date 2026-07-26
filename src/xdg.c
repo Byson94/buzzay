@@ -119,8 +119,6 @@ static void xdg_toplevel_unmap(struct wl_listener *listener, void *data) {
 	if (toplevel == toplevel->server->grabbed_toplevel) {
 		reset_cursor_mode(toplevel->server);
 	}
-
-	wl_list_remove(&toplevel->link);
 }
 
 static void xdg_toplevel_commit(struct wl_listener *listener, void *data) {
@@ -147,12 +145,13 @@ static void xdg_toplevel_destroy(struct wl_listener *listener, void *data) {
 	struct buzzay_toplevel *toplevel = wl_container_of(listener, toplevel, destroy);
     struct buzzay_server *saved_server = toplevel->server;
 
+    wl_list_remove(&toplevel->link);
+    workspace_remove_toplevel(toplevel);
+
     struct buzzay_toplevel *last_toplevel = NULL;
     if (!wl_list_empty(&toplevel->in_workspace->toplevels)) {
         last_toplevel = wl_container_of(toplevel->in_workspace->toplevels.next, toplevel, link);
     }
-
-    workspace_remove_toplevel(toplevel);
 
     if (toplevel->scene_tree) {
         wlr_scene_node_destroy(&toplevel->scene_tree->node);
