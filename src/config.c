@@ -58,11 +58,11 @@ int handle_config_only_envs(const char *path, struct buzzay_server *server) {
     }
 
     // Apply env variables
-    toml_datum_t xcursor_theme = toml_seek(result.toptab, "env.xcursor_theme");
+    toml_datum_t xcursor_theme = toml_seek(result.toptab, "env.xcursor-theme");
     if (xcursor_theme.type == TOML_STRING) {
         server->xcursor_theme = xcursor_theme.u.s;
     }
-    toml_datum_t xcursor_size = toml_seek(result.toptab, "env.xcursor_size");
+    toml_datum_t xcursor_size = toml_seek(result.toptab, "env.xcursor-size");
     if (xcursor_size.type == TOML_INT64) {
         server->xcursor_size = xcursor_size.u.int64;
     }
@@ -212,13 +212,10 @@ int handle_config(const char *path, struct buzzay_server *server) {
     }
 
     // Hanlde core
-    toml_datum_t core_conf = toml_seek(result.toptab, "core");
-    CHECK_TOML_TYPE(core_conf, TOML_TABLE, "core");
-
-    toml_datum_t core_focuson = toml_seek(core_conf, "focus-on");
-    toml_datum_t core_xdg_interactive = toml_seek(core_conf, "xdg-interactive");
-    toml_datum_t core_layout_mode = toml_seek(core_conf, "layout-mode");
-    toml_datum_t core_spawn = toml_seek(core_conf, "spawn");
+    toml_datum_t core_focuson = toml_seek(result.toptab, "core.focus-on");
+    toml_datum_t core_xdg_interactive = toml_seek(result.toptab, "core.xdg-interactive");
+    toml_datum_t core_layout_mode = toml_seek(result.toptab, "core.layout-mode");
+    toml_datum_t core_spawn = toml_seek(result.toptab, "core.spawn");
 
     CHECK_TOML_TYPE(core_focuson, TOML_STRING, "focus-on");
     CHECK_TOML_TYPE(core_xdg_interactive, TOML_BOOLEAN, "xdg-interactive");
@@ -305,10 +302,8 @@ int handle_config(const char *path, struct buzzay_server *server) {
     }
 
     // Handle eyecandy
-    toml_datum_t eyecandy = toml_seek(result.toptab, "candy");
-    toml_datum_t candy_gap = toml_seek(eyecandy, "gap");
-    toml_datum_t candy_opacity = toml_seek(eyecandy, "opacity");
-    CHECK_TOML_TYPE(eyecandy, TOML_TABLE, "candy");
+    toml_datum_t candy_gap = toml_seek(result.toptab, "candy.gap");
+    toml_datum_t candy_opacity = toml_seek(result.toptab, "candy.opacity");
     CHECK_TOML_TYPE(candy_gap, TOML_INT64, "gap");
     CHECK_TOML_TYPE(candy_opacity, TOML_FP64, "opacity");
 
@@ -316,26 +311,21 @@ int handle_config(const char *path, struct buzzay_server *server) {
     if (not_unknown(candy_opacity)) server->eyecandies.window_opacity = candy_opacity.u.fp64;
 
     // Handle border
-    toml_datum_t eyecandy_border = toml_seek(result.toptab, "candy.border");
-    CHECK_TOML_TYPE(eyecandy_border, TOML_TABLE, "candy.border");
-    
-    toml_datum_t active_clr = toml_seek(eyecandy_border, "active");
-    toml_datum_t inactive_clr = toml_seek(eyecandy_border, "inactive");
-    toml_datum_t bdr_thickness = toml_seek(eyecandy_border, "thickness");
+    toml_datum_t active_clr = toml_seek(result.toptab, "candy.border.active");
+    toml_datum_t inactive_clr = toml_seek(result.toptab, "candy.border.inactive");
+    toml_datum_t bdr_thickness = toml_seek(result.toptab, "candy.border.thickness");
     CHECK_TOML_TYPE(active_clr, TOML_STRING, "active");
     CHECK_TOML_TYPE(inactive_clr, TOML_STRING, "inactive");
     CHECK_TOML_TYPE(bdr_thickness, TOML_INT64, "thickness");
 
     if (not_unknown(active_clr)) parse_color(active_clr.u.s, server->eyecandies.active_border);
     if (not_unknown(inactive_clr)) parse_color(inactive_clr.u.s, server->eyecandies.inactive_border);
-    if (not_unknown(eyecandy_border)) server->eyecandies.border_thickness = bdr_thickness.u.int64;
+    if (not_unknown(bdr_thickness)) server->eyecandies.border_thickness = bdr_thickness.u.int64;
 
     // Handle blur
-    toml_datum_t eyecandy_blur = toml_seek(result.toptab, "eyecandy.blur");
-    toml_datum_t blur_enabled = toml_seek(eyecandy_blur, "enabled");
-    toml_datum_t blur_strength = toml_seek(eyecandy_blur, "strength");
-    toml_datum_t blur_alpha = toml_seek(eyecandy_blur, "alpha");
-    CHECK_TOML_TYPE(eyecandy_blur, TOML_TABLE, "eyecandy.blur");
+    toml_datum_t blur_enabled = toml_seek(result.toptab, "candy.blur.enabled");
+    toml_datum_t blur_strength = toml_seek(result.toptab, "candy.blur.strength");
+    toml_datum_t blur_alpha = toml_seek(result.toptab, "candy.blur.alpha");
     CHECK_TOML_TYPE(blur_enabled, TOML_BOOLEAN, "enabled");
     CHECK_TOML_TYPE(blur_strength, TOML_FP64, "strength");
     CHECK_TOML_TYPE(blur_alpha, TOML_FP64, "alpha");
