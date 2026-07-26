@@ -312,6 +312,9 @@ static int start_compositor() {
     wl_list_remove(&server.new_xdg_toplevel.link);
     wl_list_remove(&server.new_xdg_popup.link);
     wl_list_remove(&server.new_toplevel_decoration.link);
+    wl_list_remove(&server.output_layout_change.link);
+    wl_list_remove(&server.pointer_focus_change.link);
+    wl_list_remove(&server.request_set_selection.link);
 
 	wl_list_remove(&server.cursor_motion.link);
 	wl_list_remove(&server.cursor_motion_absolute.link);
@@ -319,6 +322,7 @@ static int start_compositor() {
 	wl_list_remove(&server.cursor_axis.link);
 	wl_list_remove(&server.cursor_frame.link);
     wl_list_remove(&server.cursor_request_set_shape.link);
+    wl_list_remove(&server.request_cursor.link);
 
     wl_list_remove(&server.new_input.link);
     wl_list_remove(&server.new_output.link);
