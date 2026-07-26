@@ -71,6 +71,20 @@ static int start_compositor() {
 
     struct buzzay_server server = {0};
 
+    // Resolve configuration path
+    char conf_file_path[PATH_MAX];
+    const char *conf_home = getenv("XDG_CONFIG_HOME");
+    const char *conf_file = getenv("BUZZAY_CONF");
+
+    if (conf_file != NULL) {
+        strcpy(conf_file_path, conf_file);
+    } else if (conf_home != NULL) {
+        snprintf(conf_file_path, sizeof(conf_file_path), "%s/buzzay/config.toml", conf_home);
+    } else {
+        char *homedir = getpwuid(getuid())->pw_dir;
+        snprintf(conf_file_path, sizeof(conf_file_path), "%s/.config/buzzay/config.toml", homedir);
+    }
+
     // Setup Configs
     server.enable_xdg_interactive = true;
     server.window_active_on = WINDOW_ACTIVE_ON_CLICK;
@@ -97,7 +111,7 @@ static int start_compositor() {
     server.eyecandies = default_eyecandy;
 
     // setup the envs & server plugin
-    handle_config_only_envs("test.toml", &server);
+    handle_config_only_envs(conf_file_path, &server);
 
     // - managed by libwayland. 
     // - manages many stuff.
@@ -281,32 +295,9 @@ static int start_compositor() {
 
     // setup WAYLAND_DISPLAY env var and run init script
     setenv("WAYLAND_DISPLAY", wayland_socket, true);
-    char init_file_str[PATH_MAX];
-    const char *conf_home = getenv("XDG_CONFIG_HOME");
-    const char *conf_file = getenv("BUZZAY_CONF");
-
-    if (conf_file != NULL) {
-        strcpy(init_file_str, conf_file);
-    } else if (conf_home != NULL) {
-        snprintf(init_file_str, sizeof(init_file_str), "%s/buzzay/init", conf_home);
-    } else {
-        char *homedir = getpwuid(getuid())->pw_dir;
-        snprintf(init_file_str, sizeof(init_file_str), "%s/.config/buzzay/init", homedir);
-    }
 
     // Parse config
-    handle_config("test.toml", &server);
-
-    FILE *init_file = fopen(init_file_str, "r");
-    if (init_file) {
-        fclose(init_file);
-        if (fork() == 0) {
-            execl("/bin/sh", "/bin/sh", "-c", init_file_str, (void *)NULL);
-            _exit(127);
-        }
-    } else {
-        wlr_log(WLR_ERROR, "Init file '%s' does not exist.", init_file_str);
-    }
+    handle_config(conf_file_path, &server);
 
     // Finally, run the wayland event loop.
     wlr_log(WLR_INFO, "Running Wayland compositor on WAYLAND_DISPLAY=%s", wayland_socket);

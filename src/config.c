@@ -40,6 +40,11 @@ static inline const char *toml_type_to_string(int type) {
     }
 }
 
+static bool not_unknown(toml_datum_t dat) {
+    if (dat.type != TOML_UNKNOWN) return true;
+    return false;
+}
+
 struct keybinding_cmd {
     const char *commands[MAX_COMMAND_ARGS];
     int command_count;
@@ -139,6 +144,20 @@ static int parse_keybinding_string(const char *key_str, xkb_keysym_t *out_sym, e
     return 0;
 }
 
+static void spawn_command(const char *cmd) {
+    pid_t pid = fork();
+    if (pid < 0) {
+        perror("fork failed");
+        return;
+    }
+
+    if (pid == 0) {
+        setsid();
+        execl("/bin/sh", "sh", "-c", cmd, NULL);
+        _exit(1);
+    }
+}
+
 static void keybinding_handler(struct buzzay_server *server, void *data) {
     struct keybinding_cmd *kb = data;
     const char *act = kb->commands[0];
@@ -149,17 +168,7 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
             return;
         }
 
-        pid_t pid = fork();
-        if (pid < 0) {
-            perror("fork failed");
-            return;
-        }
-
-        if (pid == 0) {
-            setsid();
-            execl("/bin/sh", "sh", "-c", kb->commands[1], NULL);
-            _exit(1);
-        }
+        spawn_command(kb->commands[1]);
     } else if (strcmp(act, "close-active-window") == 0) {
         struct buzzay_workspace *workspace = get_workspace_at_index(&server->workspaces, server->current_workspace);
         struct buzzay_toplevel *toplevel = workspace->focused_window;
@@ -207,37 +216,47 @@ int handle_config(const char *path, struct buzzay_server *server) {
     toml_datum_t core_focuson = toml_seek(core_conf, "focus-on");
     toml_datum_t core_xdg_interactive = toml_seek(core_conf, "xdg-interactive");
     toml_datum_t core_layout_mode = toml_seek(core_conf, "layout-mode");
+    toml_datum_t core_spawn = toml_seek(core_conf, "spawn");
 
     CHECK_TOML_TYPE(core_focuson, TOML_STRING, "focus-on");
     CHECK_TOML_TYPE(core_xdg_interactive, TOML_BOOLEAN, "xdg-interactive");
     CHECK_TOML_TYPE(core_layout_mode, TOML_STRING, "layout-mode");
+    CHECK_TOML_TYPE(core_spawn, TOML_ARRAY, "spawn");
 
-    server->enable_xdg_interactive = core_xdg_interactive.u.boolean;
+    if (not_unknown(core_xdg_interactive)) 
+        server->enable_xdg_interactive = core_xdg_interactive.u.boolean;
 
-    if (strcmp(core_focuson.u.s, "click") == 0) {
-        server->window_active_on = WINDOW_ACTIVE_ON_CLICK;
-    } else if (strcmp(core_focuson.u.s, "hover") == 0) {
-        server->window_active_on = WINDOW_ACTIVE_ON_HOVER;
-    } else {
-        printf("Unknown mode found in 'focus-on'.\n");
-        return 1;
+    if (not_unknown(core_focuson)) {
+        if (strcmp(core_focuson.u.s, "click") == 0) {
+            server->window_active_on = WINDOW_ACTIVE_ON_CLICK;
+        } else if (strcmp(core_focuson.u.s, "hover") == 0) {
+            server->window_active_on = WINDOW_ACTIVE_ON_HOVER;
+        } else {
+            printf("Unknown mode found in 'focus-on'.\n");
+            return 1;
+        }
     }
 
-    if (strcmp(core_layout_mode.u.s, "tiling") == 0) {
-        server->window_layout_mode = BZ_LAYOUT_TILE;
-    } else if (strcmp(core_layout_mode.u.s, "monocle") == 0) {
-        server->window_layout_mode = BZ_LAYOUT_MONOCLE;
-    } else {
-        printf("Unknown mode found in 'layout-mode'.\n");
-        return 1;
+    if (not_unknown(core_layout_mode)) {
+        if (strcmp(core_layout_mode.u.s, "tiling") == 0) {
+            server->window_layout_mode = BZ_LAYOUT_TILE;
+        } else if (strcmp(core_layout_mode.u.s, "monocle") == 0) {
+            server->window_layout_mode = BZ_LAYOUT_MONOCLE;
+        } else {
+            printf("Unknown mode found in 'layout-mode'.\n");
+            return 1;
+        }
+    }
+
+    for (int i = 0; i < core_spawn.u.arr.size; i++) {
+        toml_datum_t item = core_spawn.u.arr.elem[i];
+        if (item.type != TOML_STRING) continue;
+        spawn_command(item.u.s);
     }
 
     // Apply monitors
     toml_datum_t monitors = toml_seek(result.toptab, "monitor");
-    if (monitors.type != TOML_ARRAY && monitors.type != TOML_UNKNOWN) {
-        printf("'monitor' must of an array of tables.\n");
-        return 1;
-    }
+    CHECK_TOML_TYPE(monitors, TOML_ARRAY, "monitor");
 
     for (int i = 0; i < monitors.u.arr.size; i++) {
         toml_datum_t item = monitors.u.arr.elem[i];
@@ -251,17 +270,18 @@ int handle_config(const char *path, struct buzzay_server *server) {
         toml_datum_t scale = toml_seek(item, "scale");
         toml_datum_t position = toml_seek(item, "position");
 
-        if (name.type != TOML_STRING && name.type != TOML_UNKNOWN) {
-            printf("'id' of monitor must be of type string.\n");
-            break;
-        }
+        CHECK_TOML_TYPE(name, TOML_STRING, "id");
+        CHECK_TOML_TYPE(enabled, TOML_BOOLEAN, "enabled");
+        CHECK_TOML_TYPE(scale, TOML_FP64, "scale");
+        CHECK_TOML_TYPE(position, TOML_ARRAY, "position");
 
         struct buzzay_output *output;
         wl_list_for_each(output, &server->outputs, link) {
             if (strcmp(output->wlr_output->name, name.u.s) == 0) {
-                if (enabled.type == TOML_BOOLEAN) output->wlr_output->enabled = enabled.u.boolean;
-                if (scale.type == TOML_FP64) output->wlr_output->scale = scale.u.fp64;
-                if (scale.type == TOML_ARRAY) {
+                if (not_unknown(enabled)) output->wlr_output->enabled = enabled.u.boolean;
+                if (not_unknown(scale)) output->wlr_output->scale = scale.u.fp64;
+
+                if (not_unknown(position)) {
                     if (position.u.arr.size <= 2) {
                         printf("Monitor position must receive two elements: '[x, y]'\n");
                         break;
@@ -276,7 +296,7 @@ int handle_config(const char *path, struct buzzay_server *server) {
 
                     wlr_output_layout_add(server->output_layout, output->wlr_output, x.u.int64, y.u.int64);
                 }
-
+                
                 break;
             }
         }
@@ -284,31 +304,18 @@ int handle_config(const char *path, struct buzzay_server *server) {
 
     // Handle eyecandy
     toml_datum_t eyecandy = toml_seek(result.toptab, "candy");
-    if (eyecandy.type != TOML_TABLE && eyecandy.type != TOML_UNKNOWN) {
-        printf("'candy' must be a table.\n");
-        return 1;
-    }
     toml_datum_t candy_gap = toml_seek(eyecandy, "gap");
     toml_datum_t candy_opacity = toml_seek(eyecandy, "opacity");
+    CHECK_TOML_TYPE(eyecandy, TOML_TABLE, "candy");
+    CHECK_TOML_TYPE(candy_gap, TOML_INT64, "gap");
+    CHECK_TOML_TYPE(candy_opacity, TOML_FP64, "opacity");
 
-    if (candy_gap.type != TOML_INT64 && candy_gap.type != TOML_UNKNOWN) {
-        printf("'gap' of candy must be an integer.\n");
-        return 1;
-    }
-    server->eyecandies.gap = candy_gap.u.int64;
-
-    if (candy_opacity.type != TOML_FP64 && candy_opacity.type != TOML_UNKNOWN) {
-        printf("'opacity' of candy must be a float.\n");
-        return 1;
-    }
-    server->eyecandies.window_opacity = candy_opacity.u.fp64;
+    if (not_unknown(candy_gap)) server->eyecandies.gap = candy_gap.u.int64;
+    if (not_unknown(candy_opacity)) server->eyecandies.window_opacity = candy_opacity.u.fp64;
 
     // Handle border
     toml_datum_t eyecandy_border = toml_seek(result.toptab, "candy.border");
-    if (eyecandy_border.type != TOML_TABLE && eyecandy.type != TOML_UNKNOWN) {
-        printf("'candy.border' must be a table.");
-        return 1;
-    }
+    CHECK_TOML_TYPE(eyecandy_border, TOML_TABLE, "candy.border");
     
     toml_datum_t active_clr = toml_seek(eyecandy_border, "active");
     toml_datum_t inactive_clr = toml_seek(eyecandy_border, "inactive");
@@ -317,28 +324,23 @@ int handle_config(const char *path, struct buzzay_server *server) {
     CHECK_TOML_TYPE(inactive_clr, TOML_STRING, "inactive");
     CHECK_TOML_TYPE(bdr_thickness, TOML_INT64, "thickness");
 
-    parse_color(active_clr.u.s, server->eyecandies.active_border);
-    parse_color(inactive_clr.u.s, server->eyecandies.inactive_border);
-
-    server->eyecandies.border_thickness = bdr_thickness.u.int64;
+    if (not_unknown(active_clr)) parse_color(active_clr.u.s, server->eyecandies.active_border);
+    if (not_unknown(inactive_clr)) parse_color(inactive_clr.u.s, server->eyecandies.inactive_border);
+    if (not_unknown(eyecandy_border)) server->eyecandies.border_thickness = bdr_thickness.u.int64;
 
     // Handle blur
     toml_datum_t eyecandy_blur = toml_seek(result.toptab, "eyecandy.blur");
-    if (eyecandy_blur.type != TOML_TABLE && eyecandy_blur.type != TOML_UNKNOWN) {
-        printf("'eyecandy.blur' must be a table.\n");
-        return 1;
-    }
-
     toml_datum_t blur_enabled = toml_seek(eyecandy_blur, "enabled");
     toml_datum_t blur_strength = toml_seek(eyecandy_blur, "strength");
     toml_datum_t blur_alpha = toml_seek(eyecandy_blur, "alpha");
+    CHECK_TOML_TYPE(eyecandy_blur, TOML_TABLE, "eyecandy.blur");
     CHECK_TOML_TYPE(blur_enabled, TOML_BOOLEAN, "enabled");
     CHECK_TOML_TYPE(blur_strength, TOML_FP64, "strength");
     CHECK_TOML_TYPE(blur_alpha, TOML_FP64, "alpha");
 
-    server->eyecandies.blur_enabled = blur_enabled.u.boolean;
-    server->eyecandies.blur_strength = blur_strength.u.fp64;
-    server->eyecandies.blur_alpha = blur_alpha.u.fp64;
+    if (not_unknown(blur_enabled)) server->eyecandies.blur_enabled = blur_enabled.u.boolean;
+    if (not_unknown(blur_strength)) server->eyecandies.blur_strength = blur_strength.u.fp64;
+    if (not_unknown(blur_alpha)) server->eyecandies.blur_alpha = blur_alpha.u.fp64;
 
     // Handle keybindings
     toml_datum_t bindings = toml_seek(result.toptab, "bindings");
