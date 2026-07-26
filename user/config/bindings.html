@@ -290,9 +290,8 @@ or switching the workspace. As shown above, they are an array like so:</p>
 <div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">kb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Action&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Argument&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
-</section>
 <section id="spawn">
-<h2>spawn<a class="headerlink" href="#spawn" title="Link to this heading">¶</a></h2>
+<h3>spawn<a class="headerlink" href="#spawn" title="Link to this heading">¶</a></h3>
 <p>This is the most common action. It is used to spawn a shell command. The shell command to execute
 must be the argument.</p>
 <p><strong>Example:</strong></p>
@@ -303,7 +302,7 @@ must be the argument.</p>
 </div>
 </section>
 <section id="close-active-window">
-<h2>close-active-window<a class="headerlink" href="#close-active-window" title="Link to this heading">¶</a></h2>
+<h3>close-active-window<a class="headerlink" href="#close-active-window" title="Link to this heading">¶</a></h3>
 <p>Close the currently active window. Takes no argument.</p>
 <p><strong>Example:</strong></p>
 <div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[bindings]</span>
@@ -312,7 +311,7 @@ must be the argument.</p>
 </div>
 </section>
 <section id="switch-workspace">
-<h2>switch-workspace<a class="headerlink" href="#switch-workspace" title="Link to this heading">¶</a></h2>
+<h3>switch-workspace<a class="headerlink" href="#switch-workspace" title="Link to this heading">¶</a></h3>
 <p>Switch the currently active workspace. The argument should be the workspace number.</p>
 <p><strong>Example:</strong></p>
 <div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[bindings]</span>
@@ -321,7 +320,7 @@ must be the argument.</p>
 </div>
 </section>
 <section id="toggle-monocle">
-<h2>toggle-monocle<a class="headerlink" href="#toggle-monocle" title="Link to this heading">¶</a></h2>
+<h3>toggle-monocle<a class="headerlink" href="#toggle-monocle" title="Link to this heading">¶</a></h3>
 <p>Toggle the monocle layout. Takes no argument.</p>
 <p><strong>Example:</strong></p>
 <div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[bindings]</span>
@@ -330,7 +329,7 @@ must be the argument.</p>
 </div>
 </section>
 <section id="cycle-monocle">
-<h2>cycle-monocle<a class="headerlink" href="#cycle-monocle" title="Link to this heading">¶</a></h2>
+<h3>cycle-monocle<a class="headerlink" href="#cycle-monocle" title="Link to this heading">¶</a></h3>
 <p>Cycle to the next window in the monocle. Takes no argument.</p>
 <p><strong>Example:</strong></p>
 <div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[bindings]</span>
@@ -339,13 +338,14 @@ must be the argument.</p>
 </div>
 </section>
 <section id="quit-compositor">
-<h2>quit-compositor<a class="headerlink" href="#quit-compositor" title="Link to this heading">¶</a></h2>
+<h3>quit-compositor<a class="headerlink" href="#quit-compositor" title="Link to this heading">¶</a></h3>
 <p>Quit the compositor. Takes no argument.</p>
 <p><strong>Example:</strong></p>
 <div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[bindings]</span>
 <span class="s2">&quot;Super+Escape&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;quit-compositor&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
+</section>
 </section>
 </section>
 
@@ -409,13 +409,15 @@ must be the argument.</p>
             <ul>
 <li><a class="reference internal" href="#">Keybinding Options</a><ul>
 <li><a class="reference internal" href="#modifier-keys">Modifier Keys</a></li>
-<li><a class="reference internal" href="#actions">Actions</a></li>
+<li><a class="reference internal" href="#actions">Actions</a><ul>
 <li><a class="reference internal" href="#spawn">spawn</a></li>
 <li><a class="reference internal" href="#close-active-window">close-active-window</a></li>
 <li><a class="reference internal" href="#switch-workspace">switch-workspace</a></li>
 <li><a class="reference internal" href="#toggle-monocle">toggle-monocle</a></li>
 <li><a class="reference internal" href="#cycle-monocle">cycle-monocle</a></li>
 <li><a class="reference internal" href="#quit-compositor">quit-compositor</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

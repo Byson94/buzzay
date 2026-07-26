@@ -30,7 +30,7 @@ or switching the workspace. As shown above, they are an array like so:
 kb = ["Action", "Argument"]
 ```
 
-## spawn
+### spawn
 
 This is the most common action. It is used to spawn a shell command. The shell command to execute
 must be the argument.
@@ -43,7 +43,7 @@ must be the argument.
 "Super+Return" = ["spawn", "kitty"]
 ```
 
-## close-active-window
+### close-active-window
 
 Close the currently active window. Takes no argument.
 
@@ -54,7 +54,7 @@ Close the currently active window. Takes no argument.
 "Super+Q" = ["close-active-window"]
 ```
 
-## switch-workspace
+### switch-workspace
 
 Switch the currently active workspace. The argument should be the workspace number.
 
@@ -65,7 +65,7 @@ Switch the currently active workspace. The argument should be the workspace numb
 "Super+1" = ["switch-workspace", "1"]
 ```
 
-## toggle-monocle
+### toggle-monocle
 
 Toggle the monocle layout. Takes no argument.
 
@@ -76,7 +76,7 @@ Toggle the monocle layout. Takes no argument.
 "Super+M" = ["toggle-monocle"]
 ```
 
-## cycle-monocle
+### cycle-monocle
 
 Cycle to the next window in the monocle. Takes no argument.
 
@@ -87,7 +87,7 @@ Cycle to the next window in the monocle. Takes no argument.
 "Super+J" = ["cycle-monocle"]
 ```
 
-## quit-compositor
+### quit-compositor
 
 Quit the compositor. Takes no argument.
 
