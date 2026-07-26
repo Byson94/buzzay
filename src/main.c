@@ -87,6 +87,8 @@ static int start_compositor() {
     }
 
     // Setup Configs
+    server.config_file = conf_file_path;
+    server.server_first_load = true;
     server.enable_xdg_interactive = true;
     server.window_active_on = WINDOW_ACTIVE_ON_CLICK;
     server.window_layout_mode = BZ_LAYOUT_TILE;
@@ -299,6 +301,7 @@ static int start_compositor() {
 
     // Parse config and setup watcher
     handle_config(conf_file_path, &server);
+    server.server_first_load = false;
 
     // Finally, run the wayland event loop.
     wlr_log(WLR_INFO, "Running Wayland compositor on WAYLAND_DISPLAY=%s", wayland_socket);

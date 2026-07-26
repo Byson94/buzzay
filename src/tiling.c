@@ -20,7 +20,7 @@ void server_output_layout_changed(struct wl_listener *listener, void *data) {
     arrange_workspaces(server);
 }
 
-static void apply_borders(struct buzzay_toplevel *toplevel, struct wlr_box box) {
+void apply_borders(struct buzzay_toplevel *toplevel, struct wlr_box box) {
     uint32_t border_thickness = toplevel->server->eyecandies.border_thickness;
     wlr_scene_rect_set_clipped_region(toplevel->border_rect, (struct clipped_region) {
         .corners = corner_radii_all(toplevel->server->eyecandies.corner_radius),

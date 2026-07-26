@@ -7,10 +7,12 @@
 #include <string.h>
 #include <tomlc17.h>
 #include <wayland-util.h>
+#include <sys/inotify.h>
 #include <wlr/util/log.h>
 #include <wlr/types/wlr_output_layout.h>
 #include <wlr/types/wlr_scene.h>
 
+#include "macro-utils.h"
 #include "input.h"
 #include "output.h"
 #include "server.h"
@@ -27,6 +29,93 @@
             return 1; \
         } \
     } while (0)
+
+struct config_watcher {
+    int notify_fd;
+    struct wl_event_source *source;
+};
+
+struct config_watcher *watchers;
+size_t watcher_count;
+size_t watcher_capacity;
+
+void cleanup_all_watchers() {
+    for (size_t i = 0; i < watcher_count; i++) {
+        if (watchers[i].source) {
+            wl_event_source_remove(watchers[i].source);
+        }
+        if (watchers[i].notify_fd >= 0) {
+            close(watchers[i].notify_fd);
+        }
+    }
+    free(watchers);
+    watchers = NULL;
+    watcher_count = 0;
+    watcher_capacity = 0;
+}
+
+static int handle_config_change(int fd, uint32_t mask, void *data) {
+    UNUSED(mask);
+    struct buzzay_server *server = data;
+
+    char buffer[512];
+    ssize_t len = read(fd, buffer, sizeof(buffer));
+    if (len < 0) {
+        perror("read inotify");
+        return 0;
+    }
+
+    cleanup_all_watchers();
+    handle_config(server->config_file, server);
+
+    return 0;
+}
+
+int add_config_watcher(struct buzzay_server *server, const char *path) {
+    int notify_fd = inotify_init1(IN_CLOEXEC);
+    if (notify_fd < 0) {
+        perror("inotify_init");
+        return -1;
+    }
+
+    int wd = inotify_add_watch(notify_fd, path, IN_MODIFY | IN_DELETE_SELF);
+    if (wd < 0) {
+        perror("inotify_add_watch");
+        close(notify_fd);
+        return -1;
+    }
+
+    if (watcher_count >= watcher_capacity) {
+        size_t new_cap = watcher_capacity == 0 ? 4 : watcher_capacity * 2;
+        struct config_watcher *new_watchers = realloc(watchers, new_cap * sizeof(struct config_watcher));
+        if (!new_watchers) {
+            close(notify_fd);
+            return -1;
+        }
+        watchers = new_watchers;
+        watcher_capacity = new_cap;
+    }
+
+    struct wl_event_source *source = wl_event_loop_add_fd(
+        server->wl_event_loop, 
+        notify_fd, 
+        WL_EVENT_READABLE, 
+        handle_config_change, 
+        server
+    );
+
+    if (!source) {
+        close(notify_fd);
+        return -1;
+    }
+
+    watchers[watcher_count++] = (struct config_watcher){
+        .notify_fd = notify_fd,
+        .source = source,
+    };
+
+    return 0;
+}
 
 static inline const char *toml_type_to_string(int type) {
     switch (type) {
@@ -153,6 +242,13 @@ static void spawn_command(const char *cmd) {
 
     if (pid == 0) {
         setsid();
+
+        // redirect stdout and stderr of child
+        if (freopen("/dev/null", "w", stdout) == NULL ||
+            freopen("/dev/null", "w", stderr) == NULL) {
+            _exit(1);
+        }
+
         execl("/bin/sh", "sh", "-c", cmd, NULL);
         _exit(1);
     }
@@ -211,6 +307,9 @@ int handle_config(const char *path, struct buzzay_server *server) {
         return 1;
     }
 
+    // First setup watcher
+    add_config_watcher(server, path);
+
     // Hanlde core
     toml_datum_t core_focuson = toml_seek(result.toptab, "core.focus-on");
     toml_datum_t core_xdg_interactive = toml_seek(result.toptab, "core.xdg-interactive");
@@ -249,7 +348,7 @@ int handle_config(const char *path, struct buzzay_server *server) {
         }
     }
 
-    if (not_unknown(core_spawn)) {
+    if (not_unknown(core_spawn) && server->server_first_load) {
         for (int i = 0; i < core_spawn.u.arr.size; i++) {
             toml_datum_t item = core_spawn.u.arr.elem[i];
             if (item.type != TOML_STRING) continue;
@@ -319,7 +418,9 @@ int handle_config(const char *path, struct buzzay_server *server) {
     CHECK_TOML_TYPE(candy_gap, TOML_INT64, "gap");
     CHECK_TOML_TYPE(candy_opacity, TOML_FP64, "opacity");
 
-    if (not_unknown(candy_gap)) server->eyecandies.gap = candy_gap.u.int64;
+    if (not_unknown(candy_gap)) {
+        server->eyecandies.gap = candy_gap.u.int64;
+    }
     if (not_unknown(candy_opacity)) server->eyecandies.window_opacity = candy_opacity.u.fp64;
 
     // Handle border
@@ -330,9 +431,17 @@ int handle_config(const char *path, struct buzzay_server *server) {
     CHECK_TOML_TYPE(inactive_clr, TOML_STRING, "inactive");
     CHECK_TOML_TYPE(bdr_thickness, TOML_INT64, "thickness");
 
-    if (not_unknown(active_clr)) parse_color(active_clr.u.s, server->eyecandies.active_border);
-    if (not_unknown(inactive_clr)) parse_color(inactive_clr.u.s, server->eyecandies.inactive_border);
-    if (not_unknown(bdr_thickness)) server->eyecandies.border_thickness = bdr_thickness.u.int64;
+    if (not_unknown(active_clr)) {
+        parse_color(active_clr.u.s, server->eyecandies.active_border);
+        update_border_colors(server);
+    }
+    if (not_unknown(inactive_clr)) {
+        parse_color(inactive_clr.u.s, server->eyecandies.inactive_border);
+        update_border_colors(server);
+    }
+    if (not_unknown(bdr_thickness)) {
+        server->eyecandies.border_thickness = bdr_thickness.u.int64;
+    }
 
     // Handle blur
     toml_datum_t blur_enabled = toml_seek(result.toptab, "candy.blur.enabled");
@@ -393,6 +502,8 @@ int handle_config(const char *path, struct buzzay_server *server) {
         binding.data = kb_cmd;
         register_keybinding(binding);
     }
+
+    arrange_workspaces(server);
 
     toml_free(result);
     return 0;

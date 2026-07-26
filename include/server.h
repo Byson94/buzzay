@@ -100,6 +100,8 @@ struct buzzay_server {
     int idle_inhibit_count;
 
     // Config
+    const char *config_file;
+    bool server_first_load;
     bool enable_xdg_interactive; // actions like move & resize
     enum window_active_evt window_active_on;
     enum buzzay_layout_mode window_layout_mode;
