@@ -48,7 +48,8 @@ strength = 1.0
 # alpha of the blur (0.0 - 1.0)
 alpha = 1.0
 
-# Keybindings
+# == Keybindings ==
+
 [bindings]
 "Super+Return" = ["spawn", "kitty"]
 "Super+Q" = ["close-active-window"]
