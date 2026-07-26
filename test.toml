@@ -1,3 +1,26 @@
+# Setup Environment Variables
 [env]
 xcursor_theme = "capitaine-cursors"
 xcursor_size = 24
+
+# Eye Candy and Effects
+[candy]
+gap = 2
+opacity = 0.8
+
+[candy.border]
+active = "#fff"
+inactive = "#000"
+thickness = 2
+
+[candy.blur]
+enabled = true
+strength = 1
+alpha = 1
+
+# Keybindings
+[bindings]
+"Super+Enter" = ["spawn", "notify-send hi"]
+"Super+Q" = ["close-active-window"]
+"Super+1" = ["switch-workspace", "1"]
+

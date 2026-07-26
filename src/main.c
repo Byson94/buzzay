@@ -149,8 +149,8 @@ int main(int argc, char** argv) {
     };
     server.eyecandies = default_eyecandy;
 
-    // Parse config
-    handle_config("test.toml", &server);
+    // setup the envs
+    handle_config_only_envs("test.toml", &server);
 
     // - managed by libwayland. 
     // - manages many stuff.
@@ -346,6 +346,9 @@ int main(int argc, char** argv) {
         char *homedir = getpwuid(getuid())->pw_dir;
         snprintf(init_file_str, sizeof(init_file_str), "%s/.config/buzzay/init", homedir);
     }
+
+    // Parse config
+    handle_config("test.toml", &server);
 
     FILE *init_file = fopen(init_file_str, "r");
     if (init_file) {
