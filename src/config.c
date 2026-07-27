@@ -306,7 +306,9 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
         }
         arrange_workspaces(server);
     } else if (strcmp(act, "cycle-monocle") == 0) {
-        focus_next_monocle(server);
+        focus_next_monocle(server, false);
+    } else if (strcmp(act, "cycle-monocle-reverse") == 0) {
+        focus_next_monocle(server, true);
     } else if (strcmp(act, "quit-compositor") == 0) {
         wl_display_terminate(server->wl_display);
     }

@@ -181,7 +181,7 @@ void arrange_workspaces(struct buzzay_server *server) {
 
 // Behavior
 
-void focus_next_monocle(struct buzzay_server *server) {
+void focus_next_monocle(struct buzzay_server *server, bool is_anti_clockwise) {
     if (server->window_layout_mode != BZ_LAYOUT_MONOCLE) {
         return;
     }
@@ -202,11 +202,20 @@ void focus_next_monocle(struct buzzay_server *server) {
         }
 
         struct buzzay_toplevel *next = NULL;
-        if (current->link.next == &wp->toplevels) {
-            // At the end, wrap back to start
-            next = wl_container_of(wp->toplevels.next, next, link);
+        if (is_anti_clockwise) {
+            if (current->link.prev == &wp->toplevels) {
+                // At the start, wrap back to end
+                next = wl_container_of(wp->toplevels.prev, next, link);
+            } else {
+                next = wl_container_of(current->link.prev, next, link);
+            }
         } else {
-            next = wl_container_of(current->link.next, next, link);
+            if (current->link.next == &wp->toplevels) {
+                // At the end, wrap back to start
+                next = wl_container_of(wp->toplevels.next, next, link);
+            } else {
+                next = wl_container_of(current->link.next, next, link);
+            }
         }
 
         focus_toplevel(next);

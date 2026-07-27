@@ -8,5 +8,5 @@ void arrange_workspaces_monocle(struct buzzay_server *server);
 void arrange_workspaces_tiling(struct buzzay_server *server);
 void arrange_workspaces(struct buzzay_server *server);
 
-void focus_next_monocle(struct buzzay_server *server);
+void focus_next_monocle(struct buzzay_server *server, bool is_anti_clockwise);
 void update_border_colors(struct buzzay_server *server);
