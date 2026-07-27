@@ -142,19 +142,41 @@ struct keybinding_cmd {
     int command_count;
 };
 
-int handle_config_only_envs(const char *path, struct buzzay_server *server) {
+int handle_config_only_envs(const char *path) {
     toml_result_t result = toml_parse_file_ex(path);
     if (!result.ok) {
         printf("Failed to parse toml: %s\n", result.errmsg);
         return 1;
     }
 
-    // Apply env variables
-    toml_datum_t xcursor_theme = toml_seek(result.toptab, "env.xcursor-theme");
+    toml_datum_t envs = toml_seek(result.toptab, "env");
+    CHECK_TOML_TYPE(envs, TOML_TABLE, "env");
+
+    for (int i = 0; i < envs.u.tab.size; i++) {
+        const char *key = envs.u.tab.key[i];
+        toml_datum_t val = envs.u.tab.value[i];
+
+        if (val.type != TOML_STRING) continue;
+        setenv(key, val.u.s, true);
+    }
+
+    toml_free(result);
+    return 0;
+}
+
+int handle_config_only_cursor(const char *path, struct buzzay_server *server) {
+    toml_result_t result = toml_parse_file_ex(path);
+    if (!result.ok) {
+        printf("Failed to parse toml: %s\n", result.errmsg);
+        return 1;
+    }
+
+    // Apply cursor
+    toml_datum_t xcursor_theme = toml_seek(result.toptab, "cursor.theme");
     if (xcursor_theme.type == TOML_STRING) {
         server->xcursor_theme = strdup(xcursor_theme.u.s);
     }
-    toml_datum_t xcursor_size = toml_seek(result.toptab, "env.xcursor-size");
+    toml_datum_t xcursor_size = toml_seek(result.toptab, "cursor.size");
     if (xcursor_size.type == TOML_INT64) {
         server->xcursor_size = xcursor_size.u.int64;
     }

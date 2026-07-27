@@ -125,8 +125,9 @@ static int start_compositor() {
     };
     server.eyecandies = default_eyecandy;
 
-    // setup the envs & server plugin
-    handle_config_only_envs(conf_file_path, &server);
+    // setup the cursor, envs & server plugin
+    handle_config_only_cursor(conf_file_path, &server);
+    handle_config_only_envs(conf_file_path);
 
     // - managed by libwayland. 
     // - manages many stuff.

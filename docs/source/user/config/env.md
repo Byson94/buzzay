@@ -1,25 +1,13 @@
 # Env Options
 
-All the enviornment related options in the `[env]` table.
-
-## xcursor-theme
-
-The cursor theme inside the compositor. Must be the name of your cursor theme.
+The `[env]` is a special table that can be used to setup environment variables. The environment variables are 
+set at the start of the compositor, way before evaulation of the rest of the configuration options.
 
 **Example:**
 
 ```toml
 [env]
-xcursor-theme = "capitaine-cursors"
-```
-
-## xcursor-size
-
-The cursor size inside the compositor. Must be an integer of your desired cursor size.
-
-**Example:**
-
-```toml
-[env]
-xcursor-size = 24
+BROWSER = "firefox"
+XDG_CONFIG_HOME = "/home/username/"
+SOME_OTHER = "xyz"
 ```
