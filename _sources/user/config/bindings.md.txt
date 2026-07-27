@@ -71,6 +71,17 @@ Focus a window. Takes the direction as an argument. Available directions:
 "Super+Right" = ["focus-window", "right"]
 ```
 
+### move-window
+
+Move a window. Takes a direction as an argument (same options as `focus-window`).
+
+**Example:**
+
+```toml
+[bindings]
+"Super+Shift+Right" = ["move-window", "right"]
+```
+
 ### switch-workspace
 
 Switch the currently active workspace. The argument should be the workspace number.

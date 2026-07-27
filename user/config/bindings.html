@@ -327,6 +327,15 @@ must be the argument.</p>
 </pre></div>
 </div>
 </section>
+<section id="move-window">
+<h3>move-window<a class="headerlink" href="#move-window" title="Link to this heading">¶</a></h3>
+<p>Move a window. Takes a direction as an argument (same options as <code class="docutils literal notranslate"><span class="pre">focus-window</span></code>).</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[bindings]</span>
+<span class="s2">&quot;Super+Shift+Right&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;move-window&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;right&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
 <section id="switch-workspace">
 <h3>switch-workspace<a class="headerlink" href="#switch-workspace" title="Link to this heading">¶</a></h3>
 <p>Switch the currently active workspace. The argument should be the workspace number.</p>
@@ -430,6 +439,7 @@ must be the argument.</p>
 <li><a class="reference internal" href="#spawn">spawn</a></li>
 <li><a class="reference internal" href="#close-active-window">close-active-window</a></li>
 <li><a class="reference internal" href="#focus-window">focus-window</a></li>
+<li><a class="reference internal" href="#move-window">move-window</a></li>
 <li><a class="reference internal" href="#switch-workspace">switch-workspace</a></li>
 <li><a class="reference internal" href="#toggle-monocle">toggle-monocle</a></li>
 <li><a class="reference internal" href="#cycle-monocle">cycle-monocle</a></li>
