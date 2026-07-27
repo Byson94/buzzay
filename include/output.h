@@ -16,3 +16,4 @@ struct buzzay_output {
 };
 
 void server_new_output(struct wl_listener *listener, void *data);
+void output_apply_transform(struct wlr_output_state *state, const char *transform);

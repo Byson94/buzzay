@@ -408,22 +408,39 @@ int handle_config(const char *path, struct buzzay_server *server) {
 
         toml_datum_t name = toml_seek(item, "id");
         toml_datum_t enabled = toml_seek(item, "enabled");
+        toml_datum_t vrr = toml_seek(item, "vrr");
         toml_datum_t scale = toml_seek(item, "scale");
         toml_datum_t position = toml_seek(item, "position");
+        toml_datum_t transform = toml_seek(item, "transform");
 
         CHECK_TOML_TYPE(name, TOML_STRING, "id");
         CHECK_TOML_TYPE(enabled, TOML_BOOLEAN, "enabled");
+        CHECK_TOML_TYPE(vrr, TOML_BOOLEAN, "vrr");
         CHECK_TOML_TYPE(scale, TOML_FP64, "scale");
         CHECK_TOML_TYPE(position, TOML_ARRAY, "position");
+        CHECK_TOML_TYPE(transform, TOML_STRING, "transform");
 
         struct buzzay_output *output;
         wl_list_for_each(output, &server->outputs, link) {
             if (strcmp(output->wlr_output->name, name.u.s) == 0) {
-                if (not_unknown(enabled)) output->wlr_output->enabled = enabled.u.boolean;
-                if (not_unknown(scale)) output->wlr_output->scale = scale.u.fp64;
+                struct wlr_output_state state;
+                wlr_output_state_init(&state);
+
+                if (not_unknown(enabled)) wlr_output_state_set_enabled(&state, enabled.u.boolean);
+                if (not_unknown(scale)) wlr_output_state_set_scale(&state, scale.u.fp64);
+
+                if (not_unknown(vrr)) {
+                    wlr_output_state_set_adaptive_sync_enabled(&state, vrr.u.boolean);
+                }
+
+                if (not_unknown(transform)) output_apply_transform(&state, transform.u.s);
+
+                if (wlr_output_test_state(output->wlr_output, &state))
+                    wlr_output_commit_state(output->wlr_output, &state);
+                wlr_output_state_finish(&state);
 
                 if (not_unknown(position)) {
-                    if (position.u.arr.size <= 2) {
+                    if (position.u.arr.size < 2) {
                         printf("Monitor position must receive two elements: '[x, y]'\n");
                         break;
                     }

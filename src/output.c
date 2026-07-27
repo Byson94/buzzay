@@ -1,5 +1,7 @@
 #include <stdlib.h>
+#include <string.h>
 #include <wayland-client-core.h>
+#include <wayland-server-protocol.h>
 #include <wlr/backend.h>
 #include <wlr/types/wlr_output.h>
 #include <wlr/types/wlr_output_layout.h>
@@ -136,3 +138,22 @@ void server_new_output(struct wl_listener *listener, void *data) {
 			output->wlr_output->width, output->wlr_output->height);
 }
 
+void output_apply_transform(struct wlr_output_state *state, const char *transform) {
+    if (strcmp(transform, "normal") == 0) {
+        wlr_output_state_set_transform(state, WL_OUTPUT_TRANSFORM_NORMAL);
+    } else if (strcmp(transform, "90") == 0) {
+        wlr_output_state_set_transform(state, WL_OUTPUT_TRANSFORM_90);
+    } else if (strcmp(transform, "180") == 0) {
+        wlr_output_state_set_transform(state, WL_OUTPUT_TRANSFORM_180);
+    } else if (strcmp(transform, "270") == 0) {
+        wlr_output_state_set_transform(state, WL_OUTPUT_TRANSFORM_270);
+    } else if (strcmp(transform, "flipped") == 0) {
+        wlr_output_state_set_transform(state, WL_OUTPUT_TRANSFORM_FLIPPED);
+    } else if (strcmp(transform, "flipped-90") == 0) {
+        wlr_output_state_set_transform(state, WL_OUTPUT_TRANSFORM_FLIPPED_90);
+    } else if (strcmp(transform, "flipped-180") == 0) {
+        wlr_output_state_set_transform(state, WL_OUTPUT_TRANSFORM_FLIPPED_180);
+    } else if (strcmp(transform, "flipped-270") == 0) {
+        wlr_output_state_set_transform(state, WL_OUTPUT_TRANSFORM_270);
+    }
+}
