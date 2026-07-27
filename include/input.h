@@ -32,4 +32,5 @@ extern int keybinding_capacity;
 
 void apply_keyboard_config_to_device(struct wlr_keyboard *keyboard, const char *layout, const char *variant, const char *options);
 void register_keybinding(struct keybinding binding);
+void clear_all_keybinding();
 void server_new_input(struct wl_listener *listener, void *data);

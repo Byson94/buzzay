@@ -67,6 +67,7 @@ static int handle_config_change(int fd, uint32_t mask, void *data) {
     }
 
     cleanup_all_watchers();
+    clear_all_keybinding();
     handle_config(server->config_file, server);
 
     return 0;

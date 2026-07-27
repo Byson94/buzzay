@@ -59,6 +59,10 @@ void register_keybinding(struct keybinding binding) {
     keybinding_count++;
 }
 
+void clear_all_keybinding() {
+    keybinding_count = 0;
+}
+
 static void keyboard_handle_modifiers(struct wl_listener *listener, void *data) {
     UNUSED(data);
 
