@@ -312,6 +312,21 @@ must be the argument.</p>
 </pre></div>
 </div>
 </section>
+<section id="focus-window">
+<h3>focus-window<a class="headerlink" href="#focus-window" title="Link to this heading">¶</a></h3>
+<p>Focus a window. Takes the direction as an argument. Available directions:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;up&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;down&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;left&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;right&quot;</span></code></p></li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[bindings]</span>
+<span class="s2">&quot;Super+Right&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;focus-window&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;right&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
 <section id="switch-workspace">
 <h3>switch-workspace<a class="headerlink" href="#switch-workspace" title="Link to this heading">¶</a></h3>
 <p>Switch the currently active workspace. The argument should be the workspace number.</p>
@@ -414,6 +429,7 @@ must be the argument.</p>
 <li><a class="reference internal" href="#actions">Actions</a><ul>
 <li><a class="reference internal" href="#spawn">spawn</a></li>
 <li><a class="reference internal" href="#close-active-window">close-active-window</a></li>
+<li><a class="reference internal" href="#focus-window">focus-window</a></li>
 <li><a class="reference internal" href="#switch-workspace">switch-workspace</a></li>
 <li><a class="reference internal" href="#toggle-monocle">toggle-monocle</a></li>
 <li><a class="reference internal" href="#cycle-monocle">cycle-monocle</a></li>

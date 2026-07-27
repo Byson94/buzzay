@@ -55,6 +55,22 @@ Close the currently active window. Takes no argument.
 "Super+Q" = ["close-active-window"]
 ```
 
+### focus-window
+
+Focus a window. Takes the direction as an argument. Available directions:
+
+- `"up"`
+- `"down"`
+- `"left"`
+- `"right"`
+
+**Example:**
+
+```toml
+[bindings]
+"Super+Right" = ["focus-window", "right"]
+```
+
 ### switch-workspace
 
 Switch the currently active workspace. The argument should be the workspace number.
