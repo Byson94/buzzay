@@ -8,6 +8,6 @@ set at the start of the compositor, way before evaulation of the rest of the con
 ```toml
 [env]
 BROWSER = "firefox"
-XDG_CONFIG_HOME = "/home/username/"
+XDG_CONFIG_HOME = "/home/username/.config"
 SOME_OTHER = "xyz"
 ```
