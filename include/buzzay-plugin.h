@@ -36,7 +36,7 @@ struct bz_plugin {
     size_t _internal_server_size;
 };
 
-// General
+// == General ==
 
 /**
  * Send a message back to the IPC client.
@@ -70,5 +70,14 @@ BZ_API void bz_set_decoration_mode(struct bz_plugin *plugin, enum bz_decoration_
  * Enable xdg interactives like window move, window resize, etc.
  */
 BZ_API void bz_enable_xdg_interactive(struct bz_plugin *plugin, bool enable);
+
+// == WL & WLR related options ==
+
+/**
+ * Get the wl_display from buzzay. A void pointer to the wl_display is returned
+ * which the user has to cast to the `struct wl_display` type from the
+ * `wayland-server-core.h` header file.
+ */
+BZ_API void *bz_get_wl_display(struct bz_plugin *plugin);
 
 #endif

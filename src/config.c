@@ -10,7 +10,7 @@
 #include <sys/inotify.h>
 #include <wlr/util/log.h>
 #include <wlr/types/wlr_output_layout.h>
-#include <wlr/types/wlr_scene.h>
+#include <scenefx/types/wlr_scene.h>
 #include <wlr/backend/wayland.h>
 
 #include "macro-utils.h"

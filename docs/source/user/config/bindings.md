@@ -20,7 +20,7 @@ There are four modifier keys:
 
 These keys can be paired with keys to get a keybinding. Example: `Super+Return`. The key names
 are provided by xkbcommon, so you should follow those names for the keybinding to function. 
-This is why `Return` is used instead of `Enter`.
+This is why `Return` is used instead of `Enter`. It is case insensitive, so something like `super+return` works too.
 
 ## Actions
 

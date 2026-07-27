@@ -269,3 +269,11 @@ BZ_API void bz_set_decoration_mode(struct bz_plugin *plugin, enum bz_decoration_
             break;
     }
 }
+
+// == handle wl based API
+
+BZ_API void *bz_get_wl_display(struct bz_plugin *plugin) {
+    struct buzzay_server *server = plugin->_internal_server;
+    return (void *)server->wl_display;
+}
+
