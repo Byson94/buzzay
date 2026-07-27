@@ -150,13 +150,14 @@ int handle_config_only_envs(const char *path, struct buzzay_server *server) {
     // Apply env variables
     toml_datum_t xcursor_theme = toml_seek(result.toptab, "env.xcursor-theme");
     if (xcursor_theme.type == TOML_STRING) {
-        server->xcursor_theme = xcursor_theme.u.s;
+        server->xcursor_theme = strdup(xcursor_theme.u.s);
     }
     toml_datum_t xcursor_size = toml_seek(result.toptab, "env.xcursor-size");
     if (xcursor_size.type == TOML_INT64) {
         server->xcursor_size = xcursor_size.u.int64;
     }
 
+    toml_free(result);
     return 0;
 }
 
