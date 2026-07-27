@@ -16,13 +16,13 @@ spawn = [
     "kitty"
 ]
 
-# == Environment Variables ==
+# == Cursor ==
 
-[env]
+[cursor]
 # set your cursor theme here
-xcursor-theme = "capitaine-cursors"
+theme = "capitaine-cursors"
 # set your cursor size here
-xcursor-size = 24
+size = 24
 
 # == Eye Candy and Effects ==
 
