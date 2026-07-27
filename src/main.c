@@ -54,16 +54,28 @@ void print_help() {
     printf("%s - An extensible wayland compositor.\n\n", program_name);
     printf("Usage:\n");
     printf("  %s\n", program_name);
-    printf("  %s plugin load <plugin_name>\n", program_name);
-    printf("  %s plugin msg <messages...>\n", program_name);
+    printf("  %s plugin <subcommand>\n", program_name);
+    printf("  %s ipc <subcommand>\n", program_name);
     printf("  %s -h, --help\n", program_name);
     printf("  %s -v, --version\n\n", program_name);
     printf("Commands:\n");
-    printf("  plugin load    Load a plugin\n");
-    printf("  plugin msg     Send a message to a plugin\n\n");
+    printf("  plugin   Plugin related commands\n");
+    printf("  ipc      Ipc related commands\n");
     printf("Options:\n");
     printf("  -h, --help     Show this help message and exit\n");
-    printf("  -v, --version  Print the program version\n");
+    printf("  -v, --version  Print the program version\n\n");
+    printf("Tip: Run '<command> --help' to get help for each command.\n");
+}
+
+void print_help_plugin() {
+    printf("Usage:\n");
+    printf("  %s plugin load <plugin_name>\n", program_name);
+    printf("  %s plugin msg <plugin_name> <messages...>\n\n", program_name);
+    printf("Commands:\n");
+    printf("  plugin load    Load a plugin\n");
+    printf("  plugin msg     Send a message to a plugin\n\n");
+    printf("Additional Info: Messages can be send to a plugin in the '<plugin_name> <arg1> <arg2> ...' format.\n");
+    printf("Example: '%s plugin msg myplugin perform greeting'\n", program_name);
 }
 
 static int start_compositor() {
@@ -367,6 +379,12 @@ int main(int argc, char** argv) {
         if (argc < 3) {
             fprintf(stderr, "Error: 'plugin' subcommand requires an action (load, msg).\n");
             return 1;
+        }
+
+        // Action: print help
+        if (strcmp(argv[2], "--help") == 0) {
+            print_help_plugin();
+            return 0;
         }
 
         // Action: plugin load <name>
