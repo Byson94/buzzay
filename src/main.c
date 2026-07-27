@@ -308,8 +308,15 @@ static int start_compositor() {
 
     wl_event_loop_add_fd(server.wl_event_loop, fd, WL_EVENT_READABLE, handle_ipc_connection, (void *)&server);
 
-    // setup WAYLAND_DISPLAY env var and run init script
+    // setup env vars
     setenv("WAYLAND_DISPLAY", wayland_socket, true);
+    setenv("XCURSOR_THEME", server.xcursor_theme, true);
+
+    int s = (int)((ceil(log10(server.xcursor_size))+1)*sizeof(char));
+    char cur_size[s];
+    sprintf(cur_size, "%d", server.xcursor_size);
+
+    setenv("XCURSOR_SIZE", cur_size, true);
 
     // Parse config and setup watcher
     handle_config(conf_file_path, &server);
