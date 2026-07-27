@@ -59,22 +59,38 @@ alpha = 1.0
 "Super+2" = ["switch-workspace", "2"]
 "Super+3" = ["switch-workspace", "3"]
 "Super+4" = ["switch-workspace", "4"]
+"Super+5" = ["switch-workspace", "5"]
+"Super+6" = ["switch-workspace", "6"]
+"Super+7" = ["switch-workspace", "7"]
+"Super+8" = ["switch-workspace", "8"]
+"Super+9" = ["switch-workspace", "9"]
+
+# Move window to workspace (max 9 workspaces)
+"Super+Shift+1" = ["window-to-workspace", "1"]
+"Super+Shift+2" = ["window-to-workspace", "2"]
+"Super+Shift+3" = ["window-to-workspace", "3"]
+"Super+Shift+4" = ["window-to-workspace", "4"]
+"Super+Shift+5" = ["window-to-workspace", "5"]
+"Super+Shift+6" = ["window-to-workspace", "6"]
+"Super+Shift+7" = ["window-to-workspace", "7"]
+"Super+Shift+8" = ["window-to-workspace", "8"]
+"Super+Shift+9" = ["window-to-workspace", "9"]
 
 # Monocle layout
 "Super+M" = ["toggle-monocle"]
 "Super+J" = ["cycle-monocle"]
 
 # Focusing Windows
-"Adpt+Right" = ["focus-window", "right"]
-"Adpt+Left" = ["focus-window", "left"]
-"Adpt+Up" = ["focus-window", "up"]
-"Adpt+Down" = ["focus-window", "down"]
+"Super+Right" = ["focus-window", "right"]
+"Super+Left" = ["focus-window", "left"]
+"Super+Up" = ["focus-window", "up"]
+"Super+Down" = ["focus-window", "down"]
 
 # Moving windows
-"Adpt+Shift+Right" = ["move-window", "right"]
-"Adpt+Shift+Left" = ["move-window", "left"]
-"Adpt+Shift+Up" = ["move-window", "up"]
-"Adpt+Shift+Down" = ["move-window", "down"]
+"Super+Shift+Right" = ["move-window", "right"]
+"Super+Shift+Left" = ["move-window", "left"]
+"Super+Shift+Up" = ["move-window", "up"]
+"Super+Shift+Down" = ["move-window", "down"]
 
 # Exit the compositor
 "Super+Escape" = ["quit-compositor"]

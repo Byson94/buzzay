@@ -73,13 +73,24 @@ Focus a window. Takes the direction as an argument. Available directions:
 
 ### move-window
 
-Move a window. Takes a direction as an argument (same options as `focus-window`).
+Move the focused window. Takes a direction as an argument (same options as `focus-window`).
 
 **Example:**
 
 ```toml
 [bindings]
 "Super+Shift+Right" = ["move-window", "right"]
+```
+
+### window-to-workspace
+
+Move the focused window to a workspace. Takes the workspace index to move to as the argument.
+
+**Example:**
+
+```toml
+[bindings]
+"Super+Shift+1" = ["window-to-workspace", 1]
 ```
 
 ### switch-workspace

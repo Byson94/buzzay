@@ -329,10 +329,19 @@ must be the argument.</p>
 </section>
 <section id="move-window">
 <h3>move-window<a class="headerlink" href="#move-window" title="Link to this heading">¶</a></h3>
-<p>Move a window. Takes a direction as an argument (same options as <code class="docutils literal notranslate"><span class="pre">focus-window</span></code>).</p>
+<p>Move the focused window. Takes a direction as an argument (same options as <code class="docutils literal notranslate"><span class="pre">focus-window</span></code>).</p>
 <p><strong>Example:</strong></p>
 <div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[bindings]</span>
 <span class="s2">&quot;Super+Shift+Right&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;move-window&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;right&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="window-to-workspace">
+<h3>window-to-workspace<a class="headerlink" href="#window-to-workspace" title="Link to this heading">¶</a></h3>
+<p>Move the focused window to a workspace. Takes the workspace index to move to as the argument.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[bindings]</span>
+<span class="s2">&quot;Super+Shift+1&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;window-to-workspace&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span>
 </pre></div>
 </div>
 </section>
@@ -440,6 +449,7 @@ must be the argument.</p>
 <li><a class="reference internal" href="#close-active-window">close-active-window</a></li>
 <li><a class="reference internal" href="#focus-window">focus-window</a></li>
 <li><a class="reference internal" href="#move-window">move-window</a></li>
+<li><a class="reference internal" href="#window-to-workspace">window-to-workspace</a></li>
 <li><a class="reference internal" href="#switch-workspace">switch-workspace</a></li>
 <li><a class="reference internal" href="#toggle-monocle">toggle-monocle</a></li>
 <li><a class="reference internal" href="#cycle-monocle">cycle-monocle</a></li>
