@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Included Plugins" href="../plugins/index.html"><link rel="prev" title="Example Config" href="config/example.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Plugin Docs" href="../dev/plugin/index.html"><link rel="prev" title="Example Config" href="config/example.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>Env Variables - Buzzay Docs</title>
@@ -211,20 +211,15 @@
 </li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Env Variables</a></li>
 </ul>
-<ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../plugins/index.html">Included Plugins</a><input aria-label="Toggle navigation of Included Plugins" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../plugins/kbinder.html">Kbinder</a></li>
-</ul>
-</li>
-</ul>
 <p class="caption" role="heading"><span class="caption-text">Developer</span></p>
 <ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">Plugin Docs</a><input aria-label="Toggle navigation of Plugin Docs" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../api/getting-started.html">Getting Started</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/plugin-api.html">Plugin API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/extra-info.html">Extra Information</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../dev/plugin/index.html">Plugin Docs</a><input aria-label="Toggle navigation of Plugin Docs" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../dev/plugin/getting-started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dev/plugin/plugin-api.html">Plugin API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dev/plugin/extra-info.html">Extra Information</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/contributing.html">Contributing</a></li>
 </ul>
 
 </div>
@@ -271,10 +266,10 @@
 <h1>Env Variables<a class="headerlink" href="#env-variables" title="Link to this heading">¶</a></h1>
 <p>List of all the environment variables buzzay is aware of by default.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">BUZZAY_CONF</span></code> Direct path to configuration file to execute.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">XDG_CONFIG_HOME</span></code> Optionally used to locate init file.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">XCURSOR_THEME</span></code> Used to apply custom cursor theme.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">XCURSOR_SIZE</span></code> Used to apply custom cursor size.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BUZZAY_CONF</span></code> Direct path to configuration file to load.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">XDG_CONFIG_HOME</span></code> Optionally used to locate configuration file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">XCURSOR_THEME</span></code> Used to apply custom cursor theme. (overridden with <code class="docutils literal notranslate"><span class="pre">env.xcursor-theme</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">XCURSOR_SIZE</span></code> Used to apply custom cursor size. (overridden with <code class="docutils literal notranslate"><span class="pre">env.xcursor-size</span></code>)</p></li>
 </ul>
 </section>
 
@@ -283,12 +278,12 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../plugins/index.html">
+          <a class="next-page" href="../dev/plugin/index.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Included Plugins</div>
+                <div class="title">Plugin Docs</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>

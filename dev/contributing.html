@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Plugin Docs" href="../api/index.html"><link rel="prev" title="Included Plugins" href="index.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="prev" title="Extra Information" href="plugin/extra-info.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Kbinder - Buzzay Docs</title>
+        <title>Contributing - Buzzay Docs</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -211,20 +211,15 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../user/env-vars.html">Env Variables</a></li>
 </ul>
-<ul class="current">
-<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Included Plugins</a><input aria-label="Toggle navigation of Included Plugins" checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Kbinder</a></li>
-</ul>
-</li>
-</ul>
 <p class="caption" role="heading"><span class="caption-text">Developer</span></p>
-<ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">Plugin Docs</a><input aria-label="Toggle navigation of Plugin Docs" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../api/getting-started.html">Getting Started</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/plugin-api.html">Plugin API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/extra-info.html">Extra Information</a></li>
+<ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="plugin/index.html">Plugin Docs</a><input aria-label="Toggle navigation of Plugin Docs" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="plugin/getting-started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugin/plugin-api.html">Plugin API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugin/extra-info.html">Extra Information</a></li>
 </ul>
 </li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Contributing</a></li>
 </ul>
 
 </div>
@@ -245,12 +240,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/byson94/buzzay/blob/main/docs/source/plugins/kbinder.md?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/byson94/buzzay/blob/main/docs/source/dev/contributing.md?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/byson94/buzzay/edit/main/docs/source/plugins/kbinder.md" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/byson94/buzzay/edit/main/docs/source/dev/contributing.md" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -267,87 +262,34 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="kbinder">
-<h1>Kbinder<a class="headerlink" href="#kbinder" title="Link to this heading">¶</a></h1>
-<p>Kbinder is a keybinding plugin that makes adding keybindings to buzzay easy.</p>
-<section id="loading-and-messaging">
-<h2>Loading and Messaging<a class="headerlink" href="#loading-and-messaging" title="Link to this heading">¶</a></h2>
-<p>Starting off with the most basic thing, loading and messaging kbinder.</p>
-<p>Loading is simple. Just load it with <code class="docutils literal notranslate"><span class="pre">--load</span> <span class="pre">kbinder</span></code>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>buzzay<span class="w"> </span>--load<span class="w"> </span>kbinder
-</pre></div>
-</div>
-<p>When coming to messaging, kbinder takes two arguments.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>buzzay<span class="w"> </span>--msg<span class="w"> </span>kbinder<span class="w"> </span><span class="s2">&quot;&lt;arg1&gt;&quot;</span><span class="w"> </span><span class="s2">&quot;&lt;arg2&gt;&quot;</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">&lt;arg1&gt;</span></code> Keybinding to bind to.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&lt;arg2&gt;</span></code> Command to run when keybinding is triggered.</p></li>
-</ul>
+          <section id="contributing">
+<h1>Contributing<a class="headerlink" href="#contributing" title="Link to this heading">¶</a></h1>
+<p>Contributing to buzzay is a great way to help the project grow and we really appreciate your help.</p>
+<section id="forms-of-contribution">
+<h2>Forms of Contribution<a class="headerlink" href="#forms-of-contribution" title="Link to this heading">¶</a></h2>
+<p>All forms of contribution are aprreciated. Whether that be fixing a typo in any document
+or introducing new features to the core compositor. You can do what you believe suits
+the best for you.</p>
 </section>
-<section id="keybinding-syntax">
-<h2>Keybinding Syntax<a class="headerlink" href="#keybinding-syntax" title="Link to this heading">¶</a></h2>
-<p>Unlike <code class="docutils literal notranslate"><span class="pre">&lt;arg2&gt;</span></code> which just takes a command to run, <code class="docutils literal notranslate"><span class="pre">&lt;arg1&gt;</span></code> requires a keybinding in a specific format.
-That being the <code class="docutils literal notranslate"><span class="pre">Modifier+Key</span></code> syntax.</p>
-<section id="modifiers">
-<h3>Modifiers<a class="headerlink" href="#modifiers" title="Link to this heading">¶</a></h3>
+<section id="coding-style">
+<h2>Coding Style<a class="headerlink" href="#coding-style" title="Link to this heading">¶</a></h2>
+<p>If you are doing code contributions, then do keep these coding styles in mind. It is not
+strictly followed, but ensuring it matches the rest of the codebase is appreciated.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">Super</span></code> The Mod key (or the windows key).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Shift</span></code> Shift key.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Ctrl</span></code> Control Key.</p></li>
+<li><p>Use <strong>tab</strong> for indentation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code> belongs to the variable name. Example: <code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">*var;</span></code></p></li>
+<li><p>Prefer local variables over globals.</p></li>
 </ul>
-<p>Modifier keys can also be merged like so:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Super</span><span class="o">+</span><span class="n">Shift</span><span class="o">+</span><span class="n">Ctrl</span>
-</pre></div>
-</div>
+<p>That’s pretty much the only rules.</p>
 </section>
-<section id="keys">
-<h3>Keys<a class="headerlink" href="#keys" title="Link to this heading">¶</a></h3>
-<p>All the keys supported in kbinder:</p>
-<p><strong>Numbers:</strong></p>
+<section id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Link to this heading">¶</a></h2>
+<p>Here are some resources that you will find helpful:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code> One</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">2</span></code> Two</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">3</span></code> Three</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">4</span></code> Four</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">5</span></code> Five</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">6</span></code> Six</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">7</span></code> Seven</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">8</span></code> Eight</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">9</span></code> Nine</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">0</span></code> Zero</p></li>
+<li><p><a class="reference external" href="https://wayland.app/protocols/">Wayland Protocols</a></p></li>
+<li><p><a class="reference external" href="https://wlroots.pages.freedesktop.org/wlroots/">Wlroots Documentation</a></p></li>
+<li><p><a class="reference external" href="https://gitlab.freedesktop.org/wlroots/wlroots/-/tree/master/examples">Wlroots Examples</a></p></li>
 </ul>
-<p><strong>Alphabet:</strong></p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">A</span></code> Alphabet “A”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">B</span></code> Alphabet “B”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">C</span></code> Alphabet “C”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">D</span></code> Alphabet “D”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">E</span></code> Alphabet “E”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">F</span></code> Alphabet “F”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">G</span></code> Alphabet “G”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">H</span></code> Alphabet “H”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">I</span></code> Alphabet “I”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">J</span></code> Alphabet “J”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">K</span></code> Alphabet “K”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">L</span></code> Alphabet “L”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">M</span></code> Alphabet “M”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">N</span></code> Alphabet “N”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">O</span></code> Alphabet “O”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">P</span></code> Alphabet “P”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Q</span></code> Alphabet “Q”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">R</span></code> Alphabet “R”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">S</span></code> Alphabet “S”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">T</span></code> Alphabet “T”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">U</span></code> Alphabet “U”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">V</span></code> Alphabet “V”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">W</span></code> Alphabet “W”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">X</span></code> Alphabet “X”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Y</span></code> Alphabet “Y”</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Z</span></code> Alphabet “Z”</p></li>
-</ul>
-</section>
 </section>
 </section>
 
@@ -356,23 +298,15 @@ That being the <code class="docutils literal notranslate"><span class="pre">Modi
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../api/index.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">Plugin Docs</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="index.html">
+          
+          <a class="prev-page" href="plugin/extra-info.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Included Plugins</div>
+                <div class="title">Extra Information</div>
                 
               </div>
             </a>
@@ -409,13 +343,10 @@ That being the <code class="docutils literal notranslate"><span class="pre">Modi
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Kbinder</a><ul>
-<li><a class="reference internal" href="#loading-and-messaging">Loading and Messaging</a></li>
-<li><a class="reference internal" href="#keybinding-syntax">Keybinding Syntax</a><ul>
-<li><a class="reference internal" href="#modifiers">Modifiers</a></li>
-<li><a class="reference internal" href="#keys">Keys</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">Contributing</a><ul>
+<li><a class="reference internal" href="#forms-of-contribution">Forms of Contribution</a></li>
+<li><a class="reference internal" href="#coding-style">Coding Style</a></li>
+<li><a class="reference internal" href="#resources">Resources</a></li>
 </ul>
 </li>
 </ul>

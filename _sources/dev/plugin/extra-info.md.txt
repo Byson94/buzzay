@@ -5,7 +5,7 @@ Extra information about plugins are handled.
 ## Plugin Resolval
 
 For a plugin to be resolved, they must be in the `/usr/lib/buzzay-plugins/` directory root or
-the `~/.local/share/buzzay-plugins` directory root.
+the `~/.local/share/buzzay-plugins/` directory root.
 The name of the plugin is learnt directly from the filename instead of any metadata provided 
 inside the plugin.
 
@@ -17,6 +17,7 @@ they should ensure that the plugin is also compiled against the latest version o
 
 ## Breaking Changes
 
-I plan on avoiding breaking changes as much as possible. Especially in the plugin api library (`buzzay-plugin.h`).
-Using the API abstractions provided in the library is much safer than directly working with `buzzay_server` as
-it has the lowest changes of encountering changes.
+I plan on avoiding breaking changes as much as possible. The existing function and property names 
+in `buzzay-plugin.h` will also be preserved unless absolutely necessary. If a change has to be made,
+then the previous version of the respective API will still be kept as a deprecated option that 
+can be removed any time.

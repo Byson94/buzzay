@@ -15,14 +15,9 @@ user/env-vars
 ```
 
 ```{toctree}
-:hidden:
-
-plugins/index
-```
-
-```{toctree}
 :caption: Developer
 :hidden:
 
-api/index
+dev/plugin/index
+dev/contributing
 ```

@@ -9,11 +9,6 @@ The API documentation of `buzzay-plugin.h`.
 :members:
 ```
 
-```{doxygenstruct} bz_keybinding
-:project: buzzay
-:members:
-```
-
 ## Enums 
 
 ```{doxygenenum} bz_decoration_mode
@@ -38,10 +33,3 @@ The API documentation of `buzzay-plugin.h`.
 :project: buzzay
 ```
 
-```{doxygenfunction} bz_register_keybinding
-:project: buzzay
-```
-
-```{doxygenfunction} bz_unregister_keybinding
-:project: buzzay
-```
