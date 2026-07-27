@@ -157,3 +157,62 @@ void output_apply_transform(struct wlr_output_state *state, const char *transfor
         wlr_output_state_set_transform(state, WL_OUTPUT_TRANSFORM_270);
     }
 }
+
+void output_apply_mode(struct wlr_output *wlr_output, struct wlr_output_state *state, const char *mode_str) {
+    int width = 0, height = 0;
+    float refresh = 0.0f;
+
+    // Parse format: "1920x1080@120" or "1920x1080@120.5" or "1920x1080"
+    int matches = sscanf(mode_str, "%dx%d@%f", &width, &height, &refresh);
+    if (matches < 2) {
+        return; // Parsing failed
+    }
+
+    int refresh_mhz = (matches == 3) ? (int)(refresh * 1000) : 0;
+
+    struct wlr_output_mode *mode;
+    struct wlr_output_mode *best_mode = NULL;
+    int best_refresh_diff = INT32_MAX;
+    int highest_refresh = -1;
+    struct wlr_output_mode *highest_refresh_mode = NULL;
+
+    bool found_resolution = false;
+
+    // Loop and look for exact or close size matches
+    wl_list_for_each(mode, &wlr_output->modes, link) {
+        if (mode->width == width && mode->height == height) {
+            found_resolution = true;
+
+            if (mode->refresh > highest_refresh) {
+                highest_refresh = mode->refresh;
+                highest_refresh_mode = mode;
+            }
+
+            // tolerance = 1000mHz
+            if (refresh_mhz > 0) {
+                int diff = abs(mode->refresh - refresh_mhz);
+                if (diff <= 1000 && diff < best_refresh_diff) {
+                    best_refresh_diff = diff;
+                    best_mode = mode;
+                }
+            }
+        }
+    }
+
+    // exit if no matching width/height found
+    if (!found_resolution) {
+        return;
+    }
+
+    // set if a refresh that passed was found
+    if (best_mode != NULL) {
+        wlr_output_state_set_mode(state, best_mode);
+        return;
+    }
+
+    // If refresh didnt match at all, then we will choose the 
+    // highest refresh rate mode available for that monitor size
+    if (highest_refresh_mode != NULL) {
+        wlr_output_state_set_mode(state, highest_refresh_mode);
+    }
+}

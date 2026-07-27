@@ -412,6 +412,7 @@ int handle_config(const char *path, struct buzzay_server *server) {
         toml_datum_t scale = toml_seek(item, "scale");
         toml_datum_t position = toml_seek(item, "position");
         toml_datum_t transform = toml_seek(item, "transform");
+        toml_datum_t mode = toml_seek(item, "mode");
 
         CHECK_TOML_TYPE(name, TOML_STRING, "id");
         CHECK_TOML_TYPE(enabled, TOML_BOOLEAN, "enabled");
@@ -419,6 +420,7 @@ int handle_config(const char *path, struct buzzay_server *server) {
         CHECK_TOML_TYPE(scale, TOML_FP64, "scale");
         CHECK_TOML_TYPE(position, TOML_ARRAY, "position");
         CHECK_TOML_TYPE(transform, TOML_STRING, "transform");
+        CHECK_TOML_TYPE(mode, TOML_STRING, "mode");
 
         struct buzzay_output *output;
         wl_list_for_each(output, &server->outputs, link) {
@@ -434,6 +436,7 @@ int handle_config(const char *path, struct buzzay_server *server) {
                 }
 
                 if (not_unknown(transform)) output_apply_transform(&state, transform.u.s);
+                if (not_unknown(mode)) output_apply_mode(output->wlr_output, &state, mode.u.s);
 
                 if (wlr_output_test_state(output->wlr_output, &state))
                     wlr_output_commit_state(output->wlr_output, &state);
