@@ -1,6 +1,8 @@
 #include <stdlib.h>
+#include <string.h>
 #include <wayland-client.h>
 #include <wayland-util.h>
+
 #include "workspace.h"
 
 struct buzzay_workspace *get_workspace_at_index(struct wl_list *list, uint32_t index) {
@@ -128,4 +130,60 @@ void workspace_init(struct buzzay_workspace *wp) {
     wp->layout.first_child = NULL;
     wp->layout.second_child = NULL;
     wp->layout.is_root = true;
+}
+
+struct layout_node *find_node_in_direction(struct layout_node *root, struct wlr_box current_box, const char *direction) {
+    if (!root) return NULL;
+
+    if (root->split_type == SPLIT_NONE) {
+        if (root->box.x == current_box.x && root->box.y == current_box.y) {
+            return NULL;
+        }
+
+        if (strcmp(direction, "left") == 0) {
+            if (root->box.x + root->box.width <= current_box.x) return root;
+        } else if (strcmp(direction, "right") == 0) {
+            if (root->box.x >= current_box.x + current_box.width) return root;
+        } else if (strcmp(direction, "up") == 0) {
+            if (root->box.y + root->box.height <= current_box.y) return root;
+        } else if (strcmp(direction, "down") == 0) {
+            if (root->box.y >= current_box.y + current_box.height) return root;
+        }
+        return NULL;
+    }
+
+    struct layout_node *first = find_node_in_direction(root->first_child, current_box, direction);
+    struct layout_node *second = find_node_in_direction(root->second_child, current_box, direction);
+
+    if (first && second) {
+        int c_center_x = current_box.x + current_box.width / 2;
+        int c_center_y = current_box.y + current_box.height / 2;
+        
+        int dist1 = abs((first->box.x + first->box.width/2) - c_center_x) + abs((first->box.y + first->box.height/2) - c_center_y);
+        int dist2 = abs((second->box.x + second->box.width/2) - c_center_x) + abs((second->box.y + second->box.height/2) - c_center_y);
+        
+        return (dist1 < dist2) ? first : second;
+    }
+
+    return first ? first : second;
+}
+
+struct layout_node *find_node_for_toplevel(struct layout_node *node, struct buzzay_toplevel *target_toplevel) {
+    if (!node) {
+        return NULL;
+    }
+
+    if (node->split_type == SPLIT_NONE) {
+        if (node->toplevel == target_toplevel) {
+            return node;
+        }
+        return NULL;
+    }
+
+    struct layout_node *found = find_node_for_toplevel(node->first_child, target_toplevel);
+    if (found) {
+        return found;
+    }
+
+    return find_node_for_toplevel(node->second_child, target_toplevel);
 }

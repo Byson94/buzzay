@@ -306,13 +306,42 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
         }
 
         spawn_command(kb->commands[1]);
-    } else if (strcmp(act, "close-active-window") == 0) {
+    } 
+    // == Compositor ==
+    else if (strcmp(act, "quit-compositor") == 0) {
+        wl_display_terminate(server->wl_display);
+    } 
+    // == Window == 
+    else if (strcmp(act, "close-active-window") == 0) {
         struct buzzay_workspace *workspace = get_workspace_at_index(&server->workspaces, server->current_workspace);
         struct buzzay_toplevel *toplevel = workspace->focused_window;
 
         if (toplevel == NULL || toplevel->xdg_toplevel == NULL) return;
         wlr_xdg_toplevel_send_close(toplevel->xdg_toplevel);
-    } else if (strcmp(act, "switch-workspace") == 0) {
+    } else if (strcmp(act, "focus-window") == 0) {
+        if (kb->command_count < 2) {
+            printf("'focus-window' requires a direction to follow.");
+            return;
+        }
+
+        const char *direction = kb->commands[1];
+
+        struct buzzay_workspace *workspace = get_workspace_at_index(&server->workspaces, server->current_workspace);
+        if (!workspace || !workspace->focused_window) return;
+
+        struct buzzay_toplevel *current_toplevel = workspace->focused_window;
+        struct layout_node *root_node = &workspace->layout; 
+        struct layout_node *current_layout_node = find_node_for_toplevel(root_node, current_toplevel);
+
+        if (current_layout_node) {
+            struct layout_node *next_layout_node = find_node_in_direction(root_node, current_layout_node->box, direction);
+            if (next_layout_node && next_layout_node->toplevel) {
+                focus_toplevel(next_layout_node->toplevel);
+            }
+        }
+    }
+    // == Workspace ==
+    else if (strcmp(act, "switch-workspace") == 0) {
         if (kb->command_count < 2) {
             printf("Command count must exactly be 2 in switch-workspace.\n");
             return;
@@ -327,7 +356,9 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
         }
 
         arrange_workspaces(server);
-    } else if (strcmp(act, "toggle-monocle") == 0) {
+    } 
+    // == Layout & Monocle ==
+    else if (strcmp(act, "toggle-monocle") == 0) {
         if (server->window_layout_mode != BZ_LAYOUT_MONOCLE) {
             server->window_layout_mode = BZ_LAYOUT_MONOCLE;
         } else {
@@ -338,8 +369,6 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
         focus_next_monocle(server, false);
     } else if (strcmp(act, "cycle-monocle-reverse") == 0) {
         focus_next_monocle(server, true);
-    } else if (strcmp(act, "quit-compositor") == 0) {
-        wl_display_terminate(server->wl_display);
     }
 }
 

@@ -64,6 +64,12 @@ alpha = 1.0
 "Super+M" = ["toggle-monocle"]
 "Super+J" = ["cycle-monocle"]
 
+# Focusing Windows
+"Adpt+Right" = ["focus-window", "right"]
+"Adpt+Left" = ["focus-window", "left"]
+"Adpt+Up" = ["focus-window", "up"]
+"Adpt+Down" = ["focus-window", "down"]
+
 # Exit the compositor
 "Super+Escape" = ["quit-compositor"]
 ```
