@@ -339,6 +339,30 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
                 focus_toplevel(next_layout_node->toplevel);
             }
         }
+    } else if (strcmp(act, "move-window") == 0) {
+        if (kb->command_count < 2) {
+            printf("'focus-window' requires a direction to follow.");
+            return;
+        }
+
+        const char *direction = kb->commands[1];
+
+        struct buzzay_workspace *workspace = get_workspace_at_index(&server->workspaces, server->current_workspace);
+        if (!workspace || !workspace->focused_window) return;
+
+        struct buzzay_toplevel *current_toplevel = workspace->focused_window;
+        struct layout_node *root_node = &workspace->layout; 
+        struct layout_node *current_layout_node = find_node_for_toplevel(root_node, current_toplevel);
+
+        if (current_layout_node) {
+            struct layout_node *next_layout_node = find_node_in_direction(root_node, current_layout_node->box, direction);
+            if (next_layout_node && next_layout_node->toplevel) {
+                struct buzzay_toplevel *temp_toplevel = current_layout_node->toplevel;
+                current_layout_node->toplevel = next_layout_node->toplevel;
+                next_layout_node->toplevel = temp_toplevel;
+                arrange_workspaces(server);
+            }
+        }
     }
     // == Workspace ==
     else if (strcmp(act, "switch-workspace") == 0) {

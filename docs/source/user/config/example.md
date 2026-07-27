@@ -70,6 +70,12 @@ alpha = 1.0
 "Adpt+Up" = ["focus-window", "up"]
 "Adpt+Down" = ["focus-window", "down"]
 
+# Moving windows
+"Adpt+Shift+Right" = ["move-window", "right"]
+"Adpt+Shift+Left" = ["move-window", "left"]
+"Adpt+Shift+Up" = ["move-window", "up"]
+"Adpt+Shift+Down" = ["move-window", "down"]
+
 # Exit the compositor
 "Super+Escape" = ["quit-compositor"]
 ```
