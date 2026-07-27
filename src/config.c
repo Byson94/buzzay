@@ -5,6 +5,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <string.h>
+#include <ctype.h>
 #include <tomlc17.h>
 #include <wayland-util.h>
 #include <sys/inotify.h>
@@ -215,21 +216,25 @@ static int parse_keybinding_string(
     while (token != NULL) {
         last_token = token;
         token = strtok(NULL, "+");
-        
+
+        for(int i = 0; last_token[i]; i++){
+          last_token[i] = tolower(last_token[i]);
+        }
+
         if (token != NULL) {
-            if (strcmp(last_token, "ADPT") == 0) {
+            if (strcmp(last_token, "adpt") == 0) {
                 if (is_nested) {
                     *out_mods |= WLR_MODIFIER_ALT;
                 } else {
                     *out_mods |= WLR_MODIFIER_LOGO;
                 }
-            } else if (strcasecmp(last_token, "Super") == 0 || strcasecmp(last_token, "Mod4") == 0) {
+            } else if (strcasecmp(last_token, "super") == 0 || strcasecmp(last_token, "mod4") == 0) {
                 *out_mods |= WLR_MODIFIER_LOGO;
-            } else if (strcasecmp(last_token, "Ctrl") == 0 || strcasecmp(last_token, "Control") == 0) {
+            } else if (strcasecmp(last_token, "ctrl") == 0 || strcasecmp(last_token, "control") == 0) {
                 *out_mods |= WLR_MODIFIER_CTRL;
-            } else if (strcasecmp(last_token, "Shift") == 0) {
+            } else if (strcasecmp(last_token, "shift") == 0) {
                 *out_mods |= WLR_MODIFIER_SHIFT;
-            } else if (strcasecmp(last_token, "Alt") == 0 || strcasecmp(last_token, "Mod1") == 0) {
+            } else if (strcasecmp(last_token, "alt") == 0 || strcasecmp(last_token, "mod1") == 0) {
                 *out_mods |= WLR_MODIFIER_ALT;
             }
         }
