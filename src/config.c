@@ -341,7 +341,7 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
         }
     } else if (strcmp(act, "move-window") == 0) {
         if (kb->command_count < 2) {
-            printf("'focus-window' requires a direction to follow.");
+            printf("'move-window' requires a direction to follow.");
             return;
         }
 
@@ -380,7 +380,63 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
         }
 
         arrange_workspaces(server);
-    } 
+    } else if (strcmp(act, "window-to-workspace") == 0) {
+        if (kb->command_count < 2) {
+            printf("'move-to-workspace' requires a workspace to move window to.");
+            return;
+        }
+
+        const char *wsp_number_str = kb->commands[1];
+        int wsp_number = atoi(wsp_number_str);
+
+        struct buzzay_workspace *current_workspace = get_workspace_at_index(&server->workspaces, server->current_workspace);
+        if (!current_workspace || !current_workspace->focused_window) return;
+
+        struct buzzay_toplevel *current_toplevel = current_workspace->focused_window;
+
+        struct buzzay_workspace *target_workspace = get_workspace_at_index(&server->workspaces, wsp_number);
+        if (!target_workspace || target_workspace == current_workspace) return;
+
+        wl_list_remove(&current_toplevel->link);
+        workspace_remove_toplevel(current_toplevel);
+        current_toplevel->in_workspace = target_workspace;
+        wl_list_insert(&target_workspace->toplevels, &current_toplevel->link);
+
+        struct layout_node *root = &target_workspace->layout;
+        if (root->split_type == SPLIT_NONE && root->toplevel == NULL) {
+            root->toplevel = current_toplevel;
+        } else {
+            struct layout_node *target = find_node_for_toplevel(root, target_workspace->focused_window);
+            if (!target) {
+                target = root;
+            }
+
+            struct layout_node *new_leaf = calloc(1, sizeof(struct layout_node));
+            new_leaf->split_type = SPLIT_NONE;
+            new_leaf->toplevel = current_toplevel;
+            new_leaf->split_ratio = 0.5f;
+
+            struct layout_node *old_child = calloc(1, sizeof(struct layout_node));
+            *old_child = *target; 
+
+            if (target->box.width >= target->box.height) {
+                target->split_type = SPLIT_HORIZ;
+            } else {
+                target->split_type = SPLIT_VERT;
+            }
+
+            target->split_ratio = 0.5f;
+            target->toplevel = NULL;
+            target->first_child = old_child;
+            target->second_child = new_leaf;
+        }
+
+        current_workspace->focused_window = wl_container_of(current_workspace->toplevels.next, current_toplevel, link);
+        target_workspace->focused_window = current_toplevel;
+
+        focus_toplevel(current_workspace->focused_window);
+        arrange_workspaces(server);
+    }
     // == Layout & Monocle ==
     else if (strcmp(act, "toggle-monocle") == 0) {
         if (server->window_layout_mode != BZ_LAYOUT_MONOCLE) {
