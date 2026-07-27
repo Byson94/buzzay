@@ -86,6 +86,7 @@ bool handle_keybinding(struct buzzay_server *server, xkb_keysym_t sym, uint32_t 
         uint32_t event_mods = modifiers & BZ_ALLOWED_MODS;
         uint32_t req_mods = kb->modifiers & BZ_ALLOWED_MODS;
 
+        sym = xkb_keysym_to_lower(sym);
         if (kb->sym == sym && event_mods == req_mods) {
             if (kb->handler) {
                 kb->handler(server, kb->data);

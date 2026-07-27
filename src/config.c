@@ -555,6 +555,7 @@ int handle_config(const char *path, struct buzzay_server *server) {
             free(kb_cmd);
             continue;
         }
+        binding.sym = xkb_keysym_to_lower(binding.sym);
         binding.handler = keybinding_handler;
         binding.data = kb_cmd;
         register_keybinding(binding);
