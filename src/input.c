@@ -115,12 +115,18 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
 	uint32_t keycode = event->keycode + 8;
 	/* Get a list of keysyms based on the keymap for this keyboard */
 	const xkb_keysym_t *syms;
-	int nsyms = xkb_keymap_key_get_syms_by_level(
+	int nsyms = xkb_state_key_get_syms(
+			keyboard->wlr_keyboard->xkb_state, keycode, &syms);
+    UNUSED(nsyms);
+
+    /* Get the raw keysyms for proper keybind handling */
+	const xkb_keysym_t *syms_raw;
+	int nsyms_raw = xkb_keymap_key_get_syms_by_level(
 			keyboard->wlr_keyboard->keymap, 
             keycode, 
             xkb_state_key_get_layout(keyboard->wlr_keyboard->xkb_state, keycode),
             0,
-            &syms);
+            &syms_raw);
 
     // get kb modifiers
     uint32_t modifiers = wlr_keyboard_get_modifiers(keyboard->wlr_keyboard);
@@ -141,8 +147,8 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
     // else handling compositor key binding
     bool handled = false;
     if (event->state == WL_KEYBOARD_KEY_STATE_PRESSED) {
-        for (int i = 0; i < nsyms; i++) {
-            if (handle_keybinding(server, syms[i], modifiers)) {
+        for (int i = 0; i < nsyms_raw; i++) {
+            if (handle_keybinding(server, syms_raw[i], modifiers)) {
                 handled = true;
                 break;
             }
