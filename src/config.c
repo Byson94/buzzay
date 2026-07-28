@@ -379,6 +379,10 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
             wlr_scene_node_set_enabled(&this_toplevel->scene_tree->node, false);
         }
 
+        struct buzzay_workspace *new_workspace = get_workspace_at_index(&server->workspaces, server->current_workspace);
+        struct buzzay_toplevel *first_toplevel = wl_container_of(new_workspace->toplevels.next, first_toplevel, link);
+
+        focus_toplevel(first_toplevel);
         arrange_workspaces(server);
     } else if (strcmp(act, "window-to-workspace") == 0) {
         if (kb->command_count < 2) {
@@ -629,13 +633,26 @@ int handle_config(const char *path, struct buzzay_server *server) {
     toml_datum_t blur_enabled = toml_seek(result.toptab, "candy.blur.enabled");
     toml_datum_t blur_strength = toml_seek(result.toptab, "candy.blur.strength");
     toml_datum_t blur_alpha = toml_seek(result.toptab, "candy.blur.alpha");
+    toml_datum_t blur_passes = toml_seek(result.toptab, "candy.blur.passes");
+    toml_datum_t blur_noise = toml_seek(result.toptab, "candy.blur.noise");
     CHECK_TOML_TYPE(blur_enabled, TOML_BOOLEAN, "enabled");
     CHECK_TOML_TYPE(blur_strength, TOML_FP64, "strength");
     CHECK_TOML_TYPE(blur_alpha, TOML_FP64, "alpha");
+    CHECK_TOML_TYPE(blur_passes, TOML_INT64, "passes");
+    CHECK_TOML_TYPE(blur_noise, TOML_FP64, "noise");
 
     if (not_unknown(blur_enabled)) server->eyecandies.blur_enabled = blur_enabled.u.boolean;
     if (not_unknown(blur_strength)) server->eyecandies.blur_strength = blur_strength.u.fp64;
     if (not_unknown(blur_alpha)) server->eyecandies.blur_alpha = blur_alpha.u.fp64;
+    if (not_unknown(blur_passes)) server->eyecandies.blur_passes = blur_passes.u.int64;
+    if (not_unknown(blur_noise)) server->eyecandies.blur_noise = blur_noise.u.fp64;
+    scene_set_blur_confs(server);
+
+    struct buzzay_workspace *workspace = get_workspace_at_index(&server->workspaces, server->current_workspace);
+    struct buzzay_toplevel *this_toplevel;
+    wl_list_for_each(this_toplevel, &workspace->toplevels, link) {
+        toplevel_apply_blur_confs(this_toplevel);
+    }
 
     // Handle inputs
     toml_datum_t input_keyboard_layout = toml_seek(result.toptab, "input.keyboard.layout");

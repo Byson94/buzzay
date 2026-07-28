@@ -18,6 +18,11 @@
 #include "xdg.h"
 
 // Helpers
+void scene_set_blur_confs(struct buzzay_server *server) {
+    wlr_scene_set_blur_num_passes(server->scene, server->eyecandies.blur_passes);
+    wlr_scene_set_blur_noise(server->scene, server->eyecandies.blur_noise);
+}
+
 void toplevel_apply_blur_confs(struct buzzay_toplevel *toplevel) {
     wlr_scene_blur_set_strength(toplevel->blur, toplevel->server->eyecandies.blur_strength);
     wlr_scene_blur_set_alpha(toplevel->blur, toplevel->server->eyecandies.blur_alpha);

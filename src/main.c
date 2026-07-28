@@ -121,7 +121,9 @@ static int start_compositor() {
         .corner_radius = 10,
         .window_opacity = 1,
         .blur_strength = 1,
-        .blur_alpha = 1
+        .blur_alpha = 1,
+        .blur_passes = 3,
+        .blur_noise = 0
     };
     server.eyecandies = default_eyecandy;
 
