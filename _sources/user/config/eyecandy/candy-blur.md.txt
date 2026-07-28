@@ -1,17 +1,6 @@
 # Candy Blur Options
 
-All the options in `[candy.blur]` table.
-
-## enabled
-
-Enable the blur effect.
-
-**Example:**
-
-```toml
-[candy.blur]
-enabled = true
-```
+All the options in `[candy.blur]` table. The blur effect is always enabled. It can be made visible by adjusting opacity.
 
 ## strength
 
