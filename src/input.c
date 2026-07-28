@@ -147,13 +147,34 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
     // else handling compositor key binding
     bool handled = false;
     if (event->state == WL_KEYBOARD_KEY_STATE_PRESSED) {
-        for (int i = 0; i < nsyms_raw; i++) {
-            if (handle_keybinding(server, syms_raw[i], modifiers)) {
-                handled = true;
-                break;
+            /*
+             * If it is a media key or special action key, then handle it directly.
+             */
+            for (int i = 0; i < nsyms; i++) {
+                xkb_keysym_t sym = syms[i];
+                if ((sym >= XKB_KEY_XF86AudioLowerVolume && sym <= XKB_KEY_XF86AudioMute) ||
+                    (sym >= XKB_KEY_F1 && sym <= XKB_KEY_F35)) {
+                    if (handle_keybinding(server, sym, modifiers)) {
+                        handled = true;
+                        break;
+                    }
+                }
+            }
+
+            /*
+             * Otherwise, handle the raw keybinding directly to avoid
+             * issues where something like `Super+Shift+1` would trigger
+             * `Super+@` instead.
+             */
+            if (!handled) {
+                for (int i = 0; i < nsyms_raw; i++) {
+                    if (handle_keybinding(server, syms_raw[i], modifiers)) {
+                        handled = true;
+                        break;
+                    }
+                }
             }
         }
-    }
 
 	if (!handled) {
 		/* Otherwise, we pass it along to the client. */
