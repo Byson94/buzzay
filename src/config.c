@@ -630,18 +630,15 @@ int handle_config(const char *path, struct buzzay_server *server) {
     }
 
     // Handle blur
-    toml_datum_t blur_enabled = toml_seek(result.toptab, "candy.blur.enabled");
     toml_datum_t blur_strength = toml_seek(result.toptab, "candy.blur.strength");
     toml_datum_t blur_alpha = toml_seek(result.toptab, "candy.blur.alpha");
     toml_datum_t blur_passes = toml_seek(result.toptab, "candy.blur.passes");
     toml_datum_t blur_noise = toml_seek(result.toptab, "candy.blur.noise");
-    CHECK_TOML_TYPE(blur_enabled, TOML_BOOLEAN, "enabled");
     CHECK_TOML_TYPE(blur_strength, TOML_FP64, "strength");
     CHECK_TOML_TYPE(blur_alpha, TOML_FP64, "alpha");
     CHECK_TOML_TYPE(blur_passes, TOML_INT64, "passes");
     CHECK_TOML_TYPE(blur_noise, TOML_FP64, "noise");
 
-    if (not_unknown(blur_enabled)) server->eyecandies.blur_enabled = blur_enabled.u.boolean;
     if (not_unknown(blur_strength)) server->eyecandies.blur_strength = blur_strength.u.fp64;
     if (not_unknown(blur_alpha)) server->eyecandies.blur_alpha = blur_alpha.u.fp64;
     if (not_unknown(blur_passes)) server->eyecandies.blur_passes = blur_passes.u.int64;

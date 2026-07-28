@@ -26,7 +26,6 @@ struct buzzay_eyecandies {
     uint32_t corner_radius;
     float window_opacity;
 
-    bool blur_enabled;
     float blur_strength;
     float blur_alpha;
     int blur_passes;
