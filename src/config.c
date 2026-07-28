@@ -327,6 +327,14 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
     } 
     // == Compositor ==
     else if (strcmp(act, "quit-compositor") == 0) {
+        struct buzzay_workspace *workspace = NULL;
+        wl_list_for_each(workspace, &server->workspaces, link) {
+            struct buzzay_toplevel *toplevel = NULL;
+            wl_list_for_each(toplevel, &workspace->toplevels, link) {
+                if (toplevel) 
+                    wlr_xdg_toplevel_send_close(toplevel->xdg_toplevel);
+            }
+        }
         wl_display_terminate(server->wl_display);
     } 
     // == Window == 

@@ -30,6 +30,7 @@
 #include <wlr/types/wlr_idle_notify_v1.h>
 #include <wlr/types/wlr_viewporter.h>
 #include <wlr/types/wlr_screencopy_v1.h>
+#include <wlr/types/wlr_xdg_output_v1.h>
 #include <wlr/render/allocator.h>
 #include <scenefx/render/fx_renderer/fx_renderer.h>
 #include <scenefx/types/wlr_scene.h>
@@ -233,8 +234,9 @@ static int start_compositor() {
 
     server.idle_notifier = wlr_idle_notifier_v1_create(server.wl_display);
 
-    // setup screencopy protocol
+    // setup screencopy and xdg output manager protocol
     server.screencopy_mgr = wlr_screencopy_manager_v1_create(server.wl_display);
+    server.xdg_output_mgr = wlr_xdg_output_manager_v1_create(server.wl_display, server.output_layout);
 
     // create a cursor (the image)
     server.cursor = wlr_cursor_create();
