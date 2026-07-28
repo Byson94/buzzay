@@ -41,36 +41,7 @@ void focus_layershell(struct buzzay_layer_surface *layershell) {
     update_border_colors(server);
 }
 
-static void layershell_commit(struct wl_listener *listener, void *data) {
-    UNUSED(data);
-
-    struct buzzay_layer_surface *bz_layer_surface = wl_container_of(listener, bz_layer_surface, commit);
-    struct wlr_layer_surface_v1 *layer_surface = bz_layer_surface->surface;
-    struct buzzay_server *server = bz_layer_surface->server;
-
-    if (bz_layer_surface->current_layer != layer_surface->pending.layer) {
-        struct wlr_scene_tree *target_tree = NULL;
-        switch (layer_surface->pending.layer) {
-            case ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND:
-                target_tree = server->layers.background;
-                break;
-            case ZWLR_LAYER_SHELL_V1_LAYER_BOTTOM:
-                target_tree = server->layers.bottom;
-                break;
-            case ZWLR_LAYER_SHELL_V1_LAYER_TOP:
-                target_tree = server->layers.top;
-                break;
-            case ZWLR_LAYER_SHELL_V1_LAYER_OVERLAY:
-                target_tree = server->layers.overlay;
-                break;
-        }
-
-        if (target_tree) {
-            wlr_scene_node_reparent(&bz_layer_surface->scene_layer->tree->node, target_tree);
-            bz_layer_surface->current_layer = layer_surface->pending.layer;
-        }
-    }
-
+void layershell_do_allocations(struct wlr_layer_surface_v1 *layer_surface) {
     struct wlr_output *mon_output = layer_surface->output;
     struct buzzay_output *output = mon_output->data;
     uint32_t screen_width = mon_output->width;
@@ -119,7 +90,39 @@ static void layershell_commit(struct wl_listener *listener, void *data) {
             &output->usable_area
         );
     }
-    
+}
+
+static void layershell_commit(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+
+    struct buzzay_layer_surface *bz_layer_surface = wl_container_of(listener, bz_layer_surface, commit);
+    struct wlr_layer_surface_v1 *layer_surface = bz_layer_surface->surface;
+    struct buzzay_server *server = bz_layer_surface->server;
+
+    if (bz_layer_surface->current_layer != layer_surface->pending.layer) {
+        struct wlr_scene_tree *target_tree = NULL;
+        switch (layer_surface->pending.layer) {
+            case ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND:
+                target_tree = server->layers.background;
+                break;
+            case ZWLR_LAYER_SHELL_V1_LAYER_BOTTOM:
+                target_tree = server->layers.bottom;
+                break;
+            case ZWLR_LAYER_SHELL_V1_LAYER_TOP:
+                target_tree = server->layers.top;
+                break;
+            case ZWLR_LAYER_SHELL_V1_LAYER_OVERLAY:
+                target_tree = server->layers.overlay;
+                break;
+        }
+
+        if (target_tree) {
+            wlr_scene_node_reparent(&bz_layer_surface->scene_layer->tree->node, target_tree);
+            bz_layer_surface->current_layer = layer_surface->pending.layer;
+        }
+    }
+
+    layershell_do_allocations(layer_surface);
     arrange_workspaces(bz_layer_surface->server);
 }
 
@@ -145,6 +148,9 @@ static void layershell_destroy(struct wl_listener *listener, void *data) {
     wl_list_remove(&bz_layer_surface->unmap.link);
     wl_list_remove(&bz_layer_surface->destroy.link);
     wl_list_remove(&bz_layer_surface->new_popup.link);
+
+    layershell_do_allocations(bz_layer_surface->surface);
+    arrange_workspaces(bz_layer_surface->server);
 
     free(bz_layer_surface);
 }
