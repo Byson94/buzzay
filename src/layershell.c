@@ -210,4 +210,6 @@ void server_new_layer_surface(struct wl_listener *listener, void *data) {
 
     bz_layer_surface->new_popup.notify = layershell_new_popup;
     wl_signal_add(&layer_surface->events.new_popup, &bz_layer_surface->new_popup);
+
+    focus_layershell(bz_layer_surface);
 }
