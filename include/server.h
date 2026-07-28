@@ -100,6 +100,8 @@ struct buzzay_server {
     struct wlr_idle_notifier_v1 *idle_notifier;
     int idle_inhibit_count;
 
+    struct wlr_screencopy_manager_v1 *screencopy_mgr;
+
     // Config
     const char *config_file;
     bool server_first_load;
