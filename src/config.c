@@ -281,18 +281,36 @@ static void spawn_command(const char *cmd) {
         return;
     }
 
+    /* 
+     * We perform double fork here so that we can orphan the
+     * grandchild and leave it to be adopted by the init system.
+     * Otherwise, if it were a single fork, we would have to be 
+     * responsible for reaping the zombie orphan child.
+     */
     if (pid == 0) {
-        setsid();
+        pid_t grandchild = fork();
 
-        // redirect stdout and stderr of child
-        if (freopen("/dev/null", "w", stdout) == NULL ||
-            freopen("/dev/null", "w", stderr) == NULL) {
+        if (grandchild > 0) {
+            _exit(0);
+        } else if (grandchild == 0) {
+            // Orphan that little bastard.
+            setsid();
+
+            if (freopen("/dev/null", "w", stdout) == NULL ||
+                freopen("/dev/null", "w", stderr) == NULL) {
+                _exit(1);
+            }
+
+            execl("/bin/sh", "sh", "-c", cmd, NULL);
+            _exit(1);
+        } else {
+            perror("grandchild fork failed");
             _exit(1);
         }
-
-        execl("/bin/sh", "sh", "-c", cmd, NULL);
-        _exit(1);
     }
+
+    // Reap the parent
+    waitpid(pid, NULL, 0);
 }
 
 static void keybinding_handler(struct buzzay_server *server, void *data) {
