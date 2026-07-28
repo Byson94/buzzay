@@ -36,3 +36,24 @@ Alpha of the blur effect. Must be a floating number (a.k.a decimal number) and i
 alpha = 1.0
 ```
 
+## passes
+
+The number of passes for the blur. Must be a itenger.
+
+**Example:**
+
+```toml
+[candy.blur]
+passes = 3
+```
+
+## noise
+
+Noise to add to the blur. Can be used to give a glassy effect. Must be a floating number.
+
+**Example:**
+
+```toml
+[candy.blur]
+noise = 0.5
+```
