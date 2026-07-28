@@ -11,11 +11,12 @@
 #include <wlr/types/wlr_idle_notify_v1.h>
 
 #include "macro-utils.h"
+#include "layershell.h"
 #include "server.h"
 #include "cursor.h"
 #include "xdg.h"
 
-static struct buzzay_toplevel *desktop_toplevel_at(
+static struct bz_underlying_surface *desktop_toplevel_at(
 		struct buzzay_server *server, double lx, double ly,
 		struct wlr_surface **surface, double *sx, double *sy) {
 	/* This returns the topmost node in the scene at the given layout coords.
@@ -117,16 +118,31 @@ static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
 	double sx, sy;
 	struct wlr_seat *seat = server->seat;
 	struct wlr_surface *surface = NULL;
-	struct buzzay_toplevel *toplevel = desktop_toplevel_at(server,
+	struct bz_underlying_surface *surface_under = desktop_toplevel_at(server,
 			server->cursor->x, server->cursor->y, &surface, &sx, &sy);
-	if (!toplevel) {
-		/* If there's no toplevel under the cursor, set the cursor image to a
+
+    struct buzzay_toplevel *toplevel = NULL;
+    struct buzzay_layer_surface *layershell = NULL;
+
+    if (surface_under) {
+        switch (surface_under->type) {
+            case BUZZAY_SURFACE_TOPLEVEL:
+                toplevel = surface_under->item;
+                break;
+            case BUZZAY_SURFACE_LAYERSHELL:
+                layershell = surface_under->item;
+                break;
+        }
+    }
+
+	if (!toplevel && !layershell) {
+		/* If there's no toplevel and layersehll under the cursor, set the cursor image to a
 		 * default. This is what makes the cursor image appear when you move it
 		 * around the screen, not over any toplevels. */
 		wlr_cursor_set_xcursor(server->cursor, server->cursor_mgr, "default");
 	}
 
-    if (server->window_active_on == WINDOW_ACTIVE_ON_HOVER) {
+    if (toplevel && server->window_active_on == WINDOW_ACTIVE_ON_HOVER) {
         focus_toplevel(toplevel);
         if (toplevel != NULL && server->hovered_toplevel != toplevel) {
             focus_toplevel(toplevel);
@@ -217,10 +233,13 @@ void server_cursor_button(struct wl_listener *listener, void *data) {
 		/* Focus that client if the button was _pressed_ */
         double sx, sy;
         struct wlr_surface *surface = NULL;
-        struct buzzay_toplevel *toplevel = desktop_toplevel_at(server,
+        struct bz_underlying_surface *surface_under = desktop_toplevel_at(server,
                 server->cursor->x, server->cursor->y, &surface, &sx, &sy);
 
-        focus_toplevel(toplevel);
+        if (surface_under && surface_under->type == BUZZAY_SURFACE_TOPLEVEL) {
+            struct buzzay_toplevel *toplevel = surface_under->item;
+            focus_toplevel(toplevel);
+        }
 	}
 }
 

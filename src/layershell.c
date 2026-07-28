@@ -5,6 +5,7 @@
 #include <scenefx/types/wlr_scene.h>
 #include <wlr/types/wlr_output_layout.h>
 
+#include "cursor.h"
 #include "macro-utils.h"
 #include "server.h"
 #include "output.h"
@@ -145,6 +146,12 @@ void server_new_layer_surface(struct wl_listener *listener, void *data) {
     struct buzzay_layer_surface *bz_layer_surface = calloc(1, sizeof(*bz_layer_surface));
     bz_layer_surface->surface = layer_surface;
     bz_layer_surface->scene_layer = wlr_scene_layer_surface_v1_create(target_tree, layer_surface);
+
+    struct bz_underlying_surface *surface_under = calloc(1, sizeof(*surface_under));
+    surface_under->type = BUZZAY_SURFACE_LAYERSHELL;
+    surface_under->item = bz_layer_surface;
+
+    bz_layer_surface->scene_layer->tree->node.data = surface_under;
     bz_layer_surface->current_layer = layer_surface->pending.layer;
     bz_layer_surface->server = server;
 

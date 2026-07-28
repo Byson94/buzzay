@@ -8,6 +8,16 @@ enum buzzay_cursor_mode {
 	BUZZAY_CURSOR_RESIZE,
 };
 
+enum bz_underlying_surface_type {
+    BUZZAY_SURFACE_TOPLEVEL,
+    BUZZAY_SURFACE_LAYERSHELL
+};
+
+struct bz_underlying_surface {
+    enum bz_underlying_surface_type type;
+    void *item;
+};
+
 void server_cursor_motion(struct wl_listener *listener, void *data);
 void server_cursor_motion_absolute(struct wl_listener *listener, void *data);
 void server_cursor_button(struct wl_listener *listener, void *data);

@@ -9,6 +9,7 @@
 
 #include "macro-utils.h"
 #include "server.h"
+#include "cursor.h"
 #include "output.h"
 
 static void output_configure_scene(struct wlr_scene_node *node,
@@ -17,7 +18,13 @@ static void output_configure_scene(struct wlr_scene_node *node,
 		return;
 	}
 
-	struct buzzay_toplevel *_toplevel = node->data;
+    struct bz_underlying_surface *surface_under = node->data;
+	struct buzzay_toplevel *_toplevel = NULL;
+
+    if (surface_under && surface_under->type == BUZZAY_SURFACE_TOPLEVEL) {
+        _toplevel = surface_under->item;
+    }
+
 	if (_toplevel) {
 		toplevel = _toplevel;
 	}

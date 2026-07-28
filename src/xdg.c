@@ -154,9 +154,11 @@ static void xdg_toplevel_destroy(struct wl_listener *listener, void *data) {
     }
 
     if (toplevel->scene_tree) {
+        struct bz_underlying_surface *surface_under = toplevel->scene_tree->node.data;
         wlr_scene_node_destroy(&toplevel->scene_tree->node);
         toplevel->scene_tree = NULL;
         toplevel->border_rect = NULL;
+        free(surface_under);
     }
 
 	wl_list_remove(&toplevel->map.link);
@@ -318,7 +320,12 @@ void server_new_xdg_toplevel(struct wl_listener *listener, void *data) {
 	toplevel->xdg_toplevel = xdg_toplevel;
 	toplevel->scene_tree =
 		wlr_scene_xdg_surface_create(toplevel->server->layers.workspace, xdg_toplevel->base);
-	toplevel->scene_tree->node.data = toplevel;
+
+    struct bz_underlying_surface *surface_under = calloc(1, sizeof(*surface_under));
+    surface_under->type = BUZZAY_SURFACE_TOPLEVEL;
+    surface_under->item = toplevel;
+
+	toplevel->scene_tree->node.data = surface_under;
 	xdg_toplevel->base->data = toplevel->scene_tree;
 
 	/* Listen to the various events it can emit */
