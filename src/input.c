@@ -119,7 +119,7 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
 			keyboard->wlr_keyboard->xkb_state, keycode, &syms);
     UNUSED(nsyms);
 
-    /* Get the raw keysyms for proper keybind handling */
+    /* Get the raw keysyms */
 	const xkb_keysym_t *syms_raw;
 	int nsyms_raw = xkb_keymap_key_get_syms_by_level(
 			keyboard->wlr_keyboard->keymap, 

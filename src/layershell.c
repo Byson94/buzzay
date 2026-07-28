@@ -106,6 +106,11 @@ static void layershell_destroy(struct wl_listener *listener, void *data) {
 
     struct buzzay_layer_surface *bz_layer_surface = wl_container_of(listener, bz_layer_surface, destroy);
 
+    if (bz_layer_surface->underlying_surface) {
+        free(bz_layer_surface->underlying_surface);
+        bz_layer_surface->underlying_surface = NULL;
+    }
+
     wl_list_remove(&bz_layer_surface->link);
     wl_list_remove(&bz_layer_surface->commit.link);
     wl_list_remove(&bz_layer_surface->unmap.link);
@@ -151,6 +156,7 @@ void server_new_layer_surface(struct wl_listener *listener, void *data) {
     surface_under->type = BUZZAY_SURFACE_LAYERSHELL;
     surface_under->item = bz_layer_surface;
 
+    bz_layer_surface->underlying_surface = surface_under;
     bz_layer_surface->scene_layer->tree->node.data = surface_under;
     bz_layer_surface->current_layer = layer_surface->pending.layer;
     bz_layer_surface->server = server;

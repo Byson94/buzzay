@@ -8,6 +8,7 @@ struct buzzay_layer_surface {
     struct wl_list link;
     struct wlr_layer_surface_v1 *surface;
     struct wlr_scene_layer_surface_v1 *scene_layer;
+    struct bz_underlying_surface *underlying_surface;
     struct buzzay_server *server;
     struct wl_listener unmap;
     struct wl_listener commit;
