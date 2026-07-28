@@ -12,6 +12,35 @@
 #include "layershell.h"
 #include "tiling.h"
 
+void focus_layershell(struct buzzay_layer_surface *layershell) {
+	/* Note: this function only deals with keyboard focus. */
+	if (layershell == NULL) {
+		return;
+	}
+	struct buzzay_server *server = layershell->server;
+	struct wlr_seat *seat = server->seat;
+	struct wlr_surface *prev_surface = seat->keyboard_state.focused_surface;
+	struct wlr_surface *surface = layershell->surface->surface;
+	if (prev_surface == surface) {
+		/* Don't re-focus an already focused surface. */
+		return;
+	}
+	struct wlr_keyboard *keyboard = wlr_seat_get_keyboard(seat);
+	/* Move the layershell to the front */
+	wlr_scene_node_raise_to_top(&layershell->scene_layer->tree->node);
+	/*
+	 * Tell the seat to have the keyboard enter this surface. wlroots will keep
+	 * track of this and automatically send key events to the appropriate
+	 * clients without additional work on your part.
+	 */
+	if (keyboard != NULL) {
+		wlr_seat_keyboard_notify_enter(seat, surface,
+			keyboard->keycodes, keyboard->num_keycodes, &keyboard->modifiers);
+	}
+
+    update_border_colors(server);
+}
+
 static void layershell_commit(struct wl_listener *listener, void *data) {
     UNUSED(data);
 

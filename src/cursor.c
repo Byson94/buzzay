@@ -142,12 +142,16 @@ static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
 		wlr_cursor_set_xcursor(server->cursor, server->cursor_mgr, "default");
 	}
 
-    if (toplevel && server->window_active_on == WINDOW_ACTIVE_ON_HOVER) {
-        focus_toplevel(toplevel);
+    if (server->window_active_on == WINDOW_ACTIVE_ON_HOVER) {
         if (toplevel != NULL && server->hovered_toplevel != toplevel) {
             focus_toplevel(toplevel);
             server->hovered_toplevel = toplevel;
         } else if (toplevel == NULL) {
+            server->hovered_toplevel = NULL;
+        } 
+
+        if (layershell != NULL) {
+            focus_layershell(layershell);
             server->hovered_toplevel = NULL;
         }
     }
@@ -236,9 +240,19 @@ void server_cursor_button(struct wl_listener *listener, void *data) {
         struct bz_underlying_surface *surface_under = desktop_toplevel_at(server,
                 server->cursor->x, server->cursor->y, &surface, &sx, &sy);
 
-        if (surface_under && surface_under->type == BUZZAY_SURFACE_TOPLEVEL) {
-            struct buzzay_toplevel *toplevel = surface_under->item;
-            focus_toplevel(toplevel);
+        if (!surface_under) return;
+
+        switch(surface_under->type) {
+            case BUZZAY_SURFACE_TOPLEVEL: {
+                struct buzzay_toplevel *toplevel = surface_under->item;
+                focus_toplevel(toplevel);
+                break;
+            }
+            case BUZZAY_SURFACE_LAYERSHELL: {
+                struct buzzay_layer_surface *layershell = surface_under->item;
+                focus_layershell(layershell);
+                break;
+            }
         }
 	}
 }

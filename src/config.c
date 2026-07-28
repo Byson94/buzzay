@@ -371,8 +371,15 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
             return;
         }
         
+        uint32_t new_idx = atoi(kb->commands[1]);
+        if (new_idx == server->current_workspace) return;
+        if (new_idx == 0) {
+            // warn.
+            return;
+        }
+
         struct buzzay_workspace *this_workspace = get_workspace_at_index(&server->workspaces, server->current_workspace);
-        server->current_workspace = atoi(kb->commands[1]);
+        server->current_workspace = new_idx;
         
         struct buzzay_toplevel *this_toplevel;
         wl_list_for_each(this_toplevel, &this_workspace->toplevels, link) {
@@ -380,12 +387,22 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
         }
 
         struct buzzay_workspace *new_workspace = get_workspace_at_index(&server->workspaces, server->current_workspace);
-        struct buzzay_toplevel *first_toplevel = NULL;
 
-        if (!wl_list_empty(&new_workspace->toplevels)) 
-            first_toplevel = wl_container_of(new_workspace->toplevels.next, first_toplevel, link);
+        /*
+         * Focus the toplevel in the given workspace. First, we check if there
+         * already exists a focused window in that workspace. If yes,
+         * then focus it. If not, then find the first toplevel of that workspace 
+         * and focus it.
+         */
+        if (new_workspace->focused_window) {
+            focus_toplevel(new_workspace->focused_window);
+        } else if (!wl_list_empty(&new_workspace->toplevels)) {
+            struct buzzay_toplevel *first_toplevel = 
+                wl_container_of(new_workspace->toplevels.next, first_toplevel, link);
+            focus_toplevel(first_toplevel);
+        }
 
-        focus_toplevel(first_toplevel);
+        // Arrange the workspaces to apply result.
         arrange_workspaces(server);
     } else if (strcmp(act, "window-to-workspace") == 0) {
         if (kb->command_count < 2) {

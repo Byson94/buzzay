@@ -18,4 +18,5 @@ struct buzzay_layer_surface {
     enum zwlr_layer_shell_v1_layer current_layer;
 };
 
+void focus_layershell(struct buzzay_layer_surface *layershell);
 void server_new_layer_surface(struct wl_listener *listener, void *data);
