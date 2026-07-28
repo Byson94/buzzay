@@ -380,7 +380,10 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
         }
 
         struct buzzay_workspace *new_workspace = get_workspace_at_index(&server->workspaces, server->current_workspace);
-        struct buzzay_toplevel *first_toplevel = wl_container_of(new_workspace->toplevels.next, first_toplevel, link);
+        struct buzzay_toplevel *first_toplevel = NULL;
+
+        if (!wl_list_empty(&new_workspace->toplevels)) 
+            first_toplevel = wl_container_of(new_workspace->toplevels.next, first_toplevel, link);
 
         focus_toplevel(first_toplevel);
         arrange_workspaces(server);
