@@ -83,6 +83,7 @@ struct buzzay_server {
 	uint32_t resize_edges;
     uint32_t last_serial;
     bool cursor_recently_reset;
+    struct buzzay_layer_surface *focused_layersehll;
 
     struct wlr_output_layout *output_layout;
     struct wl_listener output_layout_change;

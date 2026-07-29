@@ -138,11 +138,11 @@ static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
 	if (!toplevel && !layershell) {
 		/* If there's no toplevel and layersehll under the cursor, set the cursor image to a
 		 * default. This is what makes the cursor image appear when you move it
-		 * around the screen, not over any toplevels. */
+		 * around the screen, not over any toplevels or layershell. */
 		wlr_cursor_set_xcursor(server->cursor, server->cursor_mgr, "default");
 	}
 
-    if (server->window_active_on == WINDOW_ACTIVE_ON_HOVER) {
+    if (server->window_active_on == WINDOW_ACTIVE_ON_HOVER && !server->focused_layersehll) {
         if (toplevel != NULL && server->hovered_toplevel != toplevel) {
             focus_toplevel(toplevel);
             server->hovered_toplevel = toplevel;
@@ -174,6 +174,7 @@ static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
 	} else {
 		/* Clear pointer focus so future button events and such are not sent to
 		 * the last client to have the cursor over it. */
+        if (server->focused_layersehll) return;
 		wlr_seat_pointer_clear_focus(seat);
         wlr_seat_keyboard_clear_focus(seat);
 	}

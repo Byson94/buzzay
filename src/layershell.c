@@ -11,12 +11,22 @@
 #include "output.h"
 #include "layershell.h"
 #include "tiling.h"
+#include "wlr-layer-shell-unstable-v1-protocol.h"
+#include "wlr/types/wlr_xdg_decoration_v1.h"
+#include "workspace.h"
+#include "xdg.h"
 
 void focus_layershell(struct buzzay_layer_surface *layershell) {
-	/* Note: this function only deals with keyboard focus. */
+	/* 
+     * Note: this function only deals with keyboard focus.
+    */
 	if (layershell == NULL) {
 		return;
 	}
+    if (layershell->surface->current.keyboard_interactive == ZWLR_LAYER_SURFACE_V1_KEYBOARD_INTERACTIVITY_NONE) {
+        return;
+    }
+
 	struct buzzay_server *server = layershell->server;
 	struct wlr_seat *seat = server->seat;
 	struct wlr_surface *prev_surface = seat->keyboard_state.focused_surface;
@@ -26,8 +36,11 @@ void focus_layershell(struct buzzay_layer_surface *layershell) {
 		return;
 	}
 	struct wlr_keyboard *keyboard = wlr_seat_get_keyboard(seat);
-	/* Move the layershell to the front */
-	wlr_scene_node_raise_to_top(&layershell->scene_layer->tree->node);
+    server->focused_layersehll = layershell;
+    // raise if necessary
+    if (layershell->scene_layer != NULL) {
+        wlr_scene_node_raise_to_top(&layershell->scene_layer->tree->node);
+    }
 	/*
 	 * Tell the seat to have the keyboard enter this surface. wlroots will keep
 	 * track of this and automatically send key events to the appropriate
@@ -37,8 +50,6 @@ void focus_layershell(struct buzzay_layer_surface *layershell) {
 		wlr_seat_keyboard_notify_enter(seat, surface,
 			keyboard->keycodes, keyboard->num_keycodes, &keyboard->modifiers);
 	}
-
-    update_border_colors(server);
 }
 
 void layershell_do_allocations(struct wlr_layer_surface_v1 *layer_surface) {
@@ -127,6 +138,8 @@ static void layershell_commit(struct wl_listener *listener, void *data) {
         }
     }
 
+    if (layer_surface->initial_commit) focus_layershell(bz_layer_surface);
+
     layershell_do_allocations(layer_surface);
     arrange_workspaces(bz_layer_surface->server);
 }
@@ -154,8 +167,13 @@ static void layershell_destroy(struct wl_listener *listener, void *data) {
     wl_list_remove(&bz_layer_surface->destroy.link);
     wl_list_remove(&bz_layer_surface->new_popup.link);
 
-    wlr_seat_pointer_clear_focus(bz_layer_surface->server->seat);
-    wlr_seat_keyboard_notify_clear_focus(bz_layer_surface->server->seat);
+    struct buzzay_server *server = bz_layer_surface->server;
+    if (server->focused_layersehll == bz_layer_surface) {
+        server->focused_layersehll = NULL;
+
+        struct buzzay_workspace *wsp = get_workspace_at_index(&server->workspaces, server->current_workspace);
+        if (wsp->focused_window) focus_toplevel(wsp->focused_window);
+    }
 
     layershell_do_allocations(bz_layer_surface->surface);
     arrange_workspaces(bz_layer_surface->server);
@@ -218,6 +236,4 @@ void server_new_layer_surface(struct wl_listener *listener, void *data) {
 
     bz_layer_surface->new_popup.notify = layershell_new_popup;
     wl_signal_add(&layer_surface->events.new_popup, &bz_layer_surface->new_popup);
-
-    focus_layershell(bz_layer_surface);
 }
