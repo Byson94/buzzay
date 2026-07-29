@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <wayland-util.h>
 #include <wlr/backend.h>
+#include <wlr/util/log.h>
 #include <wlr/backend/session.h>
 #include <wlr/types/wlr_output.h>
 #include <wlr/types/wlr_gamma_control_v1.h>
@@ -24,7 +25,9 @@ static void handle_gamma_control_destroy(struct wl_listener *listener, void *dat
     wlr_output_state_init(&state);
 
     wlr_output_state_set_color_transform(&state, NULL);
-    wlr_output_commit_state(bz_gamma->output, &state);
+    if (!wlr_output_commit_state(bz_gamma->output, &state)) {
+        wlr_log(WLR_ERROR, "Failed to clean output color transform.\n");
+    }
     wlr_output_state_finish(&state);
 
 cleanup:

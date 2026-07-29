@@ -42,10 +42,15 @@ void focus_layershell(struct buzzay_layer_surface *layershell) {
 }
 
 void layershell_do_allocations(struct wlr_layer_surface_v1 *layer_surface) {
+    if (layer_surface == NULL) return;
+
     struct wlr_output *mon_output = layer_surface->output;
     struct buzzay_output *output = mon_output->data;
     uint32_t screen_width = mon_output->width;
     uint32_t screen_height = mon_output->height;
+
+    // guard in case we are switching vt
+    if (output == NULL) return;
 
     struct wlr_box full_area = {
         .x = 0,
@@ -148,6 +153,9 @@ static void layershell_destroy(struct wl_listener *listener, void *data) {
     wl_list_remove(&bz_layer_surface->unmap.link);
     wl_list_remove(&bz_layer_surface->destroy.link);
     wl_list_remove(&bz_layer_surface->new_popup.link);
+
+    wlr_seat_pointer_clear_focus(bz_layer_surface->server->seat);
+    wlr_seat_keyboard_notify_clear_focus(bz_layer_surface->server->seat);
 
     layershell_do_allocations(bz_layer_surface->surface);
     arrange_workspaces(bz_layer_surface->server);
