@@ -481,7 +481,16 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
             target->second_child = new_leaf;
         }
 
-        current_workspace->focused_window = wl_container_of(current_workspace->toplevels.next, current_toplevel, link);
+        wlr_scene_node_set_enabled(&current_toplevel->scene_tree->node, false);
+
+        if (!wl_list_empty(&current_workspace->toplevels)) {
+            current_workspace->focused_window =
+                wl_container_of(current_workspace->toplevels.next, current_toplevel, link);
+        } else {
+            // if it is empty reset the layout
+            workspace_init(current_workspace);
+        }
+
         target_workspace->focused_window = current_toplevel;
 
         focus_toplevel(current_workspace->focused_window);

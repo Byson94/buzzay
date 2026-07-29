@@ -153,11 +153,6 @@ static void xdg_toplevel_destroy(struct wl_listener *listener, void *data) {
 
     workspace_remove_toplevel(toplevel);
 
-    struct buzzay_toplevel *last_toplevel = NULL;
-    if (!wl_list_empty(&toplevel->in_workspace->toplevels)) {
-        last_toplevel = wl_container_of(toplevel->in_workspace->toplevels.next, toplevel, link);
-    }
-
     if (toplevel->scene_tree) {
         struct bz_underlying_surface *surface_under = toplevel->scene_tree->node.data;
         wlr_scene_node_destroy(&toplevel->scene_tree->node);
@@ -178,8 +173,20 @@ static void xdg_toplevel_destroy(struct wl_listener *listener, void *data) {
     wlr_seat_pointer_clear_focus(toplevel->server->seat);
     wlr_seat_keyboard_notify_clear_focus(toplevel->server->seat);
 
+    if (toplevel->in_workspace->focused_window == toplevel) {
+        toplevel->in_workspace->focused_window = NULL;
+    }
+
+    struct buzzay_toplevel *next_focus = NULL;
+    if (!wl_list_empty(&toplevel->in_workspace->toplevels)) {
+        struct buzzay_toplevel *head = wl_container_of(toplevel->in_workspace->toplevels.next, head, link);
+        if (head != toplevel) {
+            next_focus = head;
+        }
+    }
+
     free(toplevel);
-    focus_toplevel(last_toplevel);
+    focus_toplevel(next_focus);
     arrange_workspaces(saved_server);
 }
 
