@@ -31,6 +31,10 @@
 #include <wlr/types/wlr_viewporter.h>
 #include <wlr/types/wlr_screencopy_v1.h>
 #include <wlr/types/wlr_xdg_output_v1.h>
+#include <wlr/types/wlr_ext_data_control_v1.h>
+#include <wlr/types/wlr_single_pixel_buffer_v1.h>
+#include <wlr/types/wlr_fractional_scale_v1.h>
+#include <wlr/types/wlr_export_dmabuf_v1.h>
 #include <wlr/render/allocator.h>
 #include <scenefx/render/fx_renderer/fx_renderer.h>
 #include <scenefx/types/wlr_scene.h>
@@ -235,8 +239,14 @@ static int start_compositor() {
     server.idle_notifier = wlr_idle_notifier_v1_create(server.wl_display);
 
     // setup screencopy and xdg output manager protocol
-    server.screencopy_mgr = wlr_screencopy_manager_v1_create(server.wl_display);
-    server.xdg_output_mgr = wlr_xdg_output_manager_v1_create(server.wl_display, server.output_layout);
+    wlr_screencopy_manager_v1_create(server.wl_display);
+    wlr_xdg_output_manager_v1_create(server.wl_display, server.output_layout);
+
+    // setup other protocols
+    wlr_ext_data_control_manager_v1_create(server.wl_display, 1);
+    wlr_single_pixel_buffer_manager_v1_create(server.wl_display);
+    wlr_fractional_scale_manager_v1_create(server.wl_display, 1);
+    wlr_export_dmabuf_manager_v1_create(server.wl_display);
 
     // create a cursor (the image)
     server.cursor = wlr_cursor_create();
