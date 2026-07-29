@@ -20,7 +20,11 @@ struct buzzay_keyboard {
         WLR_MODIFIER_LOGO | WLR_MODIFIER_ALT | WLR_MODIFIER_MOD5)
 
 struct keybinding {
-    xkb_keysym_t sym;
+    bool is_keycode;
+    union {
+        xkb_keysym_t sym;
+        xkb_keycode_t code;
+    } key;
     enum wlr_keyboard_modifier modifiers;
     void (*handler)(struct buzzay_server *server, void *data);
     void *data;

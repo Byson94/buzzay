@@ -83,16 +83,26 @@ static void keyboard_handle_modifiers(struct wl_listener *listener, void *data) 
 		&keyboard->wlr_keyboard->modifiers);
 }
 
-bool handle_keybinding(struct buzzay_server *server, xkb_keysym_t sym, uint32_t modifiers) {
-    UNUSED(server);
+bool handle_keybinding(struct buzzay_server *server, xkb_keycode_t keycode, xkb_keysym_t sym, uint32_t modifiers) {
+    uint32_t event_mods = modifiers & BZ_ALLOWED_MODS;
+    xkb_keysym_t lower_sym = xkb_keysym_to_lower(sym);
+
     for (int i = 0; i < keybinding_count; i++) {
         struct keybinding *kb = &keybinding_arr[i];
 
-        uint32_t event_mods = modifiers & BZ_ALLOWED_MODS;
         uint32_t req_mods = kb->modifiers & BZ_ALLOWED_MODS;
+        if (event_mods != req_mods) {
+            continue;
+        }
 
-        sym = xkb_keysym_to_lower(sym);
-        if (kb->sym == sym && event_mods == req_mods) {
+        bool match = false;
+        if (kb->is_keycode) {
+            match = (kb->key.code == keycode);
+        } else {
+            match = (xkb_keysym_to_lower(kb->key.sym) == lower_sym);
+        }
+
+        if (match) {
             if (kb->handler) {
                 kb->handler(server, kb->data);
                 return true;
@@ -154,7 +164,7 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
                 xkb_keysym_t sym = syms[i];
                 if ((sym >= XKB_KEY_XF86AudioLowerVolume && sym <= XKB_KEY_XF86AudioMute) ||
                     (sym >= XKB_KEY_F1 && sym <= XKB_KEY_F35)) {
-                    if (handle_keybinding(server, sym, modifiers)) {
+                    if (handle_keybinding(server, keycode, sym, modifiers)) {
                         handled = true;
                         break;
                     }
@@ -168,7 +178,7 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
              */
             if (!handled) {
                 for (int i = 0; i < nsyms_raw; i++) {
-                    if (handle_keybinding(server, syms_raw[i], modifiers)) {
+                    if (handle_keybinding(server, keycode, syms_raw[i], modifiers)) {
                         handled = true;
                         break;
                     }

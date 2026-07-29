@@ -5,7 +5,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <string.h>
-#include <ctype.h>
 #include <tomlc17.h>
 #include <wayland-util.h>
 #include <sys/inotify.h>
@@ -223,11 +222,14 @@ static void parse_color(const char *color, float out_color[4]) {
 
 static int parse_keybinding_string(
     const char *key_str, 
-    xkb_keysym_t *out_sym, 
-    enum wlr_keyboard_modifier *out_mods,
+    struct keybinding *kb,
     bool is_nested
 ) {
-    *out_sym = XKB_KEY_NoSymbol;
+    if (!kb) return -1;
+
+    kb->modifiers = 0;
+    kb->is_keycode = false;
+    kb->key.sym = XKB_KEY_NoSymbol;
 
     char *dup = strdup(key_str);
     if (!dup) return -1;
@@ -239,38 +241,48 @@ static int parse_keybinding_string(
         last_token = token;
         token = strtok(NULL, "+");
 
-        for(int i = 0; last_token[i]; i++){
-          last_token[i] = tolower(last_token[i]);
-        }
-
         if (token != NULL) {
-            if (strcmp(last_token, "adpt") == 0) {
+            if (strcasecmp(last_token, "adpt") == 0) {
                 if (is_nested) {
-                    *out_mods |= WLR_MODIFIER_ALT;
+                    kb->modifiers |= WLR_MODIFIER_ALT;
                 } else {
-                    *out_mods |= WLR_MODIFIER_LOGO;
+                    kb->modifiers |= WLR_MODIFIER_LOGO;
                 }
             } else if (strcasecmp(last_token, "super") == 0 || strcasecmp(last_token, "mod4") == 0) {
-                *out_mods |= WLR_MODIFIER_LOGO;
+                kb->modifiers |= WLR_MODIFIER_LOGO;
             } else if (strcasecmp(last_token, "ctrl") == 0 || strcasecmp(last_token, "control") == 0) {
-                *out_mods |= WLR_MODIFIER_CTRL;
+                kb->modifiers |= WLR_MODIFIER_CTRL;
             } else if (strcasecmp(last_token, "shift") == 0) {
-                *out_mods |= WLR_MODIFIER_SHIFT;
+                kb->modifiers |= WLR_MODIFIER_SHIFT;
             } else if (strcasecmp(last_token, "alt") == 0 || strcasecmp(last_token, "mod1") == 0) {
-                *out_mods |= WLR_MODIFIER_ALT;
+                kb->modifiers |= WLR_MODIFIER_ALT;
             }
         }
     }
 
     if (last_token != NULL) {
-        *out_sym = xkb_keysym_from_name(last_token, XKB_KEYSYM_CASE_INSENSITIVE);
+        if (strncasecmp(last_token, "code:", 5) == 0) {
+            char *endptr = NULL;
+            long code = strtol(last_token + 5, &endptr, 10);
+            
+            if (endptr != (last_token + 5) && *endptr == '\0' && code >= 0) {
+                kb->is_keycode = true;
+                kb->key.code = (xkb_keycode_t)(code + 8); 
+            }
+        } else {
+            kb->is_keycode = false;
+            kb->key.sym = xkb_keysym_from_name(last_token, XKB_KEYSYM_CASE_INSENSITIVE);
+        }
     }
 
     free(dup);
 
-    if (*out_sym == XKB_KEY_NoSymbol) {
-        return -1;
+    if (kb->is_keycode) {
+        if (kb->key.code == 0) return -1;
+    } else {
+        if (kb->key.sym == XKB_KEY_NoSymbol) return -1;
     }
+
     return 0;
 }
 
@@ -773,15 +785,14 @@ int handle_config(const char *path, struct buzzay_server *server) {
             is_nested = wlr_output_is_wl(first_item->wlr_output);
         }
 
-        if (parse_keybinding_string(
-                    key, &binding.sym, 
-                    &binding.modifiers, 
-                    is_nested) != 0) {
+        if (parse_keybinding_string(key, &binding, is_nested) != 0) {
             fprintf(stderr, "Error: Failed to parse keybinding string '%s'\n", key);
             free(kb_cmd);
             continue;
         }
-        binding.sym = xkb_keysym_to_lower(binding.sym);
+        if (!binding.is_keycode) {
+            binding.key.sym = xkb_keysym_to_lower(binding.key.sym);
+        }
         binding.handler = keybinding_handler;
         binding.data = kb_cmd;
         register_keybinding(binding);
