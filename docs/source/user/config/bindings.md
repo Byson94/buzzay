@@ -22,6 +22,9 @@ These keys can be paired with keys to get a keybinding. Example: `Super+Return`.
 are provided by xkbcommon, so you should follow those names for the keybinding to function. 
 This is why `Return` is used instead of `Enter`. It is case insensitive, so something like `super+return` works too.
 
+The paired keys can also be a keycode. They should be in the `code:<number>` format. Like this: `super+code:24`.
+The keycode must be the raw scancode for the desired key used in the linux kernel.
+
 ## Actions
 
 Each keybinding can peform an action, whether that be running a shell command, closing an application,
