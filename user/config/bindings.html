@@ -284,6 +284,8 @@
 <p>These keys can be paired with keys to get a keybinding. Example: <code class="docutils literal notranslate"><span class="pre">Super+Return</span></code>. The key names
 are provided by xkbcommon, so you should follow those names for the keybinding to function.
 This is why <code class="docutils literal notranslate"><span class="pre">Return</span></code> is used instead of <code class="docutils literal notranslate"><span class="pre">Enter</span></code>. It is case insensitive, so something like <code class="docutils literal notranslate"><span class="pre">super+return</span></code> works too.</p>
+<p>The paired keys can also be a keycode. They should be in the <code class="docutils literal notranslate"><span class="pre">code:&lt;number&gt;</span></code> format. Like this: <code class="docutils literal notranslate"><span class="pre">super+code:24</span></code>.
+The keycode must be the raw scancode for the desired key used in the linux kernel.</p>
 </section>
 <section id="actions">
 <h2>Actions<a class="headerlink" href="#actions" title="Link to this heading">¶</a></h2>
