@@ -266,11 +266,21 @@
         <article role="main" id="furo-main-content">
           <section id="keybinding-options">
 <h1>Keybinding Options<a class="headerlink" href="#keybinding-options" title="Link to this heading">¶</a></h1>
-<p>Keybindings are configured under the <code class="docutils literal notranslate"><span class="pre">[bindings]</span></code> table. They are in the provided format:</p>
+<p>Keybindings are configured under the <code class="docutils literal notranslate"><span class="pre">[bindings]</span></code> table. They can be configured in two formats:
+array format, and table format.</p>
+<p><strong>Array Format:</strong></p>
 <div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;Key1+Key2&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Action&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Argument&quot;</span><span class="p">]</span><span class="w"> </span><span class="c1"># There can be multiple arguments.</span>
 </pre></div>
 </div>
 <p>All the elements in this array must always be a string.</p>
+<p><strong>Table Format:</strong></p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;Key1+Key2&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">action</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Action&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">arg</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Argument&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This format can be used when more advanced configuration is needed. For example, disabling repeat for this binding.</p>
 <section id="modifier-keys">
 <h2>Modifier Keys<a class="headerlink" href="#modifier-keys" title="Link to this heading">¶</a></h2>
 <p>There are four modifier keys:</p>
@@ -290,8 +300,15 @@ The keycode must be the raw scancode for the desired key used in the linux kerne
 <section id="actions">
 <h2>Actions<a class="headerlink" href="#actions" title="Link to this heading">¶</a></h2>
 <p>Each keybinding can peform an action, whether that be running a shell command, closing an application,
-or switching the workspace. As shown above, they are an array like so:</p>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">kb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Action&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Argument&quot;</span><span class="p">]</span>
+or switching the workspace. As shown above, they are an array or table like so:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Array Version</span>
+<span class="n">kb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Action&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Argument&quot;</span><span class="p">]</span>
+
+<span class="c1"># Table Version</span>
+<span class="n">kb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">action</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Action&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">arg</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Argument&quot;</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <section id="spawn">
@@ -384,6 +401,28 @@ must be the argument.</p>
 </div>
 </section>
 </section>
+<section id="keybinding-configuration">
+<h2>Keybinding Configuration<a class="headerlink" href="#keybinding-configuration" title="Link to this heading">¶</a></h2>
+<p>A keybinding can be configured if you are using the table format. This section will cover all the
+options you can configure inside a table.</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">kb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">action</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Action&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">arg</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Argument&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="c1"># other options here...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<section id="repeat">
+<h3>repeat<a class="headerlink" href="#repeat" title="Link to this heading">¶</a></h3>
+<p>Whether to allow repeat for this keybinding (boolean). Default is <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">kb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1"># ..</span>
+<span class="w">    </span><span class="n">repeat</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
 </section>
 
         </article>
@@ -456,6 +495,10 @@ must be the argument.</p>
 <li><a class="reference internal" href="#toggle-monocle">toggle-monocle</a></li>
 <li><a class="reference internal" href="#cycle-monocle">cycle-monocle</a></li>
 <li><a class="reference internal" href="#quit-compositor">quit-compositor</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#keybinding-configuration">Keybinding Configuration</a><ul>
+<li><a class="reference internal" href="#repeat">repeat</a></li>
 </ul>
 </li>
 </ul>

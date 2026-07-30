@@ -1,12 +1,26 @@
 # Keybinding Options
 
-Keybindings are configured under the `[bindings]` table. They are in the provided format:
+Keybindings are configured under the `[bindings]` table. They can be configured in two formats:
+array format, and table format.
+
+**Array Format:**
 
 ```toml
 "Key1+Key2" = ["Action", "Argument"] # There can be multiple arguments.
 ```
 
 All the elements in this array must always be a string.
+
+**Table Format:**
+
+```toml
+"Key1+Key2" = {
+    action = "Action",
+    arg = "Argument"
+}
+```
+
+This format can be used when more advanced configuration is needed. For example, disabling repeat for this binding.
 
 ## Modifier Keys
 
@@ -28,10 +42,17 @@ The keycode must be the raw scancode for the desired key used in the linux kerne
 ## Actions
 
 Each keybinding can peform an action, whether that be running a shell command, closing an application,
-or switching the workspace. As shown above, they are an array like so:
+or switching the workspace. As shown above, they are an array or table like so:
 
 ```toml
+# Array Version
 kb = ["Action", "Argument"]
+
+# Table Version
+kb = {
+    action = "Action",
+    arg = "Argument"
+}
 ```
 
 ### spawn
@@ -138,4 +159,28 @@ Quit the compositor. Takes no argument.
 ```toml
 [bindings]
 "Super+Escape" = ["quit-compositor"]
+```
+
+## Keybinding Configuration
+
+A keybinding can be configured if you are using the table format. This section will cover all the 
+options you can configure inside a table.
+
+```toml
+kb = {
+    action = "Action",
+    arg = "Argument",
+    # other options here...
+}
+```
+
+### repeat
+
+Whether to allow repeat for this keybinding (boolean). Default is `true`.
+
+```toml
+kb = {
+    # ..
+    repeat = false
+}
 ```
