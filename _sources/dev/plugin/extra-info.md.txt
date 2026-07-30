@@ -11,9 +11,9 @@ inside the plugin.
 
 ## Plugin Compilation
 
-It is the duty of the plugin author to ensure that the plugin is compatible with buzzay.
-So the plugins must link to the same wlroots version that buzzay is linked to. Moreover, 
-they should ensure that the plugin is also compiled against the latest version of `buzzay-plugin.h`.
+Plugins should always aim to be up to date with the latest `buzzay-plugin.h`. Although buzzay
+will let plugins using outdated versions of the header pass, it is always a good idea to be on
+the safe side and use the latest API.
 
 ## Breaking Changes
 
