@@ -523,6 +523,83 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
     }
 }
 
+void handle_keybind_regsteration(struct buzzay_server *server, struct keybinding_cmd *kb_cmd, const char *key) {
+    struct keybinding binding = {0};
+    bool is_nested = false;
+
+    if (!wl_list_empty(&server->outputs)) {
+        struct buzzay_output *first_item = wl_container_of(
+            server->outputs.next, first_item, link
+        );
+
+        is_nested = wlr_output_is_wl(first_item->wlr_output);
+    }
+
+    if (parse_keybinding_string(key, &binding, is_nested) != 0) {
+        fprintf(stderr, "Error: Failed to parse keybinding string '%s'\n", key);
+        free(kb_cmd);
+        return;
+    }
+    if (!binding.is_keycode) {
+        binding.key.sym = xkb_keysym_to_lower(binding.key.sym);
+    }
+    binding.handler = keybinding_handler;
+    binding.data = kb_cmd;
+    register_keybinding(binding);
+}
+
+void handle_keybinding_arr(struct buzzay_server *server, const char *key, toml_datum_t val) {
+    int array_size = val.u.arr.size;
+    if (array_size <= 0) {
+        fprintf(stderr, "Error: Binding for '%s' has an empty command array.\n", key);
+        return;
+    }
+
+    struct keybinding_cmd *kb_cmd = calloc(1, sizeof(struct keybinding_cmd));
+    kb_cmd->command_count = 0;
+    
+    for (int j = 0; j < array_size && kb_cmd->command_count < 16; j++) {
+        toml_datum_t elem = val.u.arr.elem[j];
+        if (elem.type != TOML_STRING) {
+            fprintf(stderr, "Error: Non-string element found in command array for '%s'.\n", key);
+            return;
+        }
+        kb_cmd->commands[kb_cmd->command_count++] = strdup(elem.u.s);
+    }
+
+    if (kb_cmd->command_count < 1) {
+        fprintf(stderr, "Error: commands should have at least 1 command.");
+        free(kb_cmd);
+        return;
+    }
+
+    handle_keybind_regsteration(server, kb_cmd, key);
+}
+
+int handle_keybinding_table(struct buzzay_server *server, const char *key, toml_datum_t val) {
+    toml_datum_t action = toml_seek(val, "action");
+    toml_datum_t arg = toml_seek(val, "arg");
+
+    CHECK_TOML_TYPE(action, TOML_STRING, "action");
+    CHECK_TOML_TYPE(arg, TOML_STRING, "arg");
+
+    struct keybinding_cmd *kb_cmd = calloc(1, sizeof(struct keybinding_cmd));
+    kb_cmd->command_count = 0;
+
+    if (not_unknown(action)) {
+        kb_cmd->commands[kb_cmd->command_count++] = strdup(action.u.s);
+    } else {
+        fprintf(stderr, "Error: action must be provided.\n");
+        return 1;
+    }
+
+    if (not_unknown(arg)) 
+        kb_cmd->commands[kb_cmd->command_count++] = strdup(arg.u.s);
+
+    handle_keybind_regsteration(server, kb_cmd, key);
+    return 0;
+}
+
 int handle_config(const char *path, struct buzzay_server *server) {
     toml_result_t result = toml_parse_file_ex(path);
     if (!result.ok) {
@@ -745,57 +822,20 @@ int handle_config(const char *path, struct buzzay_server *server) {
         const char *key = bindings.u.tab.key[i];
         toml_datum_t val = bindings.u.tab.value[i];
 
-        if (val.type != TOML_ARRAY) {
-            fprintf(stderr, "Error: Binding for '%s' must be an array of commands.\n", key);
-            continue;
+        if (val.type != TOML_ARRAY && val.type != TOML_TABLE) {
         }
 
-        int array_size = val.u.arr.size;
-        if (array_size <= 0) {
-            fprintf(stderr, "Error: Binding for '%s' has an empty command array.\n", key);
-            continue;
-        }
-
-        struct keybinding_cmd *kb_cmd = calloc(1, sizeof(struct keybinding_cmd));
-        kb_cmd->command_count = 0;
-        
-        for (int j = 0; j < array_size && kb_cmd->command_count < 16; j++) {
-            toml_datum_t elem = val.u.arr.elem[j];
-            if (elem.type != TOML_STRING) {
-                fprintf(stderr, "Error: Non-string element found in command array for '%s'.\n", key);
+        switch (val.type) {
+            case TOML_ARRAY:
+                handle_keybinding_arr(server, key, val);
                 break;
-            }
-            kb_cmd->commands[kb_cmd->command_count++] = strdup(elem.u.s);
+            case TOML_TABLE:
+                handle_keybinding_table(server, key, val);
+                break;
+            default:
+                fprintf(stderr, "Error: Binding for '%s' must be an array of commands or a table.\n", key);
+                break;
         }
-
-        if (kb_cmd->command_count < 1) {
-            fprintf(stderr, "Error: commands should have at least 1 command.");
-            free(kb_cmd);
-            continue;
-        }
-
-        struct keybinding binding = {0};
-        bool is_nested = false;
-
-        if (!wl_list_empty(&server->outputs)) {
-            struct buzzay_output *first_item = wl_container_of(
-                server->outputs.next, first_item, link
-            );
-
-            is_nested = wlr_output_is_wl(first_item->wlr_output);
-        }
-
-        if (parse_keybinding_string(key, &binding, is_nested) != 0) {
-            fprintf(stderr, "Error: Failed to parse keybinding string '%s'\n", key);
-            free(kb_cmd);
-            continue;
-        }
-        if (!binding.is_keycode) {
-            binding.key.sym = xkb_keysym_to_lower(binding.key.sym);
-        }
-        binding.handler = keybinding_handler;
-        binding.data = kb_cmd;
-        register_keybinding(binding);
     }
 
     arrange_workspaces(server);
