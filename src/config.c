@@ -157,7 +157,12 @@ static bool not_unknown(toml_datum_t dat) {
 struct keybinding_cmd {
     const char *commands[MAX_COMMAND_ARGS];
     int command_count;
+    struct keybinding_config config;
 };
+
+void kb_cmd_set_init_config(struct keybinding_cmd *kb_cmd) {
+    kb_cmd->config.repeat = true;
+}
 
 int handle_config_only_envs(const char *path) {
     toml_result_t result = toml_parse_file_ex(path);
@@ -563,6 +568,7 @@ void handle_keybind_regsteration(struct buzzay_server *server, struct keybinding
         binding.key.sym = xkb_keysym_to_lower(binding.key.sym);
     }
     binding.handler = keybinding_handler;
+    binding.config = kb_cmd->config;
     binding.data = kb_cmd;
     register_keybinding(binding);
 }
@@ -575,6 +581,7 @@ void handle_keybinding_arr(struct buzzay_server *server, const char *key, toml_d
     }
 
     struct keybinding_cmd *kb_cmd = calloc(1, sizeof(struct keybinding_cmd));
+    kb_cmd_set_init_config(kb_cmd);
     kb_cmd->command_count = 0;
     
     for (int j = 0; j < array_size && kb_cmd->command_count < 16; j++) {
@@ -598,11 +605,14 @@ void handle_keybinding_arr(struct buzzay_server *server, const char *key, toml_d
 int handle_keybinding_table(struct buzzay_server *server, const char *key, toml_datum_t val) {
     toml_datum_t action = toml_seek(val, "action");
     toml_datum_t arg = toml_seek(val, "arg");
+    toml_datum_t repeat = toml_seek(val, "repeat");
 
     CHECK_TOML_TYPE(action, TOML_STRING, "action");
     CHECK_TOML_TYPE(arg, TOML_STRING, "arg");
+    CHECK_TOML_TYPE(repeat, TOML_BOOLEAN, "repeat");
 
     struct keybinding_cmd *kb_cmd = calloc(1, sizeof(struct keybinding_cmd));
+    kb_cmd_set_init_config(kb_cmd);
     kb_cmd->command_count = 0;
 
     if (not_unknown(action)) {
@@ -614,6 +624,10 @@ int handle_keybinding_table(struct buzzay_server *server, const char *key, toml_
 
     if (not_unknown(arg)) 
         kb_cmd->commands[kb_cmd->command_count++] = strdup(arg.u.s);
+
+    if (not_unknown(repeat)) {
+        kb_cmd->config.repeat = repeat.u.boolean;
+    }
 
     handle_keybind_regsteration(server, kb_cmd, key);
     return 0;

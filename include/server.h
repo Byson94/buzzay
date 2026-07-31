@@ -40,6 +40,12 @@ enum buzzay_layout_mode {
     BZ_LAYOUT_TILE
 };
 
+struct active_keyrepeat {
+    struct keybinding *kb;
+    uint32_t keycode;
+    uint32_t modifiers;
+};
+
 struct buzzay_server {
     struct wl_display *wl_display;
     struct wl_event_loop *wl_event_loop;
@@ -103,6 +109,11 @@ struct buzzay_server {
     struct wl_listener idle_new_inhibitor;
     struct wlr_idle_notifier_v1 *idle_notifier;
     int idle_inhibit_count;
+
+    struct wl_event_source *kb_repeat_timer;
+    struct active_keyrepeat current_repeat;
+    int32_t repeat_delay;
+    int32_t repeat_rate;
 
     // Config
     const char *config_file;

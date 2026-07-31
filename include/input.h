@@ -19,12 +19,17 @@ struct buzzay_keyboard {
         WLR_MODIFIER_CTRL | WLR_MODIFIER_MOD2 | WLR_MODIFIER_MOD3 | \
         WLR_MODIFIER_LOGO | WLR_MODIFIER_ALT | WLR_MODIFIER_MOD5)
 
+struct keybinding_config {
+    bool repeat;
+};
+
 struct keybinding {
     bool is_keycode;
     union {
         xkb_keysym_t sym;
         xkb_keycode_t code;
     } key;
+    struct keybinding_config config;
     enum wlr_keyboard_modifier modifiers;
     void (*handler)(struct buzzay_server *server, void *data);
     void *data;
@@ -38,3 +43,4 @@ void apply_keyboard_config_to_device(struct wlr_keyboard *keyboard, const char *
 void register_keybinding(struct keybinding binding);
 void clear_all_keybinding();
 void server_new_input(struct wl_listener *listener, void *data);
+int handle_kb_repeat_timer(void *data);

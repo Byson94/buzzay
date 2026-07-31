@@ -83,7 +83,19 @@ static void keyboard_handle_modifiers(struct wl_listener *listener, void *data) 
 		&keyboard->wlr_keyboard->modifiers);
 }
 
-bool handle_keybinding(struct buzzay_server *server, xkb_keycode_t keycode, xkb_keysym_t sym, uint32_t modifiers) {
+int handle_kb_repeat_timer(void *data) {
+    struct buzzay_server *server = data;
+    struct keybinding *kb = server->current_repeat.kb;
+
+    if (kb && kb->handler) {
+        kb->handler(server, kb->data);
+        wl_event_source_timer_update(server->kb_repeat_timer, server->repeat_rate);
+    }
+
+    return 0;
+}
+
+struct keybinding *handle_keybinding(struct buzzay_server *server, xkb_keycode_t keycode, xkb_keysym_t sym, uint32_t modifiers) {
     uint32_t event_mods = modifiers & BZ_ALLOWED_MODS;
     xkb_keysym_t lower_sym = xkb_keysym_to_lower(sym);
 
@@ -105,12 +117,12 @@ bool handle_keybinding(struct buzzay_server *server, xkb_keycode_t keycode, xkb_
         if (match) {
             if (kb->handler) {
                 kb->handler(server, kb->data);
-                return true;
+                return kb; // Return pointer to matched keybinding
             }
         }
     }
 
-    return false;
+    return NULL;
 }
 
 static void keyboard_handle_key(struct wl_listener *listener, void *data) {
@@ -123,6 +135,20 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
 
 	/* Translate libinput keycode -> xkbcommon */
 	uint32_t keycode = event->keycode + 8;
+
+    // Handle release by clearing timer
+    if (event->state == WL_KEYBOARD_KEY_STATE_RELEASED) {
+        if (server->current_repeat.keycode == keycode) {
+            wl_event_source_timer_update(server->kb_repeat_timer, 0);
+            server->current_repeat.kb = NULL;
+            server->current_repeat.keycode = 0;
+        }
+        
+        wlr_seat_set_keyboard(seat, keyboard->wlr_keyboard);
+        wlr_seat_keyboard_notify_key(seat, event->time_msec, event->keycode, event->state);
+        return;
+    }
+
 	/* Get a list of keysyms based on the keymap for this keyboard */
 	const xkb_keysym_t *syms;
 	int nsyms = xkb_state_key_get_syms(
@@ -154,44 +180,45 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
         }
     }
 
-    // else handling compositor key binding
-    bool handled = false;
-    if (event->state == WL_KEYBOARD_KEY_STATE_PRESSED) {
-            /*
-             * If it is a media key or special action key, then handle it directly.
-             */
-            for (int i = 0; i < nsyms; i++) {
-                xkb_keysym_t sym = syms[i];
-                if ((sym >= XKB_KEY_XF86AudioLowerVolume && sym <= XKB_KEY_XF86AudioMute) ||
-                    (sym >= XKB_KEY_F1 && sym <= XKB_KEY_F35)) {
-                    if (handle_keybinding(server, keycode, sym, modifiers)) {
-                        handled = true;
-                        break;
-                    }
-                }
-            }
+    // Clear all timers 
+    wl_event_source_timer_update(server->kb_repeat_timer, 0);
+    server->current_repeat.kb = NULL;
+    server->current_repeat.keycode = 0;
 
-            /*
-             * Otherwise, handle the raw keybinding directly to avoid
-             * issues where something like `Super+Shift+1` would trigger
-             * `Super+@` instead.
-             */
-            if (!handled) {
-                for (int i = 0; i < nsyms_raw; i++) {
-                    if (handle_keybinding(server, keycode, syms_raw[i], modifiers)) {
-                        handled = true;
-                        break;
-                    }
-                }
-            }
+    struct keybinding *matched_kb = NULL;
+    
+    // Check special/media keys
+    for (int i = 0; i < nsyms; i++) {
+        xkb_keysym_t sym = syms[i];
+        if ((sym >= XKB_KEY_XF86AudioLowerVolume && sym <= XKB_KEY_XF86AudioMute) ||
+            (sym >= XKB_KEY_F1 && sym <= XKB_KEY_F35)) {
+            matched_kb = handle_keybinding(server, keycode, sym, modifiers);
+            if (matched_kb) break;
         }
+    }
 
-	if (!handled) {
-		/* Otherwise, we pass it along to the client. */
-		wlr_seat_set_keyboard(seat, keyboard->wlr_keyboard);
-		wlr_seat_keyboard_notify_key(seat, event->time_msec,
-			event->keycode, event->state);
-	}
+    // Check raw keybindings
+    if (!matched_kb) {
+        for (int i = 0; i < nsyms_raw; i++) {
+            matched_kb = handle_keybinding(server, keycode, syms_raw[i], modifiers);
+            if (matched_kb) break;
+        }
+    }
+
+    if (matched_kb) {
+        if (matched_kb->config.repeat) {
+            server->current_repeat.kb = matched_kb;
+            server->current_repeat.keycode = keycode;
+            server->current_repeat.modifiers = modifiers;
+
+            // Start timer for the initial delay
+            wl_event_source_timer_update(server->kb_repeat_timer, server->repeat_delay);
+        }
+    } else {
+        /* Pass non-keybinding presses to client */
+        wlr_seat_set_keyboard(seat, keyboard->wlr_keyboard);
+        wlr_seat_keyboard_notify_key(seat, event->time_msec, event->keycode, event->state);
+    }
 
     wlr_idle_notifier_v1_notify_activity(server->idle_notifier, server->seat);
 }

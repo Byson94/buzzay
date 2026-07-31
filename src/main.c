@@ -143,6 +143,11 @@ static int start_compositor() {
     server.wl_display = wl_display_create();
     server.wl_event_loop = wl_display_get_event_loop(server.wl_display);
 
+    // Setup keybinding configs
+    server.repeat_delay = 600;
+    server.repeat_rate = 40;
+    server.kb_repeat_timer = wl_event_loop_add_timer(server.wl_event_loop, handle_kb_repeat_timer, &server);
+
     // abstraction of i/o
     server.backend = wlr_backend_autocreate(server.wl_event_loop, &server.session);
     if (server.backend == NULL) {
@@ -355,6 +360,7 @@ static int start_compositor() {
     unlink("/tmp/buzzay.sock");
 
     wl_display_destroy_clients(server.wl_display);
+    wl_event_source_remove(server.kb_repeat_timer);
 
     wl_list_remove(&server.new_xdg_toplevel.link);
     wl_list_remove(&server.new_xdg_popup.link);
