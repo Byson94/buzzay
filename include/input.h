@@ -4,6 +4,7 @@
 #include <wlr/backend.h>
 #include <wayland-client-core.h>
 #include <xkbcommon/xkbcommon.h>
+#include <uthash.h>
 
 struct buzzay_keyboard {
 	struct wl_list link;
@@ -35,9 +36,13 @@ struct keybinding {
     void *data;
 };
 
-extern struct keybinding *keybinding_arr;
-extern int keybinding_count;
-extern int keybinding_capacity;
+struct keybinding_entry {
+    uint64_t key;
+    struct keybinding kb;
+    UT_hash_handle hh;
+};
+
+extern struct keybinding_entry *keybindings_map;
 
 void apply_keyboard_config_to_device(struct wlr_keyboard *keyboard, const char *layout, const char *variant, const char *options);
 void register_keybinding(struct keybinding binding);

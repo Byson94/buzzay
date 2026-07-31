@@ -12,9 +12,7 @@
 #include "server.h"
 #include "input.h"
 
-struct keybinding *keybinding_arr = NULL;
-int keybinding_count = 0;
-int keybinding_capacity = 0;
+struct keybinding_entry *keybindings_map = NULL;
 
 void apply_keyboard_config_to_device(struct wlr_keyboard *keyboard, const char *layout, const char *variant, const char *options) {
     struct xkb_context *context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
@@ -41,27 +39,57 @@ void apply_keyboard_config_to_device(struct wlr_keyboard *keyboard, const char *
     xkb_context_unref(context);
 }
 
+static inline uint64_t make_binding_key(uint32_t modifiers, uint32_t key_or_sym, bool is_keycode) {
+    uint64_t type_bit = is_keycode ? (1ULL << 63) : 0ULL;
+    return type_bit | ((uint64_t)(modifiers & BZ_ALLOWED_MODS) << 32) | key_or_sym;
+}
+
+static struct keybinding *find_keybinding_entry(uint32_t modifiers, uint32_t key_or_sym, bool is_keycode) {
+    uint64_t lookup_key = make_binding_key(modifiers, key_or_sym, is_keycode);
+    struct keybinding_entry *entry = NULL;
+
+    HASH_FIND(hh, keybindings_map, &lookup_key, sizeof(uint64_t), entry);
+    return entry ? &entry->kb : NULL;
+}
+
 void register_keybinding(struct keybinding binding) {
-    // save the keybinding
-    if (keybinding_count >= keybinding_capacity) {
-        int new_capacity = (keybinding_capacity == 0) ? 1 : keybinding_capacity * 2;
-        struct keybinding *temp = realloc(keybinding_arr, new_capacity * sizeof(struct keybinding));
-        
-        if (temp == NULL) {
-            fprintf(stderr, "Failed to grow array\n");
-            return; 
-        }
-        
-        keybinding_arr = temp;
-        keybinding_capacity = new_capacity;
+    uint32_t key_or_sym;
+
+    if (binding.is_keycode) {
+        key_or_sym = binding.key.code;
+    } else {
+        key_or_sym = xkb_keysym_to_lower(binding.key.sym);
     }
 
-    keybinding_arr[keybinding_count] = binding;
-    keybinding_count++;
+    uint64_t lookup_key = make_binding_key(binding.modifiers, key_or_sym, binding.is_keycode);
+
+    struct keybinding_entry *existing = NULL;
+    HASH_FIND(hh, keybindings_map, &lookup_key, sizeof(uint64_t), existing);
+    if (existing) {
+        existing->kb = binding;
+        return;
+    }
+
+    struct keybinding_entry *entry = malloc(sizeof(*entry));
+    if (!entry) {
+        fprintf(stderr, "Failed to allocate memory for keybinding entry\n");
+        return;
+    }
+
+    entry->key = lookup_key;
+    entry->kb = binding;
+
+    HASH_ADD(hh, keybindings_map, key, sizeof(uint64_t), entry);
+    return;
 }
 
 void clear_all_keybinding() {
-    keybinding_count = 0;
+    struct keybinding_entry *current, *tmp;
+
+    HASH_ITER(hh, keybindings_map, current, tmp) {
+        HASH_DEL(keybindings_map, current);
+        free(current);
+    }
 }
 
 static void keyboard_handle_modifiers(struct wl_listener *listener, void *data) {
@@ -96,30 +124,17 @@ int handle_kb_repeat_timer(void *data) {
 }
 
 struct keybinding *handle_keybinding(struct buzzay_server *server, xkb_keycode_t keycode, xkb_keysym_t sym, uint32_t modifiers) {
-    uint32_t event_mods = modifiers & BZ_ALLOWED_MODS;
-    xkb_keysym_t lower_sym = xkb_keysym_to_lower(sym);
+    uint32_t clean_mods = modifiers & BZ_ALLOWED_MODS;
+    struct keybinding *kb = find_keybinding_entry(clean_mods, keycode, true);
 
-    for (int i = 0; i < keybinding_count; i++) {
-        struct keybinding *kb = &keybinding_arr[i];
+    if (!kb && sym != XKB_KEY_NoSymbol) {
+        xkb_keysym_t lower_sym = xkb_keysym_to_lower(sym);
+        kb = find_keybinding_entry(clean_mods, lower_sym, false);
+    }
 
-        uint32_t req_mods = kb->modifiers & BZ_ALLOWED_MODS;
-        if (event_mods != req_mods) {
-            continue;
-        }
-
-        bool match = false;
-        if (kb->is_keycode) {
-            match = (kb->key.code == keycode);
-        } else {
-            match = (xkb_keysym_to_lower(kb->key.sym) == lower_sym);
-        }
-
-        if (match) {
-            if (kb->handler) {
-                kb->handler(server, kb->data);
-                return kb; // Return pointer to matched keybinding
-            }
-        }
+    if (kb && kb->handler) {
+        kb->handler(server, kb->data);
+        return kb;
     }
 
     return NULL;
