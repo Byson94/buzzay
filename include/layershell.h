@@ -20,4 +20,4 @@ struct buzzay_layer_surface {
 
 void focus_layershell(struct buzzay_layer_surface *layershell);
 void server_new_layer_surface(struct wl_listener *listener, void *data);
-void layershell_do_allocations(struct wlr_layer_surface_v1 *layer_surface);
+void layershell_do_allocations(struct wlr_output *mon_output);

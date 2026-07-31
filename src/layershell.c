@@ -52,10 +52,9 @@ void focus_layershell(struct buzzay_layer_surface *layershell) {
 	}
 }
 
-void layershell_do_allocations(struct wlr_layer_surface_v1 *layer_surface) {
-    if (layer_surface == NULL) return;
+void layershell_do_allocations(struct wlr_output *mon_output) {
+    if (mon_output == NULL) return;
 
-    struct wlr_output *mon_output = layer_surface->output;
     struct buzzay_output *output = mon_output->data;
     uint32_t screen_width = mon_output->width;
     uint32_t screen_height = mon_output->height;
@@ -140,7 +139,7 @@ static void layershell_commit(struct wl_listener *listener, void *data) {
 
     if (layer_surface->initial_commit) focus_layershell(bz_layer_surface);
 
-    layershell_do_allocations(layer_surface);
+    layershell_do_allocations(layer_surface->output);
     arrange_workspaces(bz_layer_surface->server);
 }
 
@@ -175,7 +174,7 @@ static void layershell_destroy(struct wl_listener *listener, void *data) {
         if (wsp->focused_window) focus_toplevel(wsp->focused_window);
     }
 
-    layershell_do_allocations(bz_layer_surface->surface);
+    layershell_do_allocations(bz_layer_surface->surface->output);
     arrange_workspaces(bz_layer_surface->server);
 
     free(bz_layer_surface);

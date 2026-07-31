@@ -4,11 +4,13 @@
 #include <wayland-client.h>
 #include <wlr/types/wlr_output.h>
 #include <wlr/types/wlr_output_layout.h>
+#include <wlr/types/wlr_cursor.h>
 #include <scenefx/types/wlr_scene.h>
 
 #include "macro-utils.h"
 #include "server.h"
 #include "workspace.h"
+#include "layershell.h"
 #include "tiling.h"
 #include "output.h"
 #include "xdg.h"
@@ -18,6 +20,11 @@ void server_output_layout_changed(struct wl_listener *listener, void *data) {
 
     struct buzzay_server *server = wl_container_of(listener, server, output_layout_change);
     arrange_workspaces(server);
+
+    struct wlr_output *output = wlr_output_layout_output_at(
+        server->output_layout, server->cursor->x, server->cursor->y
+    );
+    layershell_do_allocations(output);
 }
 
 void apply_borders(struct buzzay_toplevel *toplevel, struct wlr_box box) {
