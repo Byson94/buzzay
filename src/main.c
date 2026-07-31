@@ -60,7 +60,7 @@ const char *program_name = "buzzay";
 const char *program_ver = "0.1.0";
 
 void print_help() {
-    printf("%s - An extensible wayland compositor.\n\n", program_name);
+    printf("%s - An extensible & aesthetic wayland compositor.\n\n", program_name);
     printf("Usage:\n");
     printf("  %s\n", program_name);
     printf("  %s plugin <subcommand>\n", program_name);
