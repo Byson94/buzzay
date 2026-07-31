@@ -6,8 +6,8 @@
 #include <wayland-client-core.h>
 #include <wlr/types/wlr_xdg_decoration_v1.h>
 
-#include "cursor.h"
-#include "xdg.h"
+enum buzzay_cursor_mode : unsigned int;
+enum window_active_evt : unsigned int;
 
 struct scene_layers {
     struct wlr_scene_tree *background;
@@ -89,6 +89,7 @@ struct buzzay_server {
 	struct buzzay_toplevel *grabbed_toplevel;
 	double grab_x, grab_y;
 	struct wlr_box grab_geobox;
+    const char *current_cursor_shape;
 	uint32_t resize_edges;
     uint32_t last_serial;
     bool cursor_recently_reset;

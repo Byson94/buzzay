@@ -3,8 +3,6 @@
 #include <wlr/backend.h>
 #include <wayland-client-core.h>
 
-#include "workspace.h"
-
 struct buzzay_toplevel {
 	struct wl_list link;
 	struct buzzay_server *server;
@@ -38,7 +36,7 @@ struct buzzay_decoration {
     struct wl_listener destroy;
 };
 
-enum window_active_evt {
+enum window_active_evt : unsigned int {
     WINDOW_ACTIVE_ON_HOVER,
     WINDOW_ACTIVE_ON_CLICK,
 };

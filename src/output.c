@@ -11,6 +11,7 @@
 #include "server.h"
 #include "cursor.h"
 #include "output.h"
+#include "xdg.h"
 
 static void output_configure_scene(struct wlr_scene_node *node,
 		struct buzzay_toplevel *toplevel) {

@@ -4,6 +4,7 @@
 #include <wayland-util.h>
 
 #include "workspace.h"
+#include "xdg.h"
 
 struct buzzay_workspace *get_workspace_at_index(struct wl_list *list, uint32_t index) {
     struct buzzay_workspace *workspace;

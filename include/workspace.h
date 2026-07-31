@@ -3,8 +3,7 @@
 #include <stdint.h>
 #include <wayland-client.h>
 #include <wayland-util.h>
-
-#include "xdg.h"
+#include <wlr/types/wlr_scene.h>
 
 enum node_split_type {
     SPLIT_NONE, // This contains actual window

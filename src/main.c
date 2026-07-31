@@ -279,7 +279,7 @@ static int start_compositor() {
         bool loaded = wlr_xcursor_manager_load(server.cursor_mgr, 1.0f);
         wlr_log(WLR_INFO, "Manager loaded: %s", loaded ? "YES" : "NO");
     }
-    wlr_cursor_set_xcursor(server.cursor, server.cursor_mgr, "default");
+    set_cursor_shape(&server, "default");
 
     // setup cursor shape protocol 
     server.cursor_shape_mgr = wlr_cursor_shape_manager_v1_create(server.wl_display, 2);

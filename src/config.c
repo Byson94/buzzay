@@ -332,8 +332,9 @@ static void spawn_command(const char *cmd) {
             // Orphan that little bastard.
             setsid();
 
-            if (freopen("/dev/null", "w", stdout) == NULL ||
-                freopen("/dev/null", "w", stderr) == NULL) {
+            if (freopen("/dev/null", "r", stdin) == NULL ||
+                    freopen("/dev/null", "w", stdout) == NULL ||
+                    freopen("/dev/null", "w", stderr) == NULL) {
                 _exit(1);
             }
 

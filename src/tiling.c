@@ -52,7 +52,6 @@ static void arrange_node_recursive(struct layout_node *node, struct wlr_box box,
 
     node->box = box;
     uint32_t gap = eyecandies->gap;
-    uint32_t bt = eyecandies->border_thickness;
 
     if (node->split_type == SPLIT_NONE) {
         struct buzzay_toplevel *toplevel = node->toplevel;

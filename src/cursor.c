@@ -119,7 +119,6 @@ static bool is_native_overlay(struct buzzay_server *server) {
     );
 
     if (overlay_node != NULL) {
-        printf("FOUND TARGET OVERLAY NODE!\n");
         return true;
     }
 
@@ -160,7 +159,7 @@ static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
 		/* If there's no toplevel and layersehll under the cursor, set the cursor image to a
 		 * default. This is what makes the cursor image appear when you move it
 		 * around the screen, not over any toplevels or layershell. */
-		wlr_cursor_set_xcursor(server->cursor, server->cursor_mgr, "default");
+        set_cursor_shape(server, "default");
 	}
 
     if (server->window_active_on == WINDOW_ACTIVE_ON_HOVER && !server->focused_layersehll) {
@@ -312,7 +311,7 @@ void seat_pointer_focus_change(struct wl_listener *listener, void *data) {
 	 * is NULL */
 	struct wlr_seat_pointer_focus_change_event *event = data;
 	if (event->new_surface == NULL) {
-		wlr_cursor_set_xcursor(server->cursor, server->cursor_mgr, "default");
+        set_cursor_shape(server, "default");
 	}
 }
 
@@ -347,6 +346,15 @@ void seat_request_cursor(struct wl_listener *listener, void *data) {
 }
 
 // Curosr shape protocol 
+void set_cursor_shape(struct buzzay_server *server, const char *shape) {
+    if (server->current_cursor_shape && strcmp(server->current_cursor_shape, shape) == 0) {
+        return;
+    }
+
+    wlr_cursor_set_xcursor(server->cursor, server->cursor_mgr, shape);
+    server->current_cursor_shape = shape;
+}
+
 void server_new_request_cursor_set_shape(struct wl_listener *listener, void *data) {
     struct buzzay_server *server = wl_container_of(listener, server, cursor_request_set_shape);
     struct wlr_cursor_shape_manager_v1_request_set_shape_event *shape_event = data;
@@ -354,6 +362,6 @@ void server_new_request_cursor_set_shape(struct wl_listener *listener, void *dat
 
     struct wlr_seat_client *focused_client  = server->seat->pointer_state.focused_client;
     if (focused_client == shape_event->seat_client) {
-        wlr_cursor_set_xcursor(server->cursor, server->cursor_mgr, shape_name);
+        set_cursor_shape(server, shape_name);
     }
 }

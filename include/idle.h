@@ -1,7 +1,6 @@
 #pragma once
 
 #include <wlr/backend.h>
-#include "server.h"
 
 struct buzzay_inhibitor {
     struct buzzay_server *server;

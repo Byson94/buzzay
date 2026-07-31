@@ -2,7 +2,10 @@
 
 #include <wlr/backend.h>
 
-enum buzzay_cursor_mode {
+// forward declaration
+struct buzzay_server;
+
+enum buzzay_cursor_mode : unsigned int {
 	BUZZAY_CURSOR_PASSTHROUGH,
 	BUZZAY_CURSOR_MOVE,
 	BUZZAY_CURSOR_RESIZE,
@@ -29,6 +32,7 @@ void seat_pointer_focus_change(struct wl_listener *listener, void *data);
 void seat_request_set_selection(struct wl_listener *listener, void *data);
 
 // Cursor Shape protocol
+void set_cursor_shape(struct buzzay_server *server, const char *shape);
 void server_new_request_cursor_set_shape(struct wl_listener *listener, void *data);
 
 

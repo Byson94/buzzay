@@ -1,6 +1,10 @@
 #pragma once
 
-#include "server.h"
+#include <wayland-server.h>
+#include <wlr/types/wlr_scene.h>
+
+struct buzzay_toplevel;
+struct buzzay_server;
 
 void server_output_layout_changed(struct wl_listener *listener, void *data);
 void apply_borders(struct buzzay_toplevel *toplevel, struct wlr_box box);
