@@ -168,19 +168,11 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
 	const xkb_keysym_t *syms;
 	int nsyms = xkb_state_key_get_syms(
 			keyboard->wlr_keyboard->xkb_state, keycode, &syms);
-    UNUSED(nsyms);
-
-    /* Get the raw keysyms */
-	const xkb_keysym_t *syms_raw;
-	int nsyms_raw = xkb_keymap_key_get_syms_by_level(
-			keyboard->wlr_keyboard->keymap, 
-            keycode, 
-            xkb_state_key_get_layout(keyboard->wlr_keyboard->xkb_state, keycode),
-            0,
-            &syms_raw);
 
     // get kb modifiers
     uint32_t modifiers = wlr_keyboard_get_modifiers(keyboard->wlr_keyboard);
+    xkb_mod_mask_t consumed_mods = xkb_state_key_get_consumed_mods(
+            keyboard->wlr_keyboard->xkb_state, keycode);
 
     // quickly handle tty switching
     if ((modifiers & WLR_MODIFIER_ALT) && 
@@ -201,19 +193,24 @@ static void keyboard_handle_key(struct wl_listener *listener, void *data) {
     server->current_repeat.keycode = 0;
 
     struct keybinding *matched_kb = NULL;
-    
-    // Check special/media keys
+
+    // Check keysyms with consumed modifiers stripped
+    uint32_t unconsumed_modifiers = modifiers & ~consumed_mods;
     for (int i = 0; i < nsyms; i++) {
-        xkb_keysym_t sym = syms[i];
-        if ((sym >= XKB_KEY_XF86AudioLowerVolume && sym <= XKB_KEY_XF86AudioMute) ||
-            (sym >= XKB_KEY_F1 && sym <= XKB_KEY_F35)) {
-            matched_kb = handle_keybinding(server, keycode, sym, modifiers);
-            if (matched_kb) break;
-        }
+        matched_kb = handle_keybinding(server, keycode, syms[i], unconsumed_modifiers);
+        if (matched_kb) break;
     }
 
     // Check raw keybindings
     if (!matched_kb) {
+        const xkb_keysym_t *syms_raw;
+        int nsyms_raw = xkb_keymap_key_get_syms_by_level(
+            keyboard->wlr_keyboard->keymap, 
+            keycode, 
+            xkb_state_key_get_layout(keyboard->wlr_keyboard->xkb_state, keycode),
+            0,
+            &syms_raw);
+
         for (int i = 0; i < nsyms_raw; i++) {
             matched_kb = handle_keybinding(server, keycode, syms_raw[i], modifiers);
             if (matched_kb) break;
