@@ -105,6 +105,27 @@ static void process_cursor_resize(struct buzzay_server *server) {
 	wlr_xdg_toplevel_set_size(toplevel->xdg_toplevel, new_width, new_height);
 }
 
+static bool is_native_overlay(struct buzzay_server *server) {
+    if (!server || !server->layers.native_overlay) {
+        return false;
+    }
+
+    double sx, sy;
+    struct wlr_scene_node *overlay_node = wlr_scene_node_at(
+        &server->layers.native_overlay->node, 
+        server->cursor->x, 
+        server->cursor->y, 
+        &sx, &sy
+    );
+
+    if (overlay_node != NULL) {
+        printf("FOUND TARGET OVERLAY NODE!\n");
+        return true;
+    }
+
+    return false;
+}
+
 static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
 	/* If the mode is non-passthrough, delegate to those functions. */
 	if (server->cursor_mode == BUZZAY_CURSOR_MOVE) {
@@ -156,6 +177,7 @@ static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
         }
     }
 
+    if (is_native_overlay(server)) return;
 	if (surface) {
 		/*
 		 * Send pointer enter and motion events.
@@ -168,7 +190,6 @@ static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
 		 * the surface has already has pointer focus or if the client is already
 		 * aware of the coordinates passed.
 		 */
-
 		wlr_seat_pointer_notify_enter(seat, surface, sx, sy);
 		wlr_seat_pointer_notify_motion(seat, time, sx, sy);
 	} else {

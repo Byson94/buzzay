@@ -34,7 +34,7 @@ static void output_configure_scene(struct wlr_scene_node *node,
 
 		struct wlr_scene_surface * scene_surface =
 			wlr_scene_surface_try_from_buffer(buffer);
-		if (!scene_surface && !scene_surface->surface) {
+		if (!scene_surface || !scene_surface->surface) {
 			return;
 		}
 

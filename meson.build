@@ -22,6 +22,9 @@ add_project_link_arguments([
 wlroots_dep = dependency('wlroots-0.20')
 wayland_server_dep = dependency('wayland-server')
 xkbcommon_dep = dependency('xkbcommon')
+pangocairo_dep = dependency('pangocairo')
+cairo_dep = dependency('cairo')
+
 scenefx_proj = subproject('scenefx')
 scene_fx_dep = scenefx_proj.get_variable('scenefx')
 tomlc17_proj = subproject('tomlc17')
@@ -59,6 +62,8 @@ executable(
         wlroots_dep,
         wayland_server_dep,
         xkbcommon_dep,
+        pangocairo_dep,
+        cairo_dep,
         scene_fx_dep,
         tomlc17_dep
     ],

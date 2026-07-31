@@ -39,6 +39,7 @@
 #include <scenefx/render/fx_renderer/fx_renderer.h>
 #include <scenefx/types/wlr_scene.h>
 
+#include "error.h"
 #include "handle-plugin.h"
 #include "layershell.h"
 #include "workspace.h"
@@ -190,7 +191,11 @@ static int start_compositor() {
     server.layers.workspace = wlr_scene_tree_create(&server.scene->tree);
     server.layers.top = wlr_scene_tree_create(&server.scene->tree);
     server.layers.overlay = wlr_scene_tree_create(&server.scene->tree);
+    server.layers.native_overlay = wlr_scene_tree_create(&server.scene->tree);
     server.scene_layout  = wlr_scene_attach_output_layout(server.scene, server.output_layout);
+
+    // pass server to error handler
+    save_buzzay_server(&server);
 
 	/* Set up xdg-shell version 7. The xdg-shell is a Wayland protocol which is
 	 * used for application windows. For more detail on shells, refer to

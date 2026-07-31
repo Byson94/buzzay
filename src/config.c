@@ -21,12 +21,23 @@
 #include "workspace.h"
 #include "xdg.h"
 #include "config.h"
+#include "error.h"
 
 #define MAX_COMMAND_ARGS 16
 #define CHECK_TOML_TYPE(datum, expected_type, name_str) \
     do { \
         if ((datum).type != (expected_type) && (datum).type != TOML_UNKNOWN) { \
-            fprintf(stderr, "Error: '%s' must be of type %s.\n", (name_str), toml_type_to_string(expected_type)); \
+            const char *type_str = toml_type_to_string(expected_type); \
+            int len = snprintf(NULL, 0, "Error: '%s' must be of type %s.\n", (name_str), type_str); \
+            if (len > 0) { \
+                char *msg = (char *)malloc((size_t)len + 1); \
+                if (msg != NULL) { \
+                    snprintf(msg, (size_t)len + 1, "Error: '%s' must be of type %s.\n", (name_str), type_str); \
+                    fputs(msg, stderr); \
+                    create_error_bar(500, msg); \
+                    free(msg); \
+                } \
+            } \
             return 1; \
         } \
     } while (0)
@@ -53,6 +64,12 @@ void cleanup_all_watchers() {
     watchers = NULL;
     watcher_count = 0;
     watcher_capacity = 0;
+}
+
+bool is_path_watched(const char *path) {
+    UNUSED(path);
+    // Implement check against active watchers array to prevent duplicate watchers
+    return false; 
 }
 
 static int handle_config_change(int fd, uint32_t mask, void *data) {
@@ -608,7 +625,33 @@ int handle_config(const char *path, struct buzzay_server *server) {
     }
 
     // First setup watcher
-    add_config_watcher(server, path);
+    if (!is_path_watched(path)) {
+        add_config_watcher(server, path);
+    }
+
+    // Handle keybindings (must be first as its very important)
+    toml_datum_t bindings = toml_seek(result.toptab, "bindings");
+    CHECK_TOML_TYPE(bindings, TOML_TABLE, "bindings");
+
+    for (int i = 0; i < bindings.u.tab.size; i++) {
+        const char *key = bindings.u.tab.key[i];
+        toml_datum_t val = bindings.u.tab.value[i];
+
+        if (val.type != TOML_ARRAY && val.type != TOML_TABLE) {
+        }
+
+        switch (val.type) {
+            case TOML_ARRAY:
+                handle_keybinding_arr(server, key, val);
+                break;
+            case TOML_TABLE:
+                handle_keybinding_table(server, key, val);
+                break;
+            default:
+                fprintf(stderr, "Error: Binding for '%s' must be an array of commands or a table.\n", key);
+                break;
+        }
+    }
 
     // Hanlde core
     toml_datum_t core_focuson = toml_seek(result.toptab, "core.focus-on");
@@ -811,30 +854,6 @@ int handle_config(const char *path, struct buzzay_server *server) {
         struct buzzay_keyboard *device;
         wl_list_for_each(device, &server->keyboards, link) {
             apply_keyboard_config_to_device(device->wlr_keyboard, layout, variant, options);
-        }
-    }
-
-    // Handle keybindings
-    toml_datum_t bindings = toml_seek(result.toptab, "bindings");
-    CHECK_TOML_TYPE(bindings, TOML_TABLE, "bindings");
-
-    for (int i = 0; i < bindings.u.tab.size; i++) {
-        const char *key = bindings.u.tab.key[i];
-        toml_datum_t val = bindings.u.tab.value[i];
-
-        if (val.type != TOML_ARRAY && val.type != TOML_TABLE) {
-        }
-
-        switch (val.type) {
-            case TOML_ARRAY:
-                handle_keybinding_arr(server, key, val);
-                break;
-            case TOML_TABLE:
-                handle_keybinding_table(server, key, val);
-                break;
-            default:
-                fprintf(stderr, "Error: Binding for '%s' must be an array of commands or a table.\n", key);
-                break;
         }
     }
 

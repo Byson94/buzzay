@@ -16,6 +16,9 @@ struct scene_layers {
     struct wlr_scene_tree *workspace;
     struct wlr_scene_tree *top;
     struct wlr_scene_tree *overlay;
+
+    // Overlay used to draw compositor popups
+    struct wlr_scene_tree *native_overlay;
 };
 
 struct buzzay_eyecandies {
