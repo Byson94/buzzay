@@ -35,6 +35,8 @@
 #include <wlr/types/wlr_single_pixel_buffer_v1.h>
 #include <wlr/types/wlr_fractional_scale_v1.h>
 #include <wlr/types/wlr_export_dmabuf_v1.h>
+#include <wlr/types/wlr_presentation_time.h>
+#include <wlr/types/wlr_linux_drm_syncobj_v1.h>
 #include <wlr/render/allocator.h>
 #include <scenefx/render/fx_renderer/fx_renderer.h>
 #include <scenefx/types/wlr_scene.h>
@@ -257,6 +259,12 @@ static int start_compositor() {
     wlr_single_pixel_buffer_manager_v1_create(server.wl_display);
     wlr_fractional_scale_manager_v1_create(server.wl_display, 1);
     wlr_export_dmabuf_manager_v1_create(server.wl_display);
+    wlr_presentation_create(server.wl_display, server.backend, 2);
+
+    int drm_fd = wlr_renderer_get_drm_fd(server.renderer);
+    if (drm_fd >= 0) {
+        wlr_linux_drm_syncobj_manager_v1_create(server.wl_display, 1, drm_fd);
+    }
 
     // create a cursor (the image)
     server.cursor = wlr_cursor_create();
