@@ -45,16 +45,27 @@ static void arrange_node_recursive(struct layout_node *node, struct wlr_box box,
 
     node->box = box;
     uint32_t gap = eyecandies->gap;
-    uint32_t border_thickness = eyecandies->border_thickness;
 
     if (node->split_type == SPLIT_NONE) {
-        if (node->toplevel && node->toplevel->xdg_toplevel) {
-            wlr_scene_node_set_enabled(&node->toplevel->scene_tree->node, true);
+        struct buzzay_toplevel *toplevel = node->toplevel;
+        if (toplevel && toplevel->xdg_toplevel) {
+            if (!toplevel->scene_tree->node.enabled)
+                wlr_scene_node_set_enabled(&toplevel->scene_tree->node, true);
 
-            wlr_scene_blur_set_size(node->toplevel->blur, box.width, box.height);
-            wlr_xdg_toplevel_set_size(node->toplevel->xdg_toplevel, box.width, box.height);
-            wlr_scene_node_set_position(&node->toplevel->scene_tree->node, box.x, box.y);
-            apply_borders(node->toplevel, box);
+            if (toplevel->scene_tree->node.x != box.x || 
+                    toplevel->scene_tree->node.y != box.y) {
+                wlr_scene_node_set_position(&toplevel->scene_tree->node, box.x, box.y);
+            }
+
+            if (toplevel->blur->height != box.height ||
+                    toplevel->blur->width != box.width) {
+                wlr_scene_blur_set_size(toplevel->blur, box.width, box.height);
+            }
+            if (toplevel->xdg_toplevel->current.width != box.width ||
+                    toplevel->xdg_toplevel->current.height != box.height) {
+                wlr_xdg_toplevel_set_size(toplevel->xdg_toplevel, box.width, box.height);
+                apply_borders(toplevel, box);
+            }
         }
         return;
     }
@@ -64,19 +75,22 @@ static void arrange_node_recursive(struct layout_node *node, struct wlr_box box,
     struct wlr_box box1 = box;
     struct wlr_box box2 = box;
 
-    float ratio = (node->split_ratio > 0.0f) ? node->split_ratio : 0.5f;
+    float ratio = node->split_ratio;
+    if (ratio <= 0.0f || ratio >= 1.0f) {
+        ratio = 0.5f;
+    }
 
     if (node->split_type == SPLIT_HORIZ) {
         // Horizontal split (Left / Right)
         int total_width = box.width - gap;
         box1.width = (int)(total_width * ratio);
-        box2.x = box.x + box1.width + gap + border_thickness;
+        box2.x = box.x + box1.width + gap;
         box2.width = box.width - box1.width - gap;
     } else if (node->split_type == SPLIT_VERT) {
         // Vertical split (Top / Bottom)
         int total_height = box.height - gap;
         box1.height = (int)(total_height * ratio);
-        box2.y = box.y + box1.height + gap + border_thickness;
+        box2.y = box.y + box1.height + gap;
         box2.height = box.height - box1.height - gap;
     }
 
@@ -85,6 +99,9 @@ static void arrange_node_recursive(struct layout_node *node, struct wlr_box box,
 }
 
 void arrange_workspaces_tiling(struct buzzay_server *server) {
+    struct buzzay_workspace *wp = get_workspace_at_index(&server->workspaces, server->current_workspace);
+    if (!wp) return;
+
     struct buzzay_output *output;
     wl_list_for_each(output, &server->outputs, link) {
         struct wlr_box output_box;
@@ -96,9 +113,6 @@ void arrange_workspaces_tiling(struct buzzay_server *server) {
         if (output->usable_area.height > 0) {
             output_box.height = output->usable_area.height;
         }
-
-        struct buzzay_workspace *wp = get_workspace_at_index(&server->workspaces, server->current_workspace);
-        if (!wp) continue;
 
         int gap = server->eyecandies.gap;
         struct wlr_box padded_box = {
@@ -113,6 +127,9 @@ void arrange_workspaces_tiling(struct buzzay_server *server) {
 }
 
 void arrange_workspaces_monocle(struct buzzay_server *server) {
+    struct buzzay_workspace *wp = get_workspace_at_index(&server->workspaces, server->current_workspace);
+    if (!wp) return;
+
     struct buzzay_output *output;
     wl_list_for_each(output, &server->outputs, link) {
         struct wlr_box output_box;
@@ -124,10 +141,7 @@ void arrange_workspaces_monocle(struct buzzay_server *server) {
         if (output->usable_area.height > 0) {
             output_box.height = output->usable_area.height;
         }
-        
-        struct buzzay_workspace *wp = get_workspace_at_index(&server->workspaces, server->current_workspace);
-        if (!wp) continue;
-
+    
         if (wp->focused_window != NULL) {
             if (wp->focused_window->xdg_toplevel != NULL && 
                 wp->focused_window->xdg_toplevel->base->surface->mapped &&
@@ -141,12 +155,15 @@ void arrange_workspaces_monocle(struct buzzay_server *server) {
                     .height = output_box.height - (gap * 2)
                 };
 
-                wlr_scene_node_set_enabled(&wp->focused_window->scene_tree->node, true);
-
-                wlr_scene_blur_set_size(wp->focused_window->blur, padded_box.width, padded_box.height);
-                wlr_xdg_toplevel_set_size(wp->focused_window->xdg_toplevel, padded_box.width, padded_box.height);
                 wlr_scene_node_set_position(&wp->focused_window->scene_tree->node, padded_box.x, padded_box.y);
 
+                if (wp->focused_window->xdg_toplevel->current.width != padded_box.width ||
+                    wp->focused_window->xdg_toplevel->current.height != padded_box.height) {
+                    wlr_xdg_toplevel_set_size(wp->focused_window->xdg_toplevel, padded_box.width, padded_box.height);
+                    wlr_scene_blur_set_size(wp->focused_window->blur, padded_box.width, padded_box.height);
+                }
+
+                wlr_scene_node_set_enabled(&wp->focused_window->scene_tree->node, true);
                 apply_borders(wp->focused_window, padded_box);
             }
         }
