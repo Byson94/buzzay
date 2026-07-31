@@ -137,10 +137,17 @@ static void layershell_commit(struct wl_listener *listener, void *data) {
         }
     }
 
+    bool state_changed = layer_surface->initial_commit || 
+                         layer_surface->current.committed & WLR_LAYER_SURFACE_V1_STATE_EXCLUSIVE_ZONE ||
+                         layer_surface->current.committed & WLR_LAYER_SURFACE_V1_STATE_ANCHOR ||
+                         layer_surface->current.committed & WLR_LAYER_SURFACE_V1_STATE_DESIRED_SIZE;
+
     if (layer_surface->initial_commit) focus_layershell(bz_layer_surface);
 
-    layershell_do_allocations(layer_surface->output);
-    arrange_workspaces(bz_layer_surface->server);
+    if (state_changed) {
+        layershell_do_allocations(layer_surface->output);
+        arrange_workspaces(bz_layer_surface->server);
+    }
 }
 
 static void layershell_unmap(struct wl_listener *listener, void *data) {
