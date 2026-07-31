@@ -41,6 +41,26 @@ Prefer client side decorations.
 prefer-csd = true
 ```
 
+## repeat-rate
+
+The rate in which key should repeat. Default is `40`.
+
+**Example:**
+
+```toml
+[core]
+repeat-rate = 40
+```
+
+## repeat-delay
+
+Delay in which key should repeat. Default is `600`.
+
+```toml
+[core]
+repeat-delay = 600
+```
+
 ## spawn
 
 The shell commands to run on startup. This option takes an array of strings that are executed when compositor loads.
