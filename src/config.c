@@ -18,6 +18,7 @@
 #include "output.h"
 #include "server.h"
 #include "tiling.h"
+#include "wlr/types/wlr_xdg_decoration_v1.h"
 #include "workspace.h"
 #include "xdg.h"
 #include "config.h"
@@ -449,6 +450,7 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
          * then focus it. If not, then find the first toplevel of that workspace 
          * and focus it.
          */
+        wlr_seat_keyboard_notify_clear_focus(server->seat);
         if (new_workspace->focused_window) {
             focus_toplevel(new_workspace->focused_window);
         } else if (!wl_list_empty(&new_workspace->toplevels)) {
