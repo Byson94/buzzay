@@ -1,3 +1,4 @@
+#include <iso646.h>
 #include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -676,6 +677,8 @@ int handle_config(const char *path, struct buzzay_server *server) {
     toml_datum_t core_prefer_csd = toml_seek(result.toptab, "core.prever-csd");
     toml_datum_t core_spawn = toml_seek(result.toptab, "core.spawn");
     toml_datum_t core_include = toml_seek(result.toptab, "core.include");
+    toml_datum_t core_repeat_rate = toml_seek(result.toptab, "core.repeat-rate");
+    toml_datum_t core_repeat_delay = toml_seek(result.toptab, "core.repeat-delay");
 
     CHECK_TOML_TYPE(core_focuson, TOML_STRING, "core.focus-on");
     CHECK_TOML_TYPE(core_xdg_interactive, TOML_BOOLEAN, "core.xdg-interactive");
@@ -683,6 +686,8 @@ int handle_config(const char *path, struct buzzay_server *server) {
     CHECK_TOML_TYPE(core_prefer_csd, TOML_BOOLEAN, "core.prefer-csd");
     CHECK_TOML_TYPE(core_spawn, TOML_ARRAY, "core.spawn");
     CHECK_TOML_TYPE(core_include, TOML_ARRAY, "core.include");
+    CHECK_TOML_TYPE(core_repeat_rate, TOML_INT64, "core.repeat_rate");
+    CHECK_TOML_TYPE(core_repeat_delay, TOML_INT64, "core.repeat_delay");
 
     if (not_unknown(core_xdg_interactive)) 
         server->enable_xdg_interactive = core_xdg_interactive.u.boolean;
@@ -732,6 +737,12 @@ int handle_config(const char *path, struct buzzay_server *server) {
             handle_config(item.u.s, server);
         }
     }
+
+    if (not_unknown(core_repeat_rate)) 
+        server->repeat_rate = core_repeat_rate.u.int64;
+
+    if (not_unknown(core_repeat_delay))
+        server->repeat_delay = core_repeat_delay.u.int64;
 
     // Apply monitors
     toml_datum_t monitors = toml_seek(result.toptab, "monitor");
