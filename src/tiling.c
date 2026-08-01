@@ -50,6 +50,10 @@ void apply_borders(struct buzzay_toplevel *toplevel, struct wlr_box box) {
 static void arrange_node_recursive(struct layout_node *node, struct wlr_box box, struct buzzay_eyecandies *eyecandies) {
     if (!node) return;
 
+    if (box.width <= 0 || box.height <= 0) {
+        return;
+    }
+
     node->box = box;
     uint32_t gap = eyecandies->gap;
 

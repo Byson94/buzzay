@@ -442,7 +442,6 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
         }
 
         struct buzzay_workspace *this_workspace = get_workspace_at_index(&server->workspaces, server->current_workspace);
-        this_workspace->focused_window = NULL;
         server->current_workspace = new_idx;
         
         struct buzzay_toplevel *this_toplevel;
@@ -459,6 +458,8 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
          * and focus it.
          */
         wlr_seat_keyboard_notify_clear_focus(server->seat);
+        wlr_seat_pointer_notify_clear_focus(server->seat);
+
         if (new_workspace->focused_window) {
             focus_toplevel(new_workspace->focused_window);
         } else if (!wl_list_empty(&new_workspace->toplevels)) {
