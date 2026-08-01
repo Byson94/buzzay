@@ -18,4 +18,3 @@ struct buzzay_output {
 void server_new_output(struct wl_listener *listener, void *data);
 void output_apply_transform(struct wlr_output_state *state, const char *transform);
 void output_apply_mode(struct wlr_output *wlr_output, struct wlr_output_state *state, const char *mode_str);
-

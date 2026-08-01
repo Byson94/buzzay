@@ -169,6 +169,7 @@ static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
             server->cursor->x,
             server->cursor->y
         );
+        set_cursor_shape(server, "grabbing");
     }
 
 	if (!toplevel && !layershell) {

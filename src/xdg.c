@@ -11,6 +11,7 @@
 #include <scenefx/types/wlr_scene.h>
 
 #include "macro-utils.h"
+#include "output.h"
 #include "workspace.h"
 #include "server.h"
 #include "tiling.h"
@@ -87,12 +88,7 @@ static void xdg_toplevel_map(struct wl_listener *listener, void *data) {
     wlr_scene_node_lower_to_bottom(&toplevel->border_rect->node);
 
     struct wlr_box *geometry = &toplevel->xdg_toplevel->base->geometry;
-    uint32_t border_thickness = toplevel->server->eyecandies.border_thickness;
-	wlr_scene_rect_set_clipped_region(toplevel->border_rect, (struct clipped_region) {
-        .corners = corner_radii_all(toplevel->server->eyecandies.corner_radius),
-        .area = { border_thickness, border_thickness, geometry->width, geometry->height }
-	});
-    wlr_scene_rect_set_corner_radius(toplevel->border_rect, toplevel->server->eyecandies.corner_radius);
+    update_border_corners_of_toplevel(toplevel, geometry);
 
     // setup blur
     toplevel->blur = wlr_scene_blur_create(toplevel->scene_tree, 0, 0);
@@ -422,3 +418,11 @@ void server_new_toplevel_decoration(struct wl_listener *listener, void *data) {
     wl_signal_add(&xdg_decoration->toplevel->base->surface->events.map, &ctx->map);
     wl_signal_add(&xdg_decoration->events.destroy, &ctx->destroy);
 }
+
+void update_border_corners_of_toplevel(struct buzzay_toplevel *toplevel, struct wlr_box *geometry) {
+    if (!geometry || !toplevel) return;
+
+    apply_borders(toplevel, *geometry);
+    wlr_scene_rect_set_corner_radius(toplevel->border_rect, toplevel->server->eyecandies.corner_radius);
+}
+

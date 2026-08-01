@@ -818,13 +818,21 @@ int handle_config(const char *path, struct buzzay_server *server) {
     // Handle eyecandy
     toml_datum_t candy_gap = toml_seek(result.toptab, "candy.gap");
     toml_datum_t candy_opacity = toml_seek(result.toptab, "candy.opacity");
-    CHECK_TOML_TYPE(candy_gap, TOML_INT64, "gap");
-    CHECK_TOML_TYPE(candy_opacity, TOML_FP64, "opacity");
+    toml_datum_t candy_corner_radius = toml_seek(result.toptab, "candy.corner-radius");
+    CHECK_TOML_TYPE(candy_gap, TOML_INT64, "candy.gap");
+    CHECK_TOML_TYPE(candy_opacity, TOML_FP64, "candy.opacity");
+    CHECK_TOML_TYPE(candy_corner_radius, TOML_INT64, "candy.corner-radius");
 
-    if (not_unknown(candy_gap)) {
+    if (not_unknown(candy_gap))
         server->eyecandies.gap = candy_gap.u.int64;
+
+    if (not_unknown(candy_opacity)) 
+        server->eyecandies.window_opacity = candy_opacity.u.fp64;
+
+    if (not_unknown(candy_corner_radius)) {
+        server->eyecandies.corner_radius = candy_corner_radius.u.int64;
+        update_border_corners(server);
     }
-    if (not_unknown(candy_opacity)) server->eyecandies.window_opacity = candy_opacity.u.fp64;
 
     // Handle border
     toml_datum_t active_clr = toml_seek(result.toptab, "candy.border.active");
@@ -844,6 +852,7 @@ int handle_config(const char *path, struct buzzay_server *server) {
     }
     if (not_unknown(bdr_thickness)) {
         server->eyecandies.border_thickness = bdr_thickness.u.int64;
+        update_border_corners(server);
     }
 
     // Handle blur

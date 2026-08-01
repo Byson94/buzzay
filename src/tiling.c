@@ -34,17 +34,23 @@ void apply_borders(struct buzzay_toplevel *toplevel, struct wlr_box box) {
         .area = { border_thickness, border_thickness, box.width, box.height }
     });
 
-    wlr_scene_rect_set_size(
-        toplevel->border_rect, 
-        box.width + (border_thickness * 2), 
-        box.height + (border_thickness * 2)
-    );
+    int final_width = box.width + (border_thickness * 2);
+    int final_height = box.height + (border_thickness * 2);
 
-    wlr_scene_node_set_position(
-        &toplevel->border_rect->node, 
-        -border_thickness, 
-        -border_thickness
-    );
+    if (toplevel->border_rect->width != final_width ||
+            toplevel->border_rect->height != final_height) {
+        wlr_scene_rect_set_size(
+            toplevel->border_rect, 
+            final_width,
+            final_height
+        );
+
+        wlr_scene_node_set_position(
+            &toplevel->border_rect->node, 
+            -border_thickness, 
+            -border_thickness
+        );
+    }
 }
 
 static void arrange_node_recursive(struct layout_node *node, struct wlr_box box, struct buzzay_eyecandies *eyecandies) {
@@ -270,10 +276,37 @@ void update_border_colors(struct buzzay_server *server) {
             }
 
             if (toplevel == wp->focused_window) {
-                wlr_scene_rect_set_color(toplevel->border_rect, server->eyecandies.active_border);
+                if (toplevel->border_rect->color != server->eyecandies.active_border) 
+                    wlr_scene_rect_set_color(toplevel->border_rect, server->eyecandies.active_border);
             } else {
-                wlr_scene_rect_set_color(toplevel->border_rect, server->eyecandies.inactive_border);
+                if (toplevel->border_rect->color != server->eyecandies.inactive_border)
+                    wlr_scene_rect_set_color(toplevel->border_rect, server->eyecandies.inactive_border);
             }
         }
     }
 }
+
+void update_border_corners(struct buzzay_server *server) {
+    struct buzzay_output *output;
+    wl_list_for_each(output, &server->outputs, link) {
+        struct wlr_box output_box;
+        wlr_output_layout_get_box(server->output_layout, output->wlr_output, &output_box);
+        
+        struct buzzay_workspace *wp = get_workspace_at_index(&server->workspaces, server->current_workspace);
+        if (!wp) continue;
+
+        struct buzzay_toplevel *toplevel;
+        wl_list_for_each(toplevel, &wp->toplevels, link) {
+            if (!toplevel ||
+                !toplevel->xdg_toplevel || 
+                !toplevel->xdg_toplevel->base->surface->mapped ||
+                !toplevel->xdg_toplevel->base->initialized) {
+                continue; 
+            }
+
+            struct wlr_box *geometry = &toplevel->xdg_toplevel->base->geometry;
+            update_border_corners_of_toplevel(toplevel, geometry);
+        }
+    }
+}
+

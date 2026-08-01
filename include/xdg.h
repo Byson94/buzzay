@@ -49,3 +49,4 @@ void server_new_xdg_popup(struct wl_listener *listener, void *data);
 void server_new_toplevel_decoration(struct wl_listener *listener, void *data);
 void scene_set_blur_confs(struct buzzay_server *server);
 void toplevel_apply_blur_confs(struct buzzay_toplevel *toplevel);
+void update_border_corners_of_toplevel(struct buzzay_toplevel *toplevel, struct wlr_box *geometry);
