@@ -56,37 +56,6 @@
 #include "xdg.h"
 #include "ipc.h"
 
-const char *program_name = "buzzay";
-const char *program_ver = "0.1.0";
-
-void print_help() {
-    printf("%s - An extensible & aesthetic wayland compositor.\n\n", program_name);
-    printf("Usage:\n");
-    printf("  %s\n", program_name);
-    printf("  %s plugin <subcommand>\n", program_name);
-    printf("  %s ipc <subcommand>\n", program_name);
-    printf("  %s -h, --help\n", program_name);
-    printf("  %s -v, --version\n\n", program_name);
-    printf("Commands:\n");
-    printf("  plugin   Plugin related commands\n");
-    printf("  ipc      Ipc related commands\n");
-    printf("Options:\n");
-    printf("  -h, --help     Show this help message and exit\n");
-    printf("  -v, --version  Print the program version\n\n");
-    printf("Tip: Run '<command> --help' to get help for each command.\n");
-}
-
-void print_help_plugin() {
-    printf("Usage:\n");
-    printf("  %s plugin load <plugin_name>\n", program_name);
-    printf("  %s plugin msg <plugin_name> <messages...>\n\n", program_name);
-    printf("Commands:\n");
-    printf("  plugin load    Load a plugin\n");
-    printf("  plugin msg     Send a message to a plugin\n\n");
-    printf("Additional Info: Messages can be send to a plugin in the '<plugin_name> <arg1> <arg2> ...' format.\n");
-    printf("Example: '%s plugin msg myplugin perform greeting'\n", program_name);
-}
-
 static int start_compositor() {
     // setup compositor
     wlr_log_init(WLR_INFO, NULL);
@@ -415,8 +384,50 @@ static int start_compositor() {
     return 0;
 }
 
+const char *program_name = "buzzay";
+const char *program_ver = "0.1.0";
+
+void print_help() {
+    printf("%s - An extensible & aesthetic wayland compositor.\n\n", program_name);
+    printf("Usage:\n");
+    printf("  %s\n", program_name);
+    printf("  %s plugin <subcommand>\n", program_name);
+    printf("  %s ipc <subcommand>\n", program_name);
+    printf("  %s -h, --help\n", program_name);
+    printf("  %s -v, --version\n\n", program_name);
+    printf("Commands:\n");
+    printf("  plugin   Plugin related commands\n");
+    printf("  ipc      Ipc related commands\n");
+    printf("Options:\n");
+    printf("  -c, --config   Configuration file to load during startup\n");
+    printf("  -h, --help     Show this help message and exit\n");
+    printf("  -v, --version  Print the program version\n\n");
+    printf("Tip: Run '<command> --help' to get help for each command.\n");
+}
+
+void print_help_plugin() {
+    printf("Usage:\n");
+    printf("  %s plugin load <plugin_name>\n", program_name);
+    printf("  %s plugin msg <plugin_name> <messages...>\n\n", program_name);
+    printf("Commands:\n");
+    printf("  plugin load    Load a plugin\n");
+    printf("  plugin msg     Send a message to a plugin\n\n");
+    printf("Additional Info: Messages can be send to a plugin in the '<plugin_name> <arg1> <arg2> ...' format.\n");
+    printf("Example: '%s plugin msg myplugin perform greeting'\n", program_name);
+}
+
 int main(int argc, char** argv) {
     if (argc < 2) {
+        return start_compositor();
+    }
+
+    if (strcmp(argv[1], "-c") == 0 || strcmp(argv[1], "--config") == 0) {
+        if (argc < 3) {
+            fprintf(stderr, "Error: '%s' requires a path to the config to load.\n", argv[1]);
+            return 1;
+        }
+
+        setenv("BUZZAY_CONF", argv[2], true);
         return start_compositor();
     }
 
