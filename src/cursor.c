@@ -8,6 +8,7 @@
 #include <scenefx/types/wlr_scene.h>
 #include <wlr/types/wlr_data_device.h>
 #include <wlr/types/wlr_cursor_shape_v1.h>
+#include <wlr/types/wlr_primary_selection.h>
 #include <wlr/types/wlr_idle_notify_v1.h>
 
 #include "macro-utils.h"
@@ -355,6 +356,12 @@ void server_handle_request_start_drag(struct wl_listener *listener, void *data) 
     } else {
         wlr_data_source_destroy(event->drag->source);
     }
+}
+
+void seat_set_primary_selection(struct wl_listener *listener, void *data) {
+    struct buzzay_server *server = wl_container_of(listener, server, set_primary_selection);
+    struct wlr_seat_request_set_primary_selection_event *event = data;
+    wlr_seat_set_primary_selection(server->seat, event->source, event->serial);
 }
 
 // Curosr shape protocol 

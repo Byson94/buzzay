@@ -37,6 +37,7 @@
 #include <wlr/types/wlr_export_dmabuf_v1.h>
 #include <wlr/types/wlr_presentation_time.h>
 #include <wlr/types/wlr_linux_drm_syncobj_v1.h>
+#include <wlr/types/wlr_primary_selection_v1.h>
 #include <wlr/render/allocator.h>
 #include <scenefx/render/fx_renderer/fx_renderer.h>
 #include <scenefx/types/wlr_scene.h>
@@ -281,6 +282,11 @@ static int start_compositor() {
 	server.request_set_selection.notify = seat_request_set_selection;
 	wl_signal_add(&server.seat->events.request_set_selection,
 			&server.request_set_selection);
+
+    // setup primary selection v1 for middle click to paste feature
+    server.primary_selection_mgr = wlr_primary_selection_v1_device_manager_create(server.wl_display);
+    server.set_primary_selection.notify = seat_set_primary_selection;
+    wl_signal_add(&server.seat->events.request_set_primary_selection, &server.set_primary_selection);
 
     // Create data device for handling text/uri dragging
     server.data_device_mgr = wlr_data_device_manager_create(server.wl_display);

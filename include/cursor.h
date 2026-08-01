@@ -32,6 +32,7 @@ void server_handle_request_start_drag(struct wl_listener *listener, void *data);
 void seat_request_cursor(struct wl_listener *listener, void *data);
 void seat_pointer_focus_change(struct wl_listener *listener, void *data);
 void seat_request_set_selection(struct wl_listener *listener, void *data);
+void seat_set_primary_selection(struct wl_listener *listener, void *data);
 
 // Cursor Shape protocol
 void set_cursor_shape_forced(struct buzzay_server *server, const char *shape);

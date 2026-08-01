@@ -114,6 +114,9 @@ struct buzzay_server {
     struct wlr_idle_notifier_v1 *idle_notifier;
     int idle_inhibit_count;
 
+    struct wlr_primary_selection_v1_device_manager *primary_selection_mgr;
+    struct wl_listener set_primary_selection;
+
     struct wl_event_source *kb_repeat_timer;
     struct active_keyrepeat current_repeat;
     int32_t repeat_delay;
