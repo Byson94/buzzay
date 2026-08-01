@@ -310,7 +310,7 @@ static int parse_keybinding_string(
     return 0;
 }
 
-static void spawn_command(const char *cmd) {
+void spawn_command(const char *cmd) {
     pid_t pid = fork();
     if (pid < 0) {
         perror("fork failed");

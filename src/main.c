@@ -359,6 +359,12 @@ static int start_compositor() {
 
     setenv("XCURSOR_SIZE", cur_size, true);
 
+    // setup xwayland-satellite if it exists
+    if (access("/usr/bin/xwayland-satellite", F_OK | X_OK) == 0) {
+        spawn_command("/usr/bin/xwayland-satellite :0");
+        setenv("DISPLAY", ":0", true);
+    }
+
     // Parse config and setup watcher
     handle_config(conf_file_path, &server);
     server.server_first_load = false;
