@@ -126,6 +126,9 @@ static bool is_native_overlay(struct buzzay_server *server) {
 }
 
 static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
+    // Notify activity first.
+    wlr_idle_notifier_v1_notify_activity(server->idle_notifier, server->seat);
+
 	/* If the mode is non-passthrough, delegate to those functions. */
 	if (server->cursor_mode == BUZZAY_CURSOR_MOVE) {
 		process_cursor_move(server);
@@ -198,8 +201,6 @@ static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
 		wlr_seat_pointer_clear_focus(seat);
         wlr_seat_keyboard_clear_focus(seat);
 	}
-
-    wlr_idle_notifier_v1_notify_activity(server->idle_notifier, server->seat);
 }
 
 void server_cursor_motion(struct wl_listener *listener, void *data) {
@@ -345,14 +346,33 @@ void seat_request_cursor(struct wl_listener *listener, void *data) {
 	}
 }
 
+void server_handle_request_start_drag(struct wl_listener *listener, void *data) {
+    struct buzzay_server *server = wl_container_of(listener, server, request_start_drag);
+    struct wlr_seat_request_start_drag_event *event = data;
+
+    if (wlr_seat_validate_pointer_grab_serial(server->seat, event->origin, event->serial)) {
+        wlr_seat_start_drag(server->seat, event->drag, event->serial);
+    } else {
+        wlr_data_source_destroy(event->drag->source);
+    }
+}
+
 // Curosr shape protocol 
+void set_cursor_shape_forced(struct buzzay_server *server, const char *shape) {
+    wlr_cursor_set_xcursor(server->cursor, server->cursor_mgr, shape);
+    server->current_cursor_shape = shape;
+}
+
 void set_cursor_shape(struct buzzay_server *server, const char *shape) {
+    /*
+     * Unlike the 'forced' variant, this function only
+     * sets the cursor if the current cursor does not
+     * match the to-be-set cursor.
+     */
     if (server->current_cursor_shape && strcmp(server->current_cursor_shape, shape) == 0) {
         return;
     }
-
-    wlr_cursor_set_xcursor(server->cursor, server->cursor_mgr, shape);
-    server->current_cursor_shape = shape;
+    set_cursor_shape_forced(server, shape);
 }
 
 void server_new_request_cursor_set_shape(struct wl_listener *listener, void *data) {
@@ -362,6 +382,13 @@ void server_new_request_cursor_set_shape(struct wl_listener *listener, void *dat
 
     struct wlr_seat_client *focused_client  = server->seat->pointer_state.focused_client;
     if (focused_client == shape_event->seat_client) {
-        set_cursor_shape(server, shape_name);
+        /*
+         * Valid place to forcefully set cursor shape 
+         * as clients wont request it that often in terms
+         * of every cursor motion. Moreover, doing this forcefully
+         * is necessary to break the cursor out of hiding, which 
+         * it can get into by being idle.
+         */
+        set_cursor_shape_forced(server, shape_name);
     }
 }

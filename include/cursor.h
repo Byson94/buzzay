@@ -1,5 +1,6 @@
 #pragma once
 
+#include <wayland-server-core.h>
 #include <wlr/backend.h>
 
 // forward declaration
@@ -26,12 +27,14 @@ void server_cursor_motion_absolute(struct wl_listener *listener, void *data);
 void server_cursor_button(struct wl_listener *listener, void *data);
 void server_cursor_axis(struct wl_listener *listener, void *data);
 void server_cursor_frame(struct wl_listener *listener, void *data);
+void server_handle_request_start_drag(struct wl_listener *listener, void *data);
 
 void seat_request_cursor(struct wl_listener *listener, void *data);
 void seat_pointer_focus_change(struct wl_listener *listener, void *data);
 void seat_request_set_selection(struct wl_listener *listener, void *data);
 
 // Cursor Shape protocol
+void set_cursor_shape_forced(struct buzzay_server *server, const char *shape);
 void set_cursor_shape(struct buzzay_server *server, const char *shape);
 void server_new_request_cursor_set_shape(struct wl_listener *listener, void *data);
 

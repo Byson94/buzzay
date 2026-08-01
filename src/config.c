@@ -442,6 +442,7 @@ static void keybinding_handler(struct buzzay_server *server, void *data) {
         }
 
         struct buzzay_workspace *this_workspace = get_workspace_at_index(&server->workspaces, server->current_workspace);
+        this_workspace->focused_window = NULL;
         server->current_workspace = new_idx;
         
         struct buzzay_toplevel *this_toplevel;

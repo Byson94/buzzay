@@ -95,6 +95,9 @@ struct buzzay_server {
     bool cursor_recently_reset;
     struct buzzay_layer_surface *focused_layersehll;
 
+    struct wlr_data_device_manager *data_device_mgr;
+    struct wl_listener request_start_drag;
+
     struct wlr_output_layout *output_layout;
     struct wl_listener output_layout_change;
     struct wl_list outputs;

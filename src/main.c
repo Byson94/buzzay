@@ -177,7 +177,6 @@ static int start_compositor() {
 
     wlr_compositor_create(server.wl_display, 5, server.renderer);
     wlr_subcompositor_create(server.wl_display);
-    wlr_data_device_manager_create(server.wl_display);
 
     // output layout helps in working with arrangement of screens in 
     // a physical layout.
@@ -314,6 +313,11 @@ static int start_compositor() {
 	wl_signal_add(&server.seat->events.request_set_selection,
 			&server.request_set_selection);
 
+    // Create data device for handling text/uri dragging
+    server.data_device_mgr = wlr_data_device_manager_create(server.wl_display);
+    server.request_start_drag.notify = server_handle_request_start_drag;
+    wl_signal_add(&server.seat->events.request_start_drag, &server.request_start_drag);
+
     const char *wayland_socket = wl_display_add_socket_auto(server.wl_display);
     if (!wayland_socket) {
         wlr_backend_destroy(server.backend);
@@ -384,6 +388,7 @@ static int start_compositor() {
 	wl_list_remove(&server.cursor_frame.link);
     wl_list_remove(&server.cursor_request_set_shape.link);
     wl_list_remove(&server.request_cursor.link);
+    wl_list_remove(&server.request_start_drag.link);
 
     wl_list_remove(&server.new_input.link);
     wl_list_remove(&server.new_output.link);
