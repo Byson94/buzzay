@@ -11,7 +11,6 @@ A plugin-first wayland compositor.
 
 user/getting-started
 user/config/index
-user/env-vars
 user/xwayland
 ```
 
