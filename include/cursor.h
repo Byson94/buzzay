@@ -22,12 +22,20 @@ struct bz_underlying_surface {
     void *item;
 };
 
+struct drag_icon_state {
+    struct buzzay_server *server;
+    struct wlr_scene_tree *scene_tree;
+    struct wlr_drag_icon *icon;
+    struct wl_listener destroy;
+};
+
 void server_cursor_motion(struct wl_listener *listener, void *data);
 void server_cursor_motion_absolute(struct wl_listener *listener, void *data);
 void server_cursor_button(struct wl_listener *listener, void *data);
 void server_cursor_axis(struct wl_listener *listener, void *data);
 void server_cursor_frame(struct wl_listener *listener, void *data);
 void server_handle_request_start_drag(struct wl_listener *listener, void *data);
+void server_handle_start_drag(struct wl_listener *listener, void *data);
 
 void seat_request_cursor(struct wl_listener *listener, void *data);
 void seat_pointer_focus_change(struct wl_listener *listener, void *data);

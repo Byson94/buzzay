@@ -1,5 +1,8 @@
+#include <stdlib.h>
 #include <wayland-client-core.h>
+#include <wayland-server-core.h>
 #include <wayland-server-protocol.h>
+#include <wayland-util.h>
 #include <wlr/backend.h>
 #include <wlr/util/log.h>
 #include <wlr/types/wlr_cursor.h>
@@ -157,6 +160,15 @@ static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
                 layershell = surface_under->item;
                 break;
         }
+    }
+
+    // Move the dragged thing to the cursor
+    if (server->active_drag_icon_state && server->active_drag_icon_state->scene_tree) {
+        wlr_scene_node_set_position(
+            &server->active_drag_icon_state->scene_tree->node,
+            server->cursor->x,
+            server->cursor->y
+        );
     }
 
 	if (!toplevel && !layershell) {
@@ -352,9 +364,36 @@ void server_handle_request_start_drag(struct wl_listener *listener, void *data) 
     struct wlr_seat_request_start_drag_event *event = data;
 
     if (wlr_seat_validate_pointer_grab_serial(server->seat, event->origin, event->serial)) {
-        wlr_seat_start_drag(server->seat, event->drag, event->serial);
+        wlr_seat_start_pointer_drag(server->seat, event->drag, event->serial);
     } else {
         wlr_data_source_destroy(event->drag->source);
+    }
+}
+
+
+static void drag_icon_handle_destroy(struct wl_listener *listener, void *data) {
+    UNUSED(data);
+    struct drag_icon_state *state = wl_container_of(listener, state, destroy);
+    state->server->active_drag_icon_state = NULL;
+
+    wl_list_remove(&state->destroy.link);
+    free(state);
+}
+
+void server_handle_start_drag(struct wl_listener *listener, void *data) {
+    struct buzzay_server *server = wl_container_of(listener, server, seat_start_drag);
+    struct wlr_drag *drag = data;
+
+    if (drag->icon) {
+        struct drag_icon_state *state = calloc(1, sizeof(*state));
+        state->icon = drag->icon;
+        state->server = server;
+        state->scene_tree = wlr_scene_drag_icon_create(&server->scene->tree, drag->icon);
+
+        state->destroy.notify = drag_icon_handle_destroy;
+        wl_signal_add(&drag->icon->events.destroy, &state->destroy);
+
+        server->active_drag_icon_state = state;
     }
 }
 

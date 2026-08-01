@@ -7,7 +7,7 @@ xwayland-satellite on buzzay.
 ## Installation
 
 `xwayland-satellite` is a pretty known program that should be available in your linux distro's package manager. Just install it from there.
-If you are **not** installing it from your package manager, then make sure that it is installed to the `/usr/bin/xwayland-satellite` directory.
+If you are **not** installing it from your package manager, then make sure that it is installed to `/usr/bin/xwayland-satellite`.
 
 ## Setup
 

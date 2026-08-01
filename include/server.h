@@ -97,6 +97,9 @@ struct buzzay_server {
 
     struct wlr_data_device_manager *data_device_mgr;
     struct wl_listener request_start_drag;
+    struct wl_listener seat_start_drag;
+    struct wl_listener drag_icon_destroy;
+    struct drag_icon_state *active_drag_icon_state;
 
     struct wlr_output_layout *output_layout;
     struct wl_listener output_layout_change;

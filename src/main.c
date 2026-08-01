@@ -291,7 +291,9 @@ static int start_compositor() {
     // Create data device for handling text/uri dragging
     server.data_device_mgr = wlr_data_device_manager_create(server.wl_display);
     server.request_start_drag.notify = server_handle_request_start_drag;
+    server.seat_start_drag.notify = server_handle_start_drag;
     wl_signal_add(&server.seat->events.request_start_drag, &server.request_start_drag);
+    wl_signal_add(&server.seat->events.start_drag, &server.seat_start_drag);
 
     const char *wayland_socket = wl_display_add_socket_auto(server.wl_display);
     if (!wayland_socket) {
@@ -370,6 +372,7 @@ static int start_compositor() {
     wl_list_remove(&server.cursor_request_set_shape.link);
     wl_list_remove(&server.request_cursor.link);
     wl_list_remove(&server.request_start_drag.link);
+    wl_list_remove(&server.seat_start_drag.link);
 
     wl_list_remove(&server.new_input.link);
     wl_list_remove(&server.new_output.link);
@@ -377,6 +380,8 @@ static int start_compositor() {
     wl_list_remove(&server.new_layer_surface.link);
     wl_list_remove(&server.set_gamma.link);
     wl_list_remove(&server.idle_new_inhibitor.link);
+
+    wl_list_remove(&server.set_primary_selection.link);
 
     wlr_scene_node_destroy(&server.scene->tree.node);
     wlr_xcursor_manager_destroy(server.cursor_mgr);
