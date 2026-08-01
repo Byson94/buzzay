@@ -23,3 +23,14 @@ The opacity of each window. Must be a floating number (a.k.a decimal number).
 [candy]
 opacity = 0.9
 ```
+
+## corner-radius
+
+The corner radius of the window. Also known as the "curved corners". Must be an integer.
+
+**Example:**
+
+```toml
+[candy]
+corner-radius = 5
+```

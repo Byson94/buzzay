@@ -31,6 +31,8 @@ size = 24
 gap = 2
 # opacity of each window (0.0 - 1.0)
 opacity = 1.0
+# how much to curve a window
+corner-radius = 5
 
 [candy.border]
 # How thick the window border should be
@@ -47,6 +49,10 @@ enabled = true
 strength = 1.0
 # alpha of the blur (0.0 - 1.0)
 alpha = 1.0
+# num of blur passes
+passes = 3
+# noise of the blur (glassy effect) (0.0 - 1.0)
+noise = 0.0
 
 # == Keybindings ==
 
