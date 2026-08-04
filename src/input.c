@@ -92,6 +92,43 @@ void clear_all_keybinding() {
     }
 }
 
+struct keybinding_entry *safe_clear_all_keybindings(void) {
+    struct keybinding_entry *current, *tmp;
+    struct keybinding_entry *backup_list = NULL;
+
+    HASH_ITER(hh, keybindings_map, current, tmp) {
+        HASH_DEL(keybindings_map, current);
+        
+        current->hh.next = (void *)backup_list;
+        backup_list = current;
+    }
+
+    return backup_list;
+}
+
+void commit_keybinding_clear(struct keybinding_entry *backup_list) {
+    struct keybinding_entry *current, *tmp;
+
+    current = backup_list;
+    while (current != NULL) {
+        tmp = (struct keybinding_entry *)current->hh.next;
+        free(current);
+        current = tmp;
+    }
+}
+
+void revert_keybinding_clear(struct keybinding_entry *backup_list) {
+    struct keybinding_entry *current, *tmp;
+
+    current = backup_list;
+    while (current != NULL) {
+        tmp = (struct keybinding_entry *)current->hh.next;
+        memset(&current->hh, 0, sizeof(UT_hash_handle));
+        HASH_ADD_KEYPTR(hh, keybindings_map, &current->key, sizeof(uint64_t), current);
+        current = tmp;
+    }
+}
+
 static void keyboard_handle_modifiers(struct wl_listener *listener, void *data) {
     UNUSED(data);
 

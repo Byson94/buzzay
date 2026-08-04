@@ -86,8 +86,14 @@ static int handle_config_change(int fd, uint32_t mask, void *data) {
     }
 
     cleanup_all_watchers();
-    clear_all_keybinding();
-    handle_config(server->config_file, server);
+    struct keybinding_entry *backup_kbs = safe_clear_all_keybindings();
+    int res = handle_config(server->config_file, server);
+
+    if (res == 0) {
+        commit_keybinding_clear(backup_kbs);
+    } else {
+        revert_keybinding_clear(backup_kbs);
+    }
 
     return 0;
 }
@@ -640,7 +646,11 @@ int handle_keybinding_table(struct buzzay_server *server, const char *key, toml_
 int handle_config(const char *path, struct buzzay_server *server) {
     toml_result_t result = toml_parse_file_ex(path);
     if (!result.ok) {
-        printf("Failed to parse toml: %s\n", result.errmsg);
+        char msg[1024];
+        snprintf(msg, sizeof(msg), "Failed to parse config: '%s'\n", result.errmsg);
+
+        printf("%s", msg);
+        create_error_bar(500, msg);
         return 1;
     }
 

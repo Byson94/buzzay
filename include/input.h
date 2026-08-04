@@ -47,5 +47,8 @@ extern struct keybinding_entry *keybindings_map;
 void apply_keyboard_config_to_device(struct wlr_keyboard *keyboard, const char *layout, const char *variant, const char *options);
 void register_keybinding(struct keybinding binding);
 void clear_all_keybinding();
+struct keybinding_entry *safe_clear_all_keybindings(void);
+void commit_keybinding_clear(struct keybinding_entry *backup_list);
+void revert_keybinding_clear(struct keybinding_entry *backup_list);
 void server_new_input(struct wl_listener *listener, void *data);
 int handle_kb_repeat_timer(void *data);
