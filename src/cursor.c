@@ -212,8 +212,10 @@ static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
 		/* Clear pointer focus so future button events and such are not sent to
 		 * the last client to have the cursor over it. */
         if (server->focused_layersehll) return;
-		wlr_seat_pointer_clear_focus(seat);
-        wlr_seat_keyboard_clear_focus(seat);
+        if (server->window_active_on != WINDOW_ACTIVE_ON_CLICK) {
+            wlr_seat_pointer_clear_focus(seat);
+            wlr_seat_keyboard_clear_focus(seat);
+        }
 	}
 }
 

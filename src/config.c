@@ -644,6 +644,11 @@ int handle_keybinding_table(struct buzzay_server *server, const char *key, toml_
 }
 
 int handle_config(const char *path, struct buzzay_server *server) {
+    // First setup watcher
+    if (!is_path_watched(path)) {
+        add_config_watcher(server, path);
+    }
+
     toml_result_t result = toml_parse_file_ex(path);
     if (!result.ok) {
         char msg[1024];
@@ -652,11 +657,6 @@ int handle_config(const char *path, struct buzzay_server *server) {
         printf("%s", msg);
         create_error_bar(500, msg);
         return 1;
-    }
-
-    // First setup watcher
-    if (!is_path_watched(path)) {
-        add_config_watcher(server, path);
     }
 
     // Handle keybindings (must be first as its very important)
@@ -716,7 +716,7 @@ int handle_config(const char *path, struct buzzay_server *server) {
         }
     }
 
-    if (not_unknown(core_layout_mode)) {
+    if (not_unknown(core_layout_mode) && server->server_first_load) {
         if (strcmp(core_layout_mode.u.s, "tiling") == 0) {
             server->window_layout_mode = BZ_LAYOUT_TILE;
         } else if (strcmp(core_layout_mode.u.s, "monocle") == 0) {

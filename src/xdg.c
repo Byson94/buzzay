@@ -20,6 +20,10 @@
 
 // Helpers
 void scene_set_blur_confs(struct buzzay_server *server) {
+    if (server->eyecandies.blur_passes >= 20) {
+        server->eyecandies.blur_passes = 20;
+    }
+
     wlr_scene_set_blur_num_passes(server->scene, server->eyecandies.blur_passes);
     wlr_scene_set_blur_noise(server->scene, server->eyecandies.blur_noise);
 }
