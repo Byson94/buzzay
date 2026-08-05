@@ -141,7 +141,10 @@ static void xdg_toplevel_commit(struct wl_listener *listener, void *data) {
         */
 		wlr_xdg_toplevel_set_size(toplevel->xdg_toplevel, 0, 0);
         wlr_xdg_surface_schedule_configure(toplevel->xdg_toplevel->base);
-	}
+	} else if (!toplevel->cursor_processed) {
+        process_cursor_motion(toplevel->server, NULL);
+        toplevel->cursor_processed = true;
+    }
 }
 
 static void xdg_toplevel_destroy(struct wl_listener *listener, void *data) {

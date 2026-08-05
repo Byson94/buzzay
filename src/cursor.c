@@ -129,7 +129,7 @@ static bool is_native_overlay(struct buzzay_server *server) {
     return false;
 }
 
-static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
+void process_cursor_motion(struct buzzay_server *server, uint32_t *time) {
     // Notify activity first.
     wlr_idle_notifier_v1_notify_activity(server->idle_notifier, server->seat);
 
@@ -207,7 +207,8 @@ static void process_cursor_motion(struct buzzay_server *server, uint32_t time) {
 		 * aware of the coordinates passed.
 		 */
 		wlr_seat_pointer_notify_enter(seat, surface, sx, sy);
-		wlr_seat_pointer_notify_motion(seat, time, sx, sy);
+        if (time)
+            wlr_seat_pointer_notify_motion(seat, *time, sx, sy);
 	} else {
 		/* Clear pointer focus so future button events and such are not sent to
 		 * the last client to have the cursor over it. */
@@ -232,7 +233,7 @@ void server_cursor_motion(struct wl_listener *listener, void *data) {
 	 * the cursor around without any input. */
 	wlr_cursor_move(server->cursor, &event->pointer->base,
 			event->delta_x, event->delta_y);
-    process_cursor_motion(server, event->time_msec);
+    process_cursor_motion(server, &event->time_msec);
 }
 
 void server_cursor_motion_absolute(
@@ -249,7 +250,7 @@ void server_cursor_motion_absolute(
 	wlr_cursor_warp_absolute(server->cursor, &event->pointer->base, event->x,
 		event->y);
 
-    process_cursor_motion(server, event->time_msec);
+    process_cursor_motion(server, &event->time_msec);
 }
 
 void server_cursor_button(struct wl_listener *listener, void *data) {
@@ -379,6 +380,7 @@ static void drag_icon_handle_destroy(struct wl_listener *listener, void *data) {
     struct drag_icon_state *state = wl_container_of(listener, state, destroy);
     state->server->active_drag_icon_state = NULL;
 
+    process_cursor_motion(state->server, NULL);
     wl_list_remove(&state->destroy.link);
     free(state);
 }

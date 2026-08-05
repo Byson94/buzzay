@@ -20,6 +20,7 @@ struct buzzay_toplevel {
 	struct wl_listener request_fullscreen;
 
     bool is_floating;
+    bool cursor_processed;
     struct buzzay_workspace *in_workspace;
 };
 

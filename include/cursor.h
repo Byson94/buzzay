@@ -29,6 +29,7 @@ struct drag_icon_state {
     struct wl_listener destroy;
 };
 
+void process_cursor_motion(struct buzzay_server *server, uint32_t *time);
 void server_cursor_motion(struct wl_listener *listener, void *data);
 void server_cursor_motion_absolute(struct wl_listener *listener, void *data);
 void server_cursor_button(struct wl_listener *listener, void *data);
